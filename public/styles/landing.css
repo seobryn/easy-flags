@@ -108,6 +108,14 @@
 
 .tile-header {
     margin-bottom: 1rem;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.tile-header > div:first-child {
+    justify-content: center;
+    margin-bottom: 0.5rem;
 }
 
 .comparison-badge {
