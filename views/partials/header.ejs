@@ -20,25 +20,6 @@
         <path d="M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <!-- Mobile drawer & backdrop -->
-    <div id="navBackdrop" style="z-index:9998; display:none;" class="fixed inset-0 bg-black/60 transition-opacity opacity-0 pointer-events-none sm:hidden" aria-hidden="true"></div>
-
-    <nav id="mobileNav" style="z-index:9999" class="-translate-x-full fixed inset-y-0 left-0 w-64 bg-slate-900 backdrop-blur p-6 transform transition-transform sm:hidden" aria-hidden="true">
-      <div class="flex items-center justify-between mb-6">
-        <a href="/" class="logo header text-lg font-bold text-white no-underline">EF</a>
-        <button id="mobileClose" class="text-slate-400 text-2xl leading-none" aria-label="Close menu">×</button>
-      </div>
-      <% if (typeof user !== 'undefined' && user) { %>
-        <button data-nav="envs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Environments</button>
-        <button data-nav="features" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Feature Flags</button>
-        <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Docs</button>
-        <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Logout</button>
-      <% } else { %>
-        <button data-nav="pricing" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/billing'">Pricing</button>
-        <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/api/openapi.json'">API</button>
-        <button data-nav="login" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/login'">Login</button>
-      <% } %>
-    </nav>
     <!-- Nav menu (inside header; styled as drawer on mobile) -->
     <div class="nav-placeholder hidden sm:block" aria-hidden="true">
       <nav class="nav flex gap-2 items-center" id="mainNav" role="navigation" aria-label="Main navigation">
@@ -60,3 +41,23 @@
 </div>
 
 <script src="/js/header.js"></script>
+
+<!-- Mobile drawer & backdrop (placed outside header to avoid layout interference) -->
+<div id="navBackdrop" style="z-index:9998; display:none;" class="fixed inset-0 bg-black/60 transition-opacity opacity-0 pointer-events-none sm:hidden" aria-hidden="true"></div>
+
+<nav id="mobileNav" style="z-index:9999" class="-translate-x-full fixed inset-y-0 left-0 w-64 bg-slate-900 backdrop-blur p-6 transform transition-transform sm:hidden" aria-hidden="true">
+  <div class="flex items-center justify-between mb-6">
+    <a href="/" class="logo header text-lg font-bold text-white no-underline">EF</a>
+    <button id="mobileClose" class="text-slate-400 text-2xl leading-none" aria-label="Close menu">×</button>
+  </div>
+  <% if (typeof user !== 'undefined' && user) { %>
+    <button data-nav="envs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Environments</button>
+    <button data-nav="features" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Feature Flags</button>
+    <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Docs</button>
+    <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Logout</button>
+  <% } else { %>
+    <button data-nav="pricing" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/billing'">Pricing</button>
+    <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/api/openapi.json'">API</button>
+    <button data-nav="login" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/login'">Login</button>
+  <% } %>
+</nav>
