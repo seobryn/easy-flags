@@ -1003,9 +1003,48 @@
     }
   }
 
+  /* Desktop nav styles - override mobile drawer styles */
   @media (min-width: 640px) {
+    .nav {
+      display: flex !important;
+      position: static !important;
+      top: auto !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: auto !important;
+      max-width: none !important;
+      transform: none !important;
+      transition: none !important;
+      flex-direction: row !important;
+      gap: calc(var(--spacing) * 1);
+      padding: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      z-index: auto !important;
+      overflow: visible !important;
+    }
+
+    .nav.open {
+      transform: none !important;
+    }
+
+    .nav .nav-btn {
+      width: auto !important;
+      text-align: center !important;
+      padding-inline: calc(var(--spacing) * 2.5);
+      padding-block: calc(var(--spacing) * 2);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+    }
+
     .nav-backdrop {
       display: none !important;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .nav {
+      gap: calc(var(--spacing) * 2);
     }
   }
 
