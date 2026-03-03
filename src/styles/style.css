@@ -1873,15 +1873,18 @@
         box-sizing: border-box;
         padding: 0.35rem 0.5rem;
     }
+
     /* Ensure text (left column) appears before the graph on small screens */
     .container>section:last-of-type .flex {
         display: flex;
         flex-direction: column;
     }
-    .container>section:last-of-type .flex > .flex-1 {
+
+    .container>section:last-of-type .flex>.flex-1 {
         order: 1;
     }
-    .container>section:last-of-type .flex > .panel-right {
+
+    .container>section:last-of-type .flex>.panel-right {
         order: 2;
     }
 }

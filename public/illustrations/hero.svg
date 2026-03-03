@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 350" role="img" aria-label="Hero illustration">
+  <defs>
+    <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="0">
+      <stop offset="0%" stop-color="#06b6d4" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </linearGradient>
+    <linearGradient id="heroGradientSoft" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(6,182,212,0.2)" />
+      <stop offset="100%" stop-color="rgba(6,182,212,0.03)" />
+    </linearGradient>
+    <linearGradient id="g1" x1="0" x2="1">
+      <stop offset="0" stop-color="#06b6d4"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#071023" rx="20" />
+  <g transform="translate(40,0)">
+    <rect x="24" y="24" width="752" height="300" rx="28" fill="rgba(255,255,255,0.04)" />
+    <rect x="56" y="56" width="688" height="248" rx="22" fill="url(#heroGradientSoft)" stroke="rgba(255,255,255,0.08)" />
+    <rect x="88" y="86" width="210" height="18" rx="9" fill="url(#heroGradient)" />
+    <rect x="88" y="118" width="340" height="12" rx="6" fill="rgba(255,255,255,0.14)" />
+    <rect x="88" y="142" width="300" height="12" rx="6" fill="rgba(255,255,255,0.12)" />
+    <rect x="88" y="178" width="218" height="102" rx="18" fill="rgba(255,255,255,0.06)" />
+    <rect x="326" y="178" width="218" height="102" rx="18" fill="rgba(255,255,255,0.06)" />
+    <rect x="564" y="178" width="152" height="102" rx="18" fill="rgba(255,255,255,0.06)" />
+    <line x1="197" y1="229" x2="435" y2="229" stroke="rgba(255,255,255,0.18)" stroke-width="2" />
+    <line x1="435" y1="229" x2="640" y2="229" stroke="rgba(255,255,255,0.18)" stroke-width="2" />
+    <circle class="hero-dot hero-dot-1" cx="197" cy="229" r="13" fill="url(#heroGradient)" />
+    <circle class="hero-dot hero-dot-2" cx="435" cy="229" r="13" fill="url(#heroGradient)" />
+    <circle class="hero-dot hero-dot-3" cx="640" cy="229" r="13" fill="url(#heroGradient)" />
+    <rect x="118" y="242" width="64" height="10" rx="5" fill="rgba(255,255,255,0.18)" />
+    <rect x="356" y="242" width="64" height="10" rx="5" fill="rgba(255,255,255,0.18)" />
+    <rect class="hero-cta" x="596" y="212" width="88" height="34" rx="17" fill="rgba(6,182,212,0.2)" stroke="rgba(6,182,212,0.45)" />
+    <circle cx="665" cy="229" r="12" fill="url(#heroGradient)" />
+    <circle cx="684" cy="96" r="16" fill="url(#heroGradient)" />
+    <circle cx="712" cy="96" r="7" fill="rgba(255,255,255,0.3)" />
+  </g>
+</svg>

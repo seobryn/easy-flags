@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 220" role="img" aria-label="Quick start illustration">
+  <rect class="qs-card" x="16" y="16" width="388" height="188" rx="18" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" />
+  <rect class="qs-topbar" x="40" y="46" width="152" height="14" rx="7" fill="rgba(6,182,212,0.75)" />
+  <rect class="qs-line" x="40" y="72" width="230" height="10" rx="5" fill="rgba(255,255,255,0.2)" />
+  <rect class="qs-line" x="40" y="96" width="188" height="10" rx="5" fill="rgba(255,255,255,0.14)" />
+  <rect class="qs-chip" x="40" y="128" width="104" height="44" rx="12" fill="rgba(255,255,255,0.06)" />
+  <rect class="qs-chip" x="158" y="128" width="104" height="44" rx="12" fill="rgba(255,255,255,0.06)" />
+  <rect class="qs-chip" x="276" y="128" width="104" height="44" rx="12" fill="rgba(255,255,255,0.06)" />
+  <circle class="qs-badge" cx="332" cy="54" r="11" fill="rgba(6,182,212,0.78)" />
+  <rect class="qs-cta" x="300" y="84" width="72" height="30" rx="15" fill="rgba(6,182,212,0.2)" stroke="rgba(6,182,212,0.5)" />
+  <circle class="qs-cta-dot" cx="355" cy="99" r="10" fill="rgba(6,182,212,0.9)" />
+</svg>
