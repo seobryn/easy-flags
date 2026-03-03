@@ -17,30 +17,7 @@
     class="antialiased bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950"
   >
     <div class="root h-full">
-      <div class="top">
-        <div class="flex items-center gap-3 flex-1 min-w-0">
-          <div class="logo header">FF</div>
-          <h2 class="text-base sm:text-xl md:text-2xl font-bold truncate">
-            Easy Flags
-          </h2>
-        </div>
-        <div class="nav hidden sm:flex">
-          <button
-            type="button"
-            class="nav-btn"
-            onclick="window.location.href = '/login'"
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            class="nav-btn"
-            onclick="window.location.href = '/api/openapi.json'"
-          >
-            API
-          </button>
-        </div>
-      </div>
+      <%- include('partials/header') %>
 
       <div class="container mt-6 p-4 space-y-4">
         <!-- Hero -->
