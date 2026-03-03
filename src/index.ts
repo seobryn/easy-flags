@@ -24,6 +24,20 @@ app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 app.use(cookieParser());
 
+// Expose `user` to EJS templates when a valid auth cookie is present
+app.use((req, res, next) => {
+  const token = (req.cookies as any)?.ff_token;
+  if (token) {
+    try {
+      // verifyToken returns the decoded payload
+      (res as any).locals.user = verifyToken(token);
+    } catch (err) {
+      // invalid token - ignore and continue without user
+    }
+  }
+  next();
+});
+
 // Set view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
