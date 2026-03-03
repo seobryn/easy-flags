@@ -1007,20 +1007,22 @@
   @media (min-width: 640px) {
     .nav {
       display: flex !important;
-      position: static !important;
-      top: auto !important;
-      right: auto !important;
+      position: fixed !important;
+      top: 0 !important;
+      right: calc(var(--spacing) * 4) !important;
       bottom: auto !important;
       width: auto !important;
       max-width: none !important;
+      height: calc(var(--spacing) * 12) !important;
       transform: none !important;
       transition: none !important;
       flex-direction: row !important;
+      align-items: center;
       gap: calc(var(--spacing) * 1);
       padding: 0 !important;
       background: transparent !important;
       box-shadow: none !important;
-      z-index: auto !important;
+      z-index: 41 !important;
       overflow: visible !important;
     }
 
@@ -1044,7 +1046,7 @@
 
   @media (min-width: 1024px) {
     .nav {
-      gap: calc(var(--spacing) * 2);
+      gap: calc(var(--spacing) * 2) !important;
     }
   }
 
