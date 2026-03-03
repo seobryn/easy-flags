@@ -21,23 +21,27 @@
       </svg>
     </button>
 
-    <!-- Nav menu -->
-    <nav class="nav" id="mainNav">
-      <% if (typeof user !== 'undefined' && user) { %>
-        <button data-nav="envs" type="button" class="nav-btn">Environments</button>
-        <button data-nav="features" type="button" class="nav-btn">Feature Flags</button>
-        <button data-nav="docs" type="button" class="nav-btn">Docs</button>
-        <button id="btnLogout" type="button" class="nav-btn">Logout</button>
-      <% } else { %>
-        <button type="button" class="nav-btn" onclick="window.location.href = '/billing'">Pricing</button>
-        <button type="button" class="nav-btn" onclick="window.location.href = '/api/openapi.json'">API</button>
-        <button type="button" class="nav-btn" onclick="window.location.href = '/login'">Login</button>
-      <% } %>
-    </nav>
+    <!-- Nav menu (moved outside .top for correct fixed positioning) -->
+    <div class="nav-placeholder" aria-hidden="true"></div>
   </div>
 
-  <!-- Backdrop for mobile drawer -->
-  <div id="navBackdrop" class="nav-backdrop" aria-hidden="true"></div>
+  <!-- Backdrop placeholder -->
+  <div class="nav-backdrop-placeholder" aria-hidden="true"></div>
 </div>
+
+<!-- Render actual nav and backdrop outside of header to avoid stacking-context bugs -->
+<nav class="nav" id="mainNav">
+  <% if (typeof user !== 'undefined' && user) { %>
+    <button data-nav="envs" type="button" class="nav-btn">Environments</button>
+    <button data-nav="features" type="button" class="nav-btn">Feature Flags</button>
+    <button data-nav="docs" type="button" class="nav-btn">Docs</button>
+    <button id="btnLogout" type="button" class="nav-btn">Logout</button>
+  <% } else { %>
+    <button type="button" class="nav-btn" onclick="window.location.href = '/billing'">Pricing</button>
+    <button type="button" class="nav-btn" onclick="window.location.href = '/api/openapi.json'">API</button>
+    <button type="button" class="nav-btn" onclick="window.location.href = '/login'">Login</button>
+  <% } %>
+</nav>
+<div id="navBackdrop" class="nav-backdrop" aria-hidden="true"></div>
 
 <script src="/js/header.js"></script>
