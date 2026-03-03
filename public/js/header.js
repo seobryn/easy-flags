@@ -75,6 +75,10 @@ function handleHamburgerClick(e) {
   if (!nav) return;
   const isOpen = nav.classList.toggle("open");
   const hamb = document.getElementById("hamburger");
+  const backdrop = document.getElementById("navBackdrop");
+  if (backdrop) {
+    backdrop.classList.toggle("visible", isOpen);
+  }
   if (hamb) hamb.setAttribute("aria-expanded", isOpen ? "true" : "false");
 }
 
@@ -90,8 +94,24 @@ function handleBodyClick(e) {
   const target = e.target;
   if (nav.contains(target) || (hamb && hamb.contains(target))) return;
   nav.classList.remove("open");
+  const backdrop = document.getElementById("navBackdrop");
+  if (backdrop) backdrop.classList.remove("visible");
   if (hamb) hamb.setAttribute("aria-expanded", "false");
 }
+
+// Close drawer when clicking the backdrop (supports tapping the overlay)
+document.addEventListener("DOMContentLoaded", function () {
+  const backdrop = document.getElementById("navBackdrop");
+  if (backdrop) {
+    backdrop.addEventListener("click", function () {
+      const nav = document.getElementById("mainNav");
+      const hamb = document.getElementById("hamburger");
+      if (nav) nav.classList.remove("open");
+      backdrop.classList.remove("visible");
+      if (hamb) hamb.setAttribute("aria-expanded", "false");
+    });
+  }
+});
 
 // Initialize on DOMContentLoaded
 document.addEventListener("DOMContentLoaded", initHeaderModule);
