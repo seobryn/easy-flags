@@ -18,7 +18,7 @@
     <div class="root h-full">
       <%- include('partials/header') %>
 
-      <div class="container mt-4 sm:mt-6 p-4 space-y-4">
+      <div class="container mt-4 sm:mt-6 p-4">
         <!-- Hero -->
         <section class="mt-6">
           <div class="space-y-4">
@@ -258,79 +258,16 @@
           </div>
         </section>
 
-        <!-- CTA -->
-        <section class="mt-6">
-          <div class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1 space-y-4">
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-12 h-12 rounded-full flex items-center justify-center text-xl bg-cyan-200/20 shadow-lg"
-                >
-                  <img class="icon" src="/icons/bolt.svg" alt="Bolt" />
-                </div>
-                <div>
-                  <h3>Ready to launch with confidence?</h3>
-                  <p class="text-sm text-slate-400">
-                    Fast setup. Clear control. Safer releases.
-                  </p>
-                </div>
-              </div>
-
-              <div class="rounded-lg bg-white/5 p-3">
-                <p class="text-sm text-slate-400">
-                  <img
-                    class="icon inline-check"
-                    src="/icons/check.svg"
-                    alt="Check"
-                  />
-                  Manage all flags in one place
-                </p>
-                <p class="text-sm text-slate-400">
-                  <img
-                    class="icon inline-check"
-                    src="/icons/check.svg"
-                    alt="Check"
-                  />
-                  Roll out changes with less risk
-                </p>
-                <p class="text-sm text-slate-400">
-                  <img
-                    class="icon inline-check"
-                    src="/icons/check.svg"
-                    alt="Check"
-                  />
-                  Improve user experience continuously
-                </p>
-              </div>
-              <div class="flex flex-col sm:flex-row gap-2">
-                <button
-                  type="button"
-                  class="bg-cyan-500 text-white px-4 py-2 rounded-md hover:shadow-md transition transform hover:-translate-y-1 w-full sm:w-auto"
-                  onclick="window.location.href = '/login'"
-                >
-                  Start Now
-                </button>
-                <button
-                  type="button"
-                  class="border border-white/10 text-white px-4 py-2 rounded-md hover:bg-white/3 transition w-full sm:w-auto"
-                  onclick="window.location.href = '/api/openapi.json'"
-                >
-                  View API Spec
-                </button>
-              </div>
-
-              <p class="text-sm text-slate-400">
-                No complex setup. Create flags and ship.
-              </p>
+        <!-- CTA: focused -->
+        <section class="mt-8">
+          <div class="rounded-lg bg-white/4 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <h4 class="text-lg font-semibold text-white">Ready to get started?</h4>
+              <p class="text-sm text-slate-400">Create flags and ship faster with confidence.</p>
             </div>
-
-            <div class="w-full max-w-lg rounded-lg bg-white/5 p-4 shadow-2xl">
-              <!-- External SVG: quickstart illustration -->
-              <img
-                class="qs-illustration"
-                src="/illustrations/quickstart.svg"
-                alt="Quick start illustration"
-              />
+            <div class="flex gap-3">
+              <button onclick="window.location.href='/login'" class="bg-cyan-500 text-white px-4 py-2 rounded-md shadow-sm">Create account</button>
+              <a href="/api/openapi.json" class="text-sm text-slate-300 self-center underline">API Reference</a>
             </div>
           </div>
         </section>
