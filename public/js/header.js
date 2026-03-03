@@ -5,7 +5,29 @@
  */
 function initHeaderModule() {
   initNavigation();
+  moveDrawerToBody();
   initMobileMenu();
+}
+
+/**
+ * Move mobile drawer and backdrop to document.body to avoid stacking-context issues
+ * that can cause the drawer to appear behind transformed/positioned ancestors.
+ */
+function moveDrawerToBody() {
+  if (typeof document === "undefined") return;
+  const mobileNav = document.getElementById("mobileNav");
+  const backdrop = document.getElementById("navBackdrop");
+  try {
+    if (backdrop && backdrop.parentElement !== document.body) {
+      document.body.appendChild(backdrop);
+    }
+    if (mobileNav && mobileNav.parentElement !== document.body) {
+      document.body.appendChild(mobileNav);
+    }
+  } catch (err) {
+    // ignore errors if DOM modifications are not allowed
+    console.error("moveDrawerToBody error:", err);
+  }
 }
 
 /**
