@@ -1834,34 +1834,40 @@
 
 /* Make CTA (last section) layout column-friendly for tables and svg on small screens */
 @media (max-width: 640px) {
-    .container > section:last-of-type {
+    .container>section:last-of-type {
         display: block;
     }
-    .container > section:last-of-type .panel-right {
+
+    .container>section:last-of-type .panel-right {
         width: 100%;
         max-width: none;
         margin-top: 1rem;
     }
-    .container > section:last-of-type .checklist-panel {
+
+    .container>section:last-of-type .checklist-panel {
         width: 100%;
     }
-    .container > section:last-of-type .panel-right svg {
+
+    .container>section:last-of-type .panel-right svg {
         width: 100%;
         height: auto;
     }
+
     /* Responsive tables inside the last section: stack cells vertically */
-    .container > section:last-of-type table {
+    .container>section:last-of-type table {
         display: block;
         width: 100%;
         overflow: auto;
     }
-    .container > section:last-of-type table thead,
-    .container > section:last-of-type table tbody,
-    .container > section:last-of-type table tr {
+
+    .container>section:last-of-type table thead,
+    .container>section:last-of-type table tbody,
+    .container>section:last-of-type table tr {
         display: block;
     }
-    .container > section:last-of-type table th,
-    .container > section:last-of-type table td {
+
+    .container>section:last-of-type table th,
+    .container>section:last-of-type table td {
         display: block;
         width: 100%;
         box-sizing: border-box;
