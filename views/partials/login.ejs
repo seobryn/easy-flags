@@ -1,65 +1,69 @@
 <!-- Login Screen -->
-<div id="login" class="fixed inset-0 flex items-center justify-center p-4">
-  <div class="bg-white/5 rounded-lg p-6 max-w-lg relative">
-    <div id="loginMsg" class="space-y-1"></div>
+<div id="login" class="fixed inset-0 flex items-center justify-center bg-black/40">
+  <div class="w-full h-full sm:h-auto sm:w-auto sm:max-w-md mx-auto">
+    <div class="bg-white/6 backdrop-blur-sm p-6 w-full h-full sm:rounded-lg sm:shadow-lg relative flex flex-col justify-center">
+      <div id="loginMsg" class="space-y-1"></div>
 
-    <a
-      href="/"
-      class="absolute top-3 left-3 flex items-center gap-2 text-sm text-slate-400 no-underline"
-      aria-label="Back to home"
-    >
-      <svg
-        width="18"
-        height="18"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
+      <a
+        href="/"
+        class="absolute top-3 left-3 flex items-center gap-2 text-sm text-slate-300 no-underline"
+        aria-label="Back to home"
       >
-        <polyline
-          points="15 18 9 12 15 6"
-          stroke="currentColor"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
           fill="none"
-        />
-      </svg>
-      <span>Back to home</span>
-    </a>
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <polyline
+            points="15 18 9 12 15 6"
+            stroke="#ffffff"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          />
+        </svg>
+        <span>Back to home</span>
+      </a>
 
-    <div class="flex items-center gap-4 mb-4">
-      <div class="logo login">FF</div>
-      <div>
-        <h2 class="text-cyan-accent mb-1 text-2xl font-bold">Welcome back</h2>
-        <p class="text-sm text-slate-400">
-          Manage feature flags across environments
-        </p>
+      <div class="flex items-center gap-4 mb-4">
+        <div class="w-12 h-12 rounded-md bg-cyan-500 flex items-center justify-center text-white font-bold">FF</div>
+        <div>
+          <h2 class="text-white mb-1 text-2xl font-bold">Welcome back</h2>
+          <p class="text-sm text-slate-300">
+            Manage feature flags across environments
+          </p>
+        </div>
       </div>
-    </div>
 
-    <form id="loginForm" class="login-form">
-      <input
-        id="username"
-        placeholder="Username"
-        type="text"
-        autocomplete="username"
-      />
-      <input
-        id="password"
-        placeholder="Password"
-        type="password"
-        autocomplete="current-password"
-      />
-      <button
-        id="btnLogin"
-        class="bg-cyan-500 text-white px-4 py-2 rounded-md hover:shadow-md transition w-full mt-6"
-        type="submit"
-      >
-        Sign in
-      </button>
-    </form>
-    <!-- discrete back link replaces big CTA -->
+      <form id="loginForm" class="login-form space-y-3">
+        <input
+          id="username"
+          placeholder="Username"
+          type="text"
+          autocomplete="username"
+          class="block w-full bg-white/5 text-white placeholder-slate-400 px-3 py-2 rounded-md border border-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <input
+          id="password"
+          placeholder="Password"
+          type="password"
+          autocomplete="current-password"
+          class="block w-full bg-white/5 text-white placeholder-slate-400 px-3 py-2 rounded-md border border-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+        />
+        <button
+          id="btnLogin"
+          class="bg-cyan-500 text-white px-4 py-2 rounded-md hover:shadow-md transition w-full mt-2"
+          type="submit"
+        >
+          Sign in
+        </button>
+      </form>
+      <!-- discrete back link replaces big CTA -->
+    </div>
   </div>
 </div>
 
