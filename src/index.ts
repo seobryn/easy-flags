@@ -26,14 +26,14 @@ app.use(cookieParser());
 
 // Expose `user` and their permissions to EJS templates when a valid auth cookie is present
 import { PermissionRepository } from "./infrastructure/repositories/permissionRepository";
-import { UserRepository } from "./infrastructure/repositories/userRepository";
+import { JwtPayload } from "jsonwebtoken";
 
 app.use(async (req, res, next) => {
   const token = (req.cookies as any)?.ff_token;
   if (token) {
     try {
       // verifyToken returns the decoded payload
-      const user = verifyToken(token);
+      const user = verifyToken(token) as JwtPayload;
       (res as any).locals.user = user;
       // Fetch permissions for the user's role
       if (user && user.id) {

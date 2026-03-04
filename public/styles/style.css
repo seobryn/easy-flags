@@ -1462,6 +1462,15 @@
     transition-duration: var(--tw-duration, var(--default-transition-duration));
     background: rgba(255, 255, 255, 0.04);
   }
+  .toggle-switch input:disabled + .slider {
+    background: #e5e7eb;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .toggle-switch input:disabled + .slider::before {
+    background: #cbd5e1;
+    box-shadow: none;
+  }
   .slider::before {
     position: absolute;
     border-radius: calc(infinity * 1px);

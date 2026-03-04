@@ -20,9 +20,9 @@ async function getRepositories() {
  * Middleware to check if user has specific permission
  * Used to protect routes based on permissions
  */
-export async function requirePermission(permission: string | string[]) {
-  const permissions = Array.isArray(permission) ? permission : [permission];
 
+export function requirePermission(permission: string | string[]) {
+  const permissions = Array.isArray(permission) ? permission : [permission];
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req as any).user;
@@ -35,7 +35,7 @@ export async function requirePermission(permission: string | string[]) {
       // Get user's role
       const userRecord = await userRepository.findById(user.id);
       if (!userRecord || !userRecord.role_id) {
-        return res.status(403).json({ error: "User has no role assigned" });
+        return next({ status: 403, message: "User has no role assigned" });
       }
 
       // Get user's role permissions
@@ -52,8 +52,9 @@ export async function requirePermission(permission: string | string[]) {
       );
 
       if (!hasPermission) {
-        return res.status(403).json({
-          error: "Insufficient permissions",
+        return next({
+          status: 403,
+          message: "Insufficient permissions",
           required: permissions,
         });
       }
@@ -64,93 +65,4 @@ export async function requirePermission(permission: string | string[]) {
       res.status(500).json({ error: "Permission check failed" });
     }
   };
-}
-
-/**
- * Middleware to check if user has specific role
- * Used to protect routes based on roles
- */
-export async function requireRole(role: string | string[]) {
-  const roles = Array.isArray(role) ? role : [role];
-
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = (req as any).user;
-      if (!user || !user.id) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const { userRepository, roleRepository } = await getRepositories();
-
-      // Get user's role
-      const userRecord = await userRepository.findById(user.id);
-      if (!userRecord || !userRecord.role_id) {
-        return res.status(403).json({ error: "User has no role assigned" });
-      }
-
-      // Get role details
-      const userRole = await roleRepository.findById(userRecord.role_id);
-      if (!userRole) {
-        return res.status(403).json({ error: "Role not found" });
-      }
-
-      // Check if user's role matches required roles
-      const hasRole = roles.includes(userRole.name);
-
-      if (!hasRole) {
-        return res.status(403).json({
-          error: "Insufficient role",
-          required: roles,
-          current: userRole.name,
-        });
-      }
-
-      next();
-    } catch (err) {
-      console.error("Role check error:", err);
-      res.status(500).json({ error: "Role check failed" });
-    }
-  };
-}
-
-/**
- * Middleware to attach user's permissions to request object
- * Useful for conditional behavior based on permissions
- */
-export async function attachUserPermissions(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  try {
-    const user = (req as any).user;
-    if (!user || !user.id) {
-      (req as any).userPermissions = [];
-      return next();
-    }
-
-    const { userRepository, permissionRepository } = await getRepositories();
-
-    // Get user's role
-    const userRecord = await userRepository.findById(user.id);
-    if (!userRecord || !userRecord.role_id) {
-      (req as any).userPermissions = [];
-      return next();
-    }
-
-    // Get user's permissions
-    const permissions = await permissionRepository.getRolePermissions(
-      userRecord.role_id,
-    );
-    (req as any).userPermissions = permissions.map(
-      (p: { name: string }) => p.name,
-    );
-    (req as any).userRole = userRecord.role_id;
-
-    next();
-  } catch (err) {
-    console.error("Error attaching permissions:", err);
-    (req as any).userPermissions = [];
-    next();
-  }
 }
