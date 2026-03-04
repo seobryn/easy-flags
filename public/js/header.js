@@ -112,9 +112,35 @@ function initMobileMenu() {
   }
 }
 
+function initLogoutButtons() {
+  const btnLogout = document.getElementById("btnLogout");
+  const btnLogoutMobile = document.getElementById("btnLogoutMobile");
+
+  async function handleLogout() {
+    try {
+      const response = await fetch("/auth/logout", { method: "POST" });
+      if (response.ok) {
+        window.location.href = "/login";
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  }
+
+  if (btnLogout) {
+    btnLogout.addEventListener("click", handleLogout);
+  }
+  if (btnLogoutMobile) {
+    btnLogoutMobile.addEventListener("click", handleLogout);
+  }
+}
+
 function initHeaderModule() {
   moveDrawerToBody();
   initMobileMenu();
+  initLogoutButtons();
 }
 
 if (document.readyState === "loading") {
