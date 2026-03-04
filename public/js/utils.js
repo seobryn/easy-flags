@@ -90,6 +90,7 @@ function setActiveNav() {
     "/features": "features",
     "/docs": "docs",
     "/users": "users",
+    "/roles": "roles",
   };
   const currentNav = navMap[path];
   if (currentNav) {
