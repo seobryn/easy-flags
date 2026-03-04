@@ -71,6 +71,10 @@ function handleNavClick(e) {
     closeMobileNav();
     return (window.location.href = "/features");
   }
+  if (p === "users") {
+    closeMobileNav();
+    return (window.location.href = "/users");
+  }
   if (p === "pricing") {
     closeMobileNav();
     return (window.location.href = "/billing");
@@ -220,6 +224,7 @@ function setActiveNav() {
   let target = null;
   if (path.startsWith("/environments")) target = "envs";
   else if (path.startsWith("/features")) target = "features";
+  else if (path.startsWith("/users")) target = "users";
   else if (path.startsWith("/docs") || path.startsWith("/api")) target = "docs";
   else if (path.startsWith("/billing")) target = "pricing";
   else if (path.startsWith("/login")) target = "login";

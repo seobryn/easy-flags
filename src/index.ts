@@ -122,6 +122,13 @@ ensureAdmin()
       });
     });
 
+    app.get("/users", pageAuthMiddleware, (req, res) => {
+      res.render("layout", {
+        title: "Users | Feature Flags",
+        pageView: "users",
+      });
+    });
+
     app.get("/docs", pageAuthMiddleware, (req, res) => {
       res.render("layout", {
         title: "API Documentation | Feature Flags",

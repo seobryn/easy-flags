@@ -10,6 +10,13 @@ import { FeatureValueRepository } from "./infrastructure/repositories/featureVal
 import { EnvironmentService } from "./application/services/environmentService";
 import { FeatureService } from "./application/services/featureService";
 import { FlagQueryService } from "./application/services/flagQueryService";
+import stripeRoutes from "./routes/stripeRoutes";
+import createEnvironmentRouter from "./routes/environmentRoutes";
+import createFeatureRouter from "./routes/featureRoutes";
+import createFlagRouter from "./routes/flagRoutes";
+import { UserRepository } from "./infrastructure/repositories/userRepository";
+import { UserService } from "./application/services/userService";
+import createUserRouter from "./routes/userRoutes";
 
 const router = express.Router();
 
@@ -31,6 +38,8 @@ const flagQueryService = new FlagQueryService(
   featureRepository,
   featureValueRepository,
 );
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
 
 const openApiSpec = JSON.parse(
   fs.readFileSync(
@@ -44,109 +53,19 @@ router.get("/openapi.json", (req, res) => {
   res.json(openApiSpec);
 });
 
-// Stripe webhook endpoint (public). Raw body is provided by app-level middleware.
-router.post("/stripe/webhook", async (req, res) => {
-  const sig = (req.headers["stripe-signature"] as string) || "";
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
-
-  let event;
-  try {
-    // req.body will be a raw Buffer because index.ts applies express.raw for this path
-    event = stripe.webhooks.constructEvent(req.body as any, sig, webhookSecret);
-  } catch (err: any) {
-    console.error("Stripe webhook signature verification failed:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-
-  const subscriptionRepo = new SubscriptionRepository();
-
-  try {
-    switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as any;
-        if (session && session.subscription && session.customer) {
-          const userId = session.metadata?.userId
-            ? Number(session.metadata.userId)
-            : null;
-          await subscriptionRepo.upsertByCustomer(
-            userId,
-            session.customer,
-            session.subscription,
-            "active",
-            session.total_details?.amount_discounted || undefined,
-            session.current_period_end || null,
-            session.metadata || {},
-          );
-        }
-        break;
-      }
-      case "customer.subscription.updated": {
-        const sub = event.data.object as any;
-        await subscriptionRepo.updateStatusBySubscriptionId(sub.id, sub.status);
-        break;
-      }
-      case "customer.subscription.deleted": {
-        const sub = event.data.object as any;
-        await subscriptionRepo.updateStatusBySubscriptionId(
-          sub.id,
-          sub.status || "canceled",
-        );
-        break;
-      }
-      default:
-        // Ignore other events
-        break;
-    }
-  } catch (err: any) {
-    console.error("Error handling stripe webhook event:", err?.message || err);
-    return res.status(500).send("Internal error");
-  }
-
-  res.json({ received: true });
-});
-
-// Public authenticated endpoint to list active prices (includes product info)
-router.get("/stripe/prices", async (req, res) => {
-  try {
-    const prices = await stripe.prices.list({
-      active: true,
-      expand: ["data.product"],
-    });
-
-    const mapped = prices.data.map((p: any) => ({
-      id: p.id,
-      unit_amount: p.unit_amount,
-      currency: p.currency,
-      interval: p.recurring?.interval || null,
-      product:
-        p.product && typeof p.product === "object"
-          ? {
-              id: p.product.id,
-              name: p.product.name,
-              description: p.product.description,
-              features: p.product.marketing_features || null,
-            }
-          : null,
-    }));
-
-    res.json(mapped);
-  } catch (err: any) {
-    console.error("Failed to list stripe prices", err?.message || err);
-    res.status(500).json({ error: "Failed to list prices" });
-  }
-});
+// Mount public stripe routes (webhook, prices)
+router.use("/stripe", stripeRoutes);
 
 // Protect all remaining routes with authentication
 router.use(authMiddleware);
 
-// Create a Stripe Checkout session for subscription purchase
+// Protected stripe action: create checkout session
 router.post("/stripe/create-checkout-session", async (req, res) => {
   const user = (req as any).user;
   const priceId = req.body?.priceId || process.env.STRIPE_DEFAULT_PRICE_ID;
   if (!priceId) return res.status(400).json({ error: "priceId required" });
 
   try {
-    // Create (or reuse) a Stripe Customer with metadata linking to our user
     const customer = await stripe.customers.create({
       metadata: { userId: String(user.id), username: String(user.username) },
     });
@@ -174,6 +93,15 @@ router.post("/stripe/create-checkout-session", async (req, res) => {
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 });
+
+// Mount protected domain routers
+router.use("/environments", createEnvironmentRouter(environmentService));
+router.use("/features", createFeatureRouter(featureService));
+router.use(
+  "/flags",
+  createFlagRouter(environmentService, featureService, flagQueryService),
+);
+router.use("/users", createUserRouter(userService));
 
 // Environments
 router.get("/environments", async (req, res) => {

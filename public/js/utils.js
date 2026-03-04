@@ -89,6 +89,7 @@ function setActiveNav() {
     "/environments": "envs",
     "/features": "features",
     "/docs": "docs",
+    "/users": "users",
   };
   const currentNav = navMap[path];
   if (currentNav) {

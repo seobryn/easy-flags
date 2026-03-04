@@ -37,7 +37,13 @@ function handleOpenCreateEnv() {
   document.getElementById("envModalTitle").innerText = "Create Environment";
   document.getElementById("envModalName").value = "";
   document.getElementById("envModalMsg").innerText = "";
-  document.getElementById("envModal").style.display = "flex";
+  const modal = document.getElementById("envModal");
+  modal.style.display = "flex";
+  // focus the input for faster entry
+  setTimeout(() => {
+    const inp = document.getElementById("envModalName");
+    if (inp) inp.focus();
+  }, 50);
 }
 
 /**
@@ -182,5 +188,13 @@ function createDeleteButton(env) {
   return btn;
 }
 
-// Initialize on DOMContentLoaded
-document.addEventListener("DOMContentLoaded", initEnvironmentsModule);
+// Initialize on DOMContentLoaded or immediately if already loaded
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    initEnvironmentsModule();
+    loadEnvs().catch(() => {});
+  });
+} else {
+  initEnvironmentsModule();
+  loadEnvs().catch(() => {});
+}
