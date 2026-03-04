@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { Request, Response, NextFunction } from "express";
 
 dotenv.config();
 
@@ -165,12 +166,14 @@ ensureAdmin()
     app.use("/api", routes);
 
     // Error handler for forbidden (403) on page routes
-    app.use((err, req, res, next) => {
-      if (err && err.status === 403) {
-        return res.status(403).render("forbidden", { title: "Forbidden" });
+    app.use(
+      (err: any, req: Request, res: Response, next: NextFunction) => {
+        if (err && err.status === 403) {
+          return res.status(403).render("forbidden", { title: "Forbidden" });
+        }
+        next(err);
       }
-      next(err);
-    });
+    );
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
