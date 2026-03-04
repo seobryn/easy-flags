@@ -72,8 +72,41 @@ function initNavigation() {
  * Handle navigation button click
  * @param {Event} e - The click event
  */
+function showPermissionError() {
+  let el = document.getElementById("permissionError");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "permissionError";
+    el.className =
+      "fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-2 rounded shadow-lg z-50";
+    el.style.transition = "opacity 0.3s";
+    document.body.appendChild(el);
+  }
+  el.textContent = "You are not authorized to access this page.";
+  el.style.opacity = 1;
+  setTimeout(() => {
+    el.style.opacity = 0;
+  }, 2500);
+}
+
+const NAV_PERMISSIONS = {
+  envs: "view_environments",
+  features: "view_features",
+  users: "view_users",
+  roles: "view_roles",
+};
+
 function handleNavClick(e) {
   const p = e.target.closest("button[data-nav]").dataset.nav;
+  // Check permission for protected pages
+  if (NAV_PERMISSIONS[p]) {
+    const perms = window.USER_PERMISSIONS || [];
+    if (!perms.includes(NAV_PERMISSIONS[p])) {
+      showPermissionError();
+      closeMobileNav();
+      return;
+    }
+  }
   if (p === "docs") {
     closeMobileNav();
     return (window.location.href = "/docs");

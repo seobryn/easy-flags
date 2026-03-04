@@ -90,6 +90,9 @@ export async function getDb() {
   const rolesCount = await dbInstance.get<{
     count: number;
   }>("SELECT COUNT(*) as count FROM roles");
+  const permissionsCount = await dbInstance.get<{
+    count: number;
+  }>("SELECT COUNT(*) as count FROM permissions");
 
   if (rolesCount?.count === 0) {
     // Create default roles
@@ -108,16 +111,30 @@ export async function getDb() {
       "Viewer",
       "Read-only access to features and flags",
     );
+  }
 
-    // Create default permissions
+  // Seed permissions if missing (separate from roles seeding)
+  if (permissionsCount?.count === 0) {
+    // Create default permissions (CRUD split)
     const permissions = [
-      ["manage_roles", "Create, update, and delete roles"],
+      ["create_roles", "Create roles"],
+      ["update_roles", "Update roles"],
+      ["delete_roles", "Delete roles"],
+      ["view_roles", "View roles page"],
       ["manage_permissions", "Manage permissions for roles"],
-      ["manage_users", "Create, update, and delete users"],
-      ["manage_features", "Create, update, and delete features"],
-      ["manage_environments", "Create, update, and delete environments"],
-      ["manage_flags", "Update feature flag values"],
+      ["create_users", "Create users"],
+      ["update_users", "Update users"],
+      ["delete_users", "Delete users"],
+      ["view_users", "View users page"],
+      ["create_features", "Create features"],
+      ["update_features", "Update features"],
+      ["delete_features", "Delete features"],
       ["view_features", "View features and flag values"],
+      ["create_environments", "Create environments"],
+      ["update_environments", "Update environments"],
+      ["delete_environments", "Delete environments"],
+      ["view_environments", "View environments page"],
+      ["manage_flags", "Update feature flag values"],
       ["manage_billing", "Access billing and subscription management"],
     ];
 
@@ -137,7 +154,6 @@ export async function getDb() {
     const allPerms = await dbInstance.all<Array<{ id: number }>>(
       "SELECT id FROM permissions",
     );
-
     for (const perm of allPerms) {
       await dbInstance.run(
         "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
@@ -146,19 +162,24 @@ export async function getDb() {
       );
     }
 
-    // Assign permissions to Editor role
+    // Assign permissions to Editor role (CRUD: create/update/delete features, environments, flags, and view features)
     const editorRole = await dbInstance.get<{ id: number }>(
       "SELECT id FROM roles WHERE name = ?",
       "Editor",
     );
     const editorPerms = await dbInstance.all<Array<{ id: number }>>(
-      "SELECT id FROM permissions WHERE name IN (?, ?, ?, ?)",
-      "manage_features",
-      "manage_environments",
+      "SELECT id FROM permissions WHERE name IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "create_features",
+      "update_features",
+      "delete_features",
+      "create_environments",
+      "update_environments",
+      "delete_environments",
       "manage_flags",
       "view_features",
+      "create_users",
+      "update_users",
     );
-
     for (const perm of editorPerms) {
       await dbInstance.run(
         "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
@@ -167,7 +188,7 @@ export async function getDb() {
       );
     }
 
-    // Assign permissions to Viewer role
+    // Assign permissions to Viewer role (view only)
     const viewerRole = await dbInstance.get<{ id: number }>(
       "SELECT id FROM roles WHERE name = ?",
       "Viewer",
@@ -176,7 +197,6 @@ export async function getDb() {
       "SELECT id FROM permissions WHERE name = ?",
       "view_features",
     );
-
     for (const perm of viewerPerms) {
       await dbInstance.run(
         "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",

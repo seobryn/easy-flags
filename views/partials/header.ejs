@@ -24,10 +24,18 @@
     <div class="nav-placeholder hidden sm:block" aria-hidden="true">
       <nav class="nav flex gap-2 items-center" id="mainNav" role="navigation" aria-label="Main navigation">
         <% if (typeof user !== 'undefined' && user) { %>
-          <button data-nav="envs" type="button" class="nav-btn">Environments</button>
-          <button data-nav="features" type="button" class="nav-btn">Feature Flags</button>
-          <button data-nav="users" type="button" class="nav-btn">Users</button>
-          <button data-nav="roles" type="button" class="nav-btn">Roles</button>
+          <% if (permissions && permissions.includes('view_environments')) { %>
+            <button data-nav="envs" type="button" class="nav-btn">Environments</button>
+          <% } %>
+          <% if (permissions && permissions.includes('view_features')) { %>
+            <button data-nav="features" type="button" class="nav-btn">Feature Flags</button>
+          <% } %>
+          <% if (permissions && permissions.includes('view_users')) { %>
+            <button data-nav="users" type="button" class="nav-btn">Users</button>
+          <% } %>
+          <% if (permissions && permissions.includes('view_roles')) { %>
+            <button data-nav="roles" type="button" class="nav-btn">Roles</button>
+          <% } %>
           <button data-nav="docs" type="button" class="nav-btn">Docs</button>
           <button id="btnLogout" type="button" class="nav-btn">Logout</button>
         <% } else { %>
@@ -50,10 +58,18 @@
     <button id="mobileClose" class="text-slate-400 text-2xl leading-none" aria-label="Close menu">×</button>
   </div>
   <% if (typeof user !== 'undefined' && user) { %>
-    <button data-nav="envs" type="button" class="nav-btn block w-full text-left py-2">Environments</button>
-    <button data-nav="features" type="button" class="nav-btn block w-full text-left py-2">Feature Flags</button>
-    <button data-nav="users" type="button" class="nav-btn block w-full text-left py-2">Users</button>
-    <button data-nav="roles" type="button" class="nav-btn block w-full text-left py-2">Roles</button>
+    <% if (permissions && permissions.includes('view_environments')) { %>
+      <button data-nav="envs" type="button" class="nav-btn block w-full text-left py-2">Environments</button>
+    <% } %>
+    <% if (permissions && permissions.includes('view_features')) { %>
+      <button data-nav="features" type="button" class="nav-btn block w-full text-left py-2">Feature Flags</button>
+    <% } %>
+    <% if (permissions && permissions.includes('view_users')) { %>
+      <button data-nav="users" type="button" class="nav-btn block w-full text-left py-2">Users</button>
+    <% } %>
+    <% if (permissions && permissions.includes('view_roles')) { %>
+      <button data-nav="roles" type="button" class="nav-btn block w-full text-left py-2">Roles</button>
+    <% } %>
     <button data-nav="docs" type="button" class="nav-btn block w-full text-left py-2">Docs</button>
     <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left py-2">Logout</button>
   <% } else { %>
@@ -63,4 +79,8 @@
   <% } %>
 </nav>
 
+
+<script>
+  window.USER_PERMISSIONS = <%- JSON.stringify(typeof permissions !== 'undefined' ? permissions : []) %>;
+</script>
 <script src="/js/header.js"></script>

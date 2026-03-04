@@ -75,9 +75,19 @@ export default function createUserRouter(userService: UserService) {
   router.delete("/:id", async (req, res) => {
     const id = Number(req.params.id);
     try {
+      console.log(`[DELETE USER] Attempting to delete user with id: ${id}`);
       await userService.deleteUser(id);
+      // Check if user still exists
+      const user = await userService.findUser(id);
+      if (user) {
+        console.error(
+          `[DELETE USER] User with id ${id} still exists after delete attempt.`,
+        );
+        return res.status(500).json({ error: "User was not deleted." });
+      }
       res.json({ success: true });
     } catch (err: any) {
+      console.error(`[DELETE USER] Error deleting user with id ${id}:`, err);
       res.status(400).json({ error: err.message });
     }
   });

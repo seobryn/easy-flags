@@ -152,7 +152,37 @@ async function loadPermissionsForRole(roleId) {
       rolePerms.permissions ? rolePerms.permissions.map((p) => p.id) : [],
     );
 
-    allPermissions.forEach((perm) => {
+    // Permission to URL mapping (CRUD split)
+    const permUrlMap = {
+      view_environments: "/environments",
+      create_environments: "/environments",
+      update_environments: "/environments",
+      delete_environments: "/environments",
+      view_features: "/features",
+      create_features: "/features",
+      update_features: "/features",
+      delete_features: "/features",
+      view_users: "/users",
+      create_users: "/users",
+      update_users: "/users",
+      delete_users: "/users",
+      view_roles: "/roles",
+      create_roles: "/roles",
+      update_roles: "/roles",
+      delete_roles: "/roles",
+      manage_permissions: null,
+      manage_flags: null,
+      manage_billing: "/billing",
+    };
+
+    const sortedPermissions = [...allPermissions].sort((a, b) => {
+      const aHasUrl = !!permUrlMap[a.name];
+      const bHasUrl = !!permUrlMap[b.name];
+      if (aHasUrl === bHasUrl) return a.name.localeCompare(b.name);
+      return aHasUrl ? -1 : 1;
+    });
+
+    sortedPermissions.forEach((perm) => {
       const div = document.createElement("div");
       div.className =
         "flex items-center justify-between gap-3 p-3 border border-white/10 rounded bg-white/5";
@@ -163,11 +193,50 @@ async function loadPermissionsForRole(roleId) {
 
       const label = document.createElement("div");
       label.className = "font-medium text-white";
-      label.textContent = perm.name;
+      // Human-friendly label for CRUD permissions
+      let labelText = perm.name;
+      if (
+        /^(create|update|delete|view)_(roles|users|features|environments)$/.test(
+          perm.name,
+        )
+      ) {
+        const [action, entity] = perm.name.split("_");
+        const actionMap = {
+          create: "Create",
+          update: "Edit",
+          delete: "Delete",
+          view: "View",
+        };
+        labelText = `${actionMap[action] || action} ${entity.charAt(0).toUpperCase() + entity.slice(1)}`;
+      } else if (perm.name === "manage_permissions") {
+        labelText = "Manage Role Permissions";
+      } else if (perm.name === "manage_flags") {
+        labelText = "Update Feature Flag Values";
+      } else if (perm.name === "manage_billing") {
+        labelText = "Access Billing";
+      }
+      label.textContent = labelText;
 
       const description = document.createElement("div");
       description.className = "text-sm text-white/50";
-      description.textContent = perm.description || "";
+      // Hide technical description for CRUD permissions, show for others
+      if (
+        /^(create|update|delete|view)_(roles|users|features|environments)$/.test(
+          perm.name,
+        )
+      ) {
+        description.textContent = "";
+      } else {
+        description.textContent = perm.description || "";
+      }
+
+      // Add URL mapping if available
+      if (permUrlMap[perm.name]) {
+        const url = document.createElement("div");
+        url.className = "text-xs text-cyan-300 mt-1";
+        url.textContent = `URL: ${permUrlMap[perm.name]}`;
+        labelContainer.appendChild(url);
+      }
 
       labelContainer.appendChild(label);
       labelContainer.appendChild(description);

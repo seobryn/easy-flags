@@ -1,17 +1,39 @@
 // Users module - handles user CRUD operations
 
 let editingUserId = null;
+let allRoles = [];
 
-function initUsersModule() {
+async function initUsersModule() {
   const userForm = document.getElementById("userModalForm");
   const openCreateBtn = document.getElementById("openCreateUser");
   const closeBtn = document.getElementById("modalUserClose");
   const saveBtn = document.getElementById("modalUserSave");
 
+  // Load roles for dropdown
+  await loadRoles();
+
   if (openCreateBtn) openCreateBtn.onclick = handleOpenCreateUser;
   if (closeBtn) closeBtn.onclick = handleCloseUserModal;
   if (userForm) userForm.addEventListener("submit", handleSaveUserSubmit);
   else if (saveBtn) saveBtn.onclick = handleSaveUser;
+  async function loadRoles() {
+    try {
+      const res = await authFetch(api + "/roles");
+      allRoles = res;
+      const sel = document.getElementById("userModalRole");
+      if (sel) {
+        sel.innerHTML = '<option value="">-- Select a role --</option>';
+        allRoles.forEach((role) => {
+          const opt = document.createElement("option");
+          opt.value = role.id;
+          opt.textContent = role.name;
+          sel.appendChild(opt);
+        });
+      }
+    } catch (err) {
+      // ignore
+    }
+  }
 }
 
 function handleSaveUserSubmit(e) {
@@ -25,6 +47,8 @@ function handleOpenCreateUser() {
   document.getElementById("userModalUsername").value = "";
   document.getElementById("userModalPassword").value = "";
   document.getElementById("userModalMsg").innerText = "";
+  const sel = document.getElementById("userModalRole");
+  if (sel) sel.value = "";
   const modal = document.getElementById("userModal");
   modal.style.display = "flex";
   setTimeout(() => {
@@ -42,18 +66,20 @@ async function handleSaveUser() {
   btn.disabled = true;
   const username = document.getElementById("userModalUsername").value;
   const password = document.getElementById("userModalPassword").value;
+  const roleId = document.getElementById("userModalRole").value;
   try {
     if (!username) throw new Error("username required");
+    if (!roleId) throw new Error("role required");
     if (editingUserId) {
       await authFetch(api + "/users/" + editingUserId, {
         method: "PUT",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, roleId }),
       });
     } else {
       if (!password) throw new Error("password required");
       await authFetch(api + "/users", {
         method: "POST",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, roleId }),
       });
     }
     await loadUsers();
@@ -99,9 +125,25 @@ function createEditButton(u) {
   btn.className = "icon-btn";
   btn.title = "Edit";
   btn.innerHTML = `
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M3 21v-3l11-11 3 3L6 21H3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`;
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536M9 11l6 6M3 17.25V21h3.75l11.06-11.06a2.121 2.121 0 0 0-3-3L3 17.25z"></path></svg>`;
+  btn.onclick = () => handleEditUser(u);
+  return btn;
+
+  function handleEditUser(u) {
+    editingUserId = u.id;
+    document.getElementById("userModalTitle").innerText = "Edit User";
+    document.getElementById("userModalUsername").value = u.username;
+    document.getElementById("userModalPassword").value = "";
+    document.getElementById("userModalMsg").innerText = "";
+    const sel = document.getElementById("userModalRole");
+    if (sel) sel.value = u.role_id || "";
+    const modal = document.getElementById("userModal");
+    modal.style.display = "flex";
+    setTimeout(() => {
+      const inp = document.getElementById("userModalUsername");
+      if (inp) inp.focus();
+    }, 50);
+  }
   btn.onclick = async () => {
     editingUserId = u.id;
     document.getElementById("userModalTitle").innerText = "Edit User";
@@ -127,8 +169,16 @@ function createDeleteButton(u) {
     </svg>`;
   btn.onclick = async () => {
     if (!confirm('Delete user "' + u.username + '"?')) return;
-    await authFetch(api + "/users/" + u.id, { method: "DELETE" });
-    await loadUsers();
+    try {
+      const res = await authFetch(api + "/users/" + u.id, { method: "DELETE" });
+      if (res && res.error) {
+        alert("Error deleting user: " + res.error);
+      } else {
+        await loadUsers();
+      }
+    } catch (err) {
+      alert("Error deleting user. Please try again.");
+    }
   };
   return btn;
 }
