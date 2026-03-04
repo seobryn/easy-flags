@@ -12,10 +12,39 @@ export async function getDb() {
   await dbInstance.exec("PRAGMA journal_mode = WAL");
 
   await dbInstance.exec(
+    `CREATE TABLE IF NOT EXISTS roles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      description TEXT
+    )`,
+  );
+
+  await dbInstance.exec(
+    `CREATE TABLE IF NOT EXISTS permissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT UNIQUE NOT NULL,
+      description TEXT
+    )`,
+  );
+
+  await dbInstance.exec(
+    `CREATE TABLE IF NOT EXISTS role_permissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      role_id INTEGER NOT NULL,
+      permission_id INTEGER NOT NULL,
+      UNIQUE(role_id, permission_id),
+      FOREIGN KEY(role_id) REFERENCES roles(id),
+      FOREIGN KEY(permission_id) REFERENCES permissions(id)
+    )`,
+  );
+
+  await dbInstance.exec(
     `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      password TEXT NOT NULL,
+      role_id INTEGER,
+      FOREIGN KEY(role_id) REFERENCES roles(id)
     )`,
   );
 
@@ -56,6 +85,106 @@ export async function getDb() {
       metadata TEXT
     )`,
   );
+
+  // Seed default roles and permissions
+  const rolesCount = await dbInstance.get<{
+    count: number;
+  }>("SELECT COUNT(*) as count FROM roles");
+
+  if (rolesCount?.count === 0) {
+    // Create default roles
+    await dbInstance.run(
+      "INSERT INTO roles (name, description) VALUES (?, ?)",
+      "Admin",
+      "Administrator with full access",
+    );
+    await dbInstance.run(
+      "INSERT INTO roles (name, description) VALUES (?, ?)",
+      "Editor",
+      "Can create and edit features and flags",
+    );
+    await dbInstance.run(
+      "INSERT INTO roles (name, description) VALUES (?, ?)",
+      "Viewer",
+      "Read-only access to features and flags",
+    );
+
+    // Create default permissions
+    const permissions = [
+      ["manage_roles", "Create, update, and delete roles"],
+      ["manage_permissions", "Manage permissions for roles"],
+      ["manage_users", "Create, update, and delete users"],
+      ["manage_features", "Create, update, and delete features"],
+      ["manage_environments", "Create, update, and delete environments"],
+      ["manage_flags", "Update feature flag values"],
+      ["view_features", "View features and flag values"],
+      ["manage_billing", "Access billing and subscription management"],
+    ];
+
+    for (const [name, desc] of permissions) {
+      await dbInstance.run(
+        "INSERT INTO permissions (name, description) VALUES (?, ?)",
+        name,
+        desc,
+      );
+    }
+
+    // Assign all permissions to Admin role
+    const adminRole = await dbInstance.get<{ id: number }>(
+      "SELECT id FROM roles WHERE name = ?",
+      "Admin",
+    );
+    const allPerms = await dbInstance.all<Array<{ id: number }>>(
+      "SELECT id FROM permissions",
+    );
+
+    for (const perm of allPerms) {
+      await dbInstance.run(
+        "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+        adminRole?.id,
+        perm.id,
+      );
+    }
+
+    // Assign permissions to Editor role
+    const editorRole = await dbInstance.get<{ id: number }>(
+      "SELECT id FROM roles WHERE name = ?",
+      "Editor",
+    );
+    const editorPerms = await dbInstance.all<Array<{ id: number }>>(
+      "SELECT id FROM permissions WHERE name IN (?, ?, ?, ?)",
+      "manage_features",
+      "manage_environments",
+      "manage_flags",
+      "view_features",
+    );
+
+    for (const perm of editorPerms) {
+      await dbInstance.run(
+        "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+        editorRole?.id,
+        perm.id,
+      );
+    }
+
+    // Assign permissions to Viewer role
+    const viewerRole = await dbInstance.get<{ id: number }>(
+      "SELECT id FROM roles WHERE name = ?",
+      "Viewer",
+    );
+    const viewerPerms = await dbInstance.all<Array<{ id: number }>>(
+      "SELECT id FROM permissions WHERE name = ?",
+      "view_features",
+    );
+
+    for (const perm of viewerPerms) {
+      await dbInstance.run(
+        "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
+        viewerRole?.id,
+        perm.id,
+      );
+    }
+  }
 
   return dbInstance;
 }

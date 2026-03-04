@@ -120,6 +120,16 @@
         box-shadow: inset 0 -1px 0 rgba(37, 99, 235, 0.06);
     }
 
+    /* Mobile nav button styling */
+    #mobileNav .nav-btn {
+        @apply block w-full text-left py-2;
+    }
+
+    #mobileNav .nav-btn.active {
+        background: var(--nav-active-bg);
+        color: var(--accent);
+    }
+
     /* Hamburger */
     #hamburger {
         @apply sm:hidden inline-flex items-center justify-center;

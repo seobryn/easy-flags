@@ -10,10 +10,16 @@ import { FeatureValueRepository } from "./infrastructure/repositories/featureVal
 import { EnvironmentService } from "./application/services/environmentService";
 import { FeatureService } from "./application/services/featureService";
 import { FlagQueryService } from "./application/services/flagQueryService";
+import { RoleRepository } from "./infrastructure/repositories/roleRepository";
+import { PermissionRepository } from "./infrastructure/repositories/permissionRepository";
+import { RoleService } from "./application/services/roleService";
+import { PermissionService } from "./application/services/permissionService";
 import stripeRoutes from "./routes/stripeRoutes";
 import createEnvironmentRouter from "./routes/environmentRoutes";
 import createFeatureRouter from "./routes/featureRoutes";
 import createFlagRouter from "./routes/flagRoutes";
+import createRoleRouter from "./routes/roleRoutes";
+import createPermissionRouter from "./routes/permissionRoutes";
 import { UserRepository } from "./infrastructure/repositories/userRepository";
 import { UserService } from "./application/services/userService";
 import createUserRouter from "./routes/userRoutes";
@@ -23,6 +29,8 @@ const router = express.Router();
 const environmentRepository = new EnvironmentRepository();
 const featureRepository = new FeatureRepository();
 const featureValueRepository = new FeatureValueRepository();
+const roleRepository = new RoleRepository();
+const permissionRepository = new PermissionRepository();
 
 const environmentService = new EnvironmentService(
   environmentRepository,
@@ -38,6 +46,8 @@ const flagQueryService = new FlagQueryService(
   featureRepository,
   featureValueRepository,
 );
+const roleService = new RoleService(roleRepository, permissionRepository);
+const permissionService = new PermissionService(permissionRepository);
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 
@@ -102,6 +112,8 @@ router.use(
   createFlagRouter(environmentService, featureService, flagQueryService),
 );
 router.use("/users", createUserRouter(userService));
+router.use("/roles", createRoleRouter(roleService, permissionService));
+router.use("/permissions", createPermissionRouter(permissionService));
 
 // Environments
 router.get("/environments", async (req, res) => {

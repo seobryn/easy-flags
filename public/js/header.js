@@ -35,12 +35,24 @@ function moveDrawerToBody() {
  */
 function initNavigation() {
   const logoutBtn = document.getElementById("btnLogout");
-  // Set active nav on page load
+  const logoutMobileBtn = document.getElementById("btnLogoutMobile");
+
+  // Set active nav on page load - use multiple strategies to ensure it runs
   document.addEventListener("DOMContentLoaded", setActiveNav);
-  try {
-    setActiveNav();
-  } catch (err) {
-    // in case DOM isn't ready yet or setActiveNav isn't defined, ignore
+  window.addEventListener("load", setActiveNav);
+
+  // Call immediately if DOM is already loaded
+  if (
+    document.readyState === "interactive" ||
+    document.readyState === "complete"
+  ) {
+    requestAnimationFrame(setActiveNav);
+  } else {
+    try {
+      setActiveNav();
+    } catch (err) {
+      // in case DOM isn't ready yet or setActiveNav isn't defined, ignore
+    }
   }
 
   // Handle navigation button clicks
@@ -50,6 +62,9 @@ function initNavigation() {
 
   if (logoutBtn) {
     logoutBtn.onclick = handleLogout;
+  }
+  if (logoutMobileBtn) {
+    logoutMobileBtn.onclick = handleLogout;
   }
 }
 
@@ -74,6 +89,10 @@ function handleNavClick(e) {
   if (p === "users") {
     closeMobileNav();
     return (window.location.href = "/users");
+  }
+  if (p === "roles") {
+    closeMobileNav();
+    return (window.location.href = "/roles");
   }
   if (p === "pricing") {
     closeMobileNav();
@@ -225,6 +244,7 @@ function setActiveNav() {
   if (path.startsWith("/environments")) target = "envs";
   else if (path.startsWith("/features")) target = "features";
   else if (path.startsWith("/users")) target = "users";
+  else if (path.startsWith("/roles")) target = "roles";
   else if (path.startsWith("/docs") || path.startsWith("/api")) target = "docs";
   else if (path.startsWith("/billing")) target = "pricing";
   else if (path.startsWith("/login")) target = "login";

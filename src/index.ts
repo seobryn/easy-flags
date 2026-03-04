@@ -129,6 +129,13 @@ ensureAdmin()
       });
     });
 
+    app.get("/roles", pageAuthMiddleware, (req, res) => {
+      res.render("layout", {
+        title: "Roles | Feature Flags",
+        pageView: "roles",
+      });
+    });
+
     app.get("/docs", pageAuthMiddleware, (req, res) => {
       res.render("layout", {
         title: "API Documentation | Feature Flags",

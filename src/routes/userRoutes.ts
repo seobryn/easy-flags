@@ -4,19 +4,23 @@ import { UserService } from "../application/services/userService";
 export default function createUserRouter(userService: UserService) {
   const router = express.Router();
 
-  // List users (no passwords returned)
+  // List users with roles
   router.get("/", async (req, res) => {
-    const users = await userService.listUsers();
-    res.json(users);
+    try {
+      const users = await userService.listUsersWithRoles();
+      res.json(users);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
   });
 
   // Create user
   router.post("/", async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, roleId } = req.body;
     if (!username || !password)
       return res.status(400).json({ error: "username and password required" });
     try {
-      await userService.createUser(username, password);
+      await userService.createUser(username, password, roleId);
       res.status(201).json({ success: true });
     } catch (err: any) {
       res.status(400).json({ error: err.message });
@@ -38,6 +42,29 @@ export default function createUserRouter(userService: UserService) {
     if (!username) return res.status(400).json({ error: "username required" });
     try {
       await userService.updateUser(id, username, password);
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // Assign role to user
+  router.post("/:id/role/:roleId", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      const roleId = Number(req.params.roleId);
+      await userService.assignRoleToUser(userId, roleId);
+      res.json({ success: true });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  // Remove role from user
+  router.delete("/:id/role", async (req, res) => {
+    try {
+      const userId = Number(req.params.id);
+      await userService.removeRoleFromUser(userId);
       res.json({ success: true });
     } catch (err: any) {
       res.status(400).json({ error: err.message });

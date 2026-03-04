@@ -24,23 +24,22 @@
     <div class="nav-placeholder hidden sm:block" aria-hidden="true">
       <nav class="nav flex gap-2 items-center" id="mainNav" role="navigation" aria-label="Main navigation">
         <% if (typeof user !== 'undefined' && user) { %>
-          <button data-nav="envs" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded">Environments</button>
-          <button data-nav="features" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded">Feature Flags</button>
-          <button data-nav="users" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded">Users</button>
-          <button data-nav="docs" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded">Docs</button>
-          <button id="btnLogout" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded">Logout</button>
+          <button data-nav="envs" type="button" class="nav-btn">Environments</button>
+          <button data-nav="features" type="button" class="nav-btn">Feature Flags</button>
+          <button data-nav="users" type="button" class="nav-btn">Users</button>
+          <button data-nav="roles" type="button" class="nav-btn">Roles</button>
+          <button data-nav="docs" type="button" class="nav-btn">Docs</button>
+          <button id="btnLogout" type="button" class="nav-btn">Logout</button>
         <% } else { %>
-          <button data-nav="pricing" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded" onclick="window.location.href = '/billing'">Pricing</button>
-          <button data-nav="docs" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded" onclick="window.location.href = '/api/openapi.json'">API</button>
-          <button data-nav="login" type="button" class="nav-btn text-sm text-slate-200 px-3 py-1 hover:bg-white/2 rounded" onclick="window.location.href = '/login'">Login</button>
+          <button data-nav="pricing" type="button" class="nav-btn" onclick="window.location.href = '/billing'">Pricing</button>
+          <button data-nav="docs" type="button" class="nav-btn" onclick="window.location.href = '/api/openapi.json'">API</button>
+          <button data-nav="login" type="button" class="nav-btn" onclick="window.location.href = '/login'">Login</button>
         <% } %>
       </nav>
     </div>
   </div>
 
 </div>
-
-<script src="/js/header.js"></script>
 
 <!-- Mobile drawer & backdrop (placed outside header to avoid layout interference) -->
 <div id="navBackdrop" style="z-index:9998; display:none;" class="fixed inset-0 bg-black/60 transition-opacity opacity-0 pointer-events-none sm:hidden" aria-hidden="true"></div>
@@ -51,14 +50,17 @@
     <button id="mobileClose" class="text-slate-400 text-2xl leading-none" aria-label="Close menu">×</button>
   </div>
   <% if (typeof user !== 'undefined' && user) { %>
-    <button data-nav="envs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Environments</button>
-    <button data-nav="features" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Feature Flags</button>
-    <button data-nav="users" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Users</button>
-    <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Docs</button>
-    <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left text-white py-2 rounded">Logout</button>
+    <button data-nav="envs" type="button" class="nav-btn block w-full text-left py-2">Environments</button>
+    <button data-nav="features" type="button" class="nav-btn block w-full text-left py-2">Feature Flags</button>
+    <button data-nav="users" type="button" class="nav-btn block w-full text-left py-2">Users</button>
+    <button data-nav="roles" type="button" class="nav-btn block w-full text-left py-2">Roles</button>
+    <button data-nav="docs" type="button" class="nav-btn block w-full text-left py-2">Docs</button>
+    <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left py-2">Logout</button>
   <% } else { %>
-    <button data-nav="pricing" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/billing'">Pricing</button>
-    <button data-nav="docs" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/api/openapi.json'">API</button>
-    <button data-nav="login" type="button" class="nav-btn block w-full text-left text-white py-2 rounded" onclick="window.location.href = '/login'">Login</button>
+    <button data-nav="pricing" type="button" class="nav-btn block w-full text-left py-2" onclick="window.location.href = '/billing'">Pricing</button>
+    <button data-nav="docs" type="button" class="nav-btn block w-full text-left py-2" onclick="window.location.href = '/api/openapi.json'">API</button>
+    <button data-nav="login" type="button" class="nav-btn block w-full text-left py-2" onclick="window.location.href = '/login'">Login</button>
   <% } %>
 </nav>
+
+<script src="/js/header.js"></script>

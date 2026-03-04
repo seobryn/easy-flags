@@ -2,6 +2,25 @@ export interface User {
   id: number;
   username: string;
   password: string;
+  role_id?: number;
+}
+
+export interface Role {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface RolePermission {
+  id: number;
+  role_id: number;
+  permission_id: number;
 }
 
 export interface Environment {
