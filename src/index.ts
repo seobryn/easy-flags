@@ -46,7 +46,9 @@ app.use(async (req, res, next) => {
       if (user && user.id) {
         const userRecord = await userRepository.findById(user.id);
         if (userRecord && userRecord.role_id) {
-          const perms = await permissionRepository.getRolePermissions(userRecord.role_id);
+          const perms = await permissionRepository.getRolePermissions(
+            userRecord.role_id,
+          );
           (res as any).locals.permissions = perms.map((p: any) => p.name);
         } else {
           (res as any).locals.permissions = [];
@@ -102,35 +104,48 @@ ensureAdmin()
       res.render("create-account");
     });
 
-    app.post("/auth/register", validateUserInput, asyncHandler(async (req, res) => {
-      const { username, password } = req.body;
-      try {
-        await userService.createUser(username, password);
-        // Optionally, auto-login after registration
-        // const token = signToken({ username, id: user.id });
-        // res.cookie("ff_token", token, { httpOnly: true, ... });
-        return res.redirect("/login");
-      } catch (err) {
-        let errorMsg = ERROR_MESSAGES.REGISTRATION_FAILED;
-        if (err instanceof Error) errorMsg = err.message;
-        return res.status(HTTP_STATUS.BAD_REQUEST).render("create-account", { error: errorMsg });
-      }
-    }));
+    app.post(
+      "/auth/register",
+      validateUserInput,
+      asyncHandler(async (req, res) => {
+        const { username, password } = req.body;
+        try {
+          await userService.createUser(username, password);
+          // Optionally, auto-login after registration
+          // const token = signToken({ username, id: user.id });
+          // res.cookie("ff_token", token, { httpOnly: true, ... });
+          return res.redirect("/login");
+        } catch (err) {
+          let errorMsg = ERROR_MESSAGES.REGISTRATION_FAILED;
+          if (err instanceof Error) errorMsg = err.message;
+          return res
+            .status(HTTP_STATUS.BAD_REQUEST)
+            .render("create-account", { error: errorMsg });
+        }
+      }),
+    );
 
-    app.post("/auth/login", validateUserInput, asyncHandler(async (req, res) => {
-      const { username, password } = req.body;
-      const user = await authService.authenticate(username, password);
-      if (!user) return res.status(HTTP_STATUS.UNAUTHORIZED).json({ error: ERROR_MESSAGES.INVALID_CREDENTIALS });
-      const token = signToken({ username: user.username, id: user.id });
-      // Set secure httpOnly cookie
-      res.cookie("ff_token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 8 * 60 * 60 * 1000, // 8 hours
-      });
-      res.json({ token });
-    }));
+    app.post(
+      "/auth/login",
+      validateUserInput,
+      asyncHandler(async (req, res) => {
+        const { username, password } = req.body;
+        const user = await authService.authenticate(username, password);
+        if (!user)
+          return res
+            .status(HTTP_STATUS.UNAUTHORIZED)
+            .json({ error: ERROR_MESSAGES.INVALID_CREDENTIALS });
+        const token = signToken({ username: user.username, id: user.id });
+        // Set secure httpOnly cookie
+        res.cookie("ff_token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 8 * 60 * 60 * 1000, // 8 hours
+        });
+        res.json({ token });
+      }),
+    );
 
     // Add logout endpoint to clear cookie
     app.post("/auth/logout", (req, res) => {
@@ -210,7 +225,9 @@ ensureAdmin()
     // Error handler for forbidden (403) on page routes
     app.use((err: any, req: Request, res: Response, next: NextFunction) => {
       if (err && err.status === HTTP_STATUS.FORBIDDEN) {
-        return res.status(HTTP_STATUS.FORBIDDEN).render("forbidden", { title: "Forbidden" });
+        return res
+          .status(HTTP_STATUS.FORBIDDEN)
+          .render("forbidden", { title: "Forbidden" });
       }
       next(err);
     });
