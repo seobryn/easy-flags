@@ -95,7 +95,48 @@ const endpoints = [
     </div>
     <div class="mb-10">
       <h2 class="text-2xl font-bold text-cyan-400 mb-3">Usage Examples</h2>
-      <h3 class="text-xl font-semibold text-white mb-3 mt-6">JavaScript/Node.js</h3>
+      
+      <h3 class="text-xl font-semibold text-white mb-3 mt-6">Using EasyFlags JavaScript Library (Recommended)</h3>
+      <p class="text-slate-300 mb-3">The easiest way to interact with the Feature Flags API is using the <span class="font-mono text-cyan-400">EasyFlags</span> library. It handles authentication, errors, and provides a clean API.</p>
+      <div class="bg-slate-800 rounded-xl p-5 border border-cyan-700/40 shadow-lg">
+        <pre><code class="language-js">// Instantiate EasyFlags before use
+const easyFlags = new EasyFlags();
+
+// Get all features
+const features = await easyFlags.listFeatures();
+console.log('Features:', features);
+
+// Get all flags for an environment
+const { environment, flags } = await easyFlags.getFlags('production');
+flags.forEach(flag => {
+  console.log(`${flag.key}: ${flag.value}`);
+});
+
+// Check if a specific feature is enabled
+const isEnabled = await easyFlags.getFlag('production', 'new-dashboard');
+if (isEnabled) {
+  // Show new feature
+} else {
+  // Show old feature
+}
+
+// Create a new feature
+const feature = await easyFlags.createFeature('beta-ui', 'New UI v2');
+console.log('Created:', feature);
+
+// Set a feature value for an environment
+await easyFlags.setFeatureValue(feature.id, 1, true); // Enable in dev
+await easyFlags.setFeatureValue(feature.id, 2, false); // Disable in staging
+</code></pre>
+      </div>
+      <p class="text-slate-400 mt-3 text-sm">
+        <strong>Benefits:</strong> No manual fetch calls, automatic error handling, built-in authentication, type hints with JSDoc.
+        <br/>
+        <strong>Setup:</strong> The library is included in the page layout automatically. <br/>
+        <strong>Note:</strong> You must instantiate <span class="font-mono text-cyan-400">EasyFlags</span> before use.
+      </p>
+
+      <h3 class="text-xl font-semibold text-white mb-3 mt-6">JavaScript/Node.js (Manual Fetch)</h3>
       <div class="bg-slate-800 rounded-xl p-5 border border-cyan-700/40 shadow-lg">
         <pre><code class="language-js">// Login and get token
 const loginRes = await fetch('/api/auth/login', {
