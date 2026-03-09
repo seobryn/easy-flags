@@ -63,6 +63,12 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Expose current request path to all EJS templates for active link highlighting
+app.use((req, res, next) => {
+  (res as any).locals.path = req.path;
+  next();
+});
+
 // Set view engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));

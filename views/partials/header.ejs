@@ -1,5 +1,5 @@
 <% 
-  const currentPath = (typeof path !== 'undefined' ? path : (typeof url !== 'undefined' ? url : (request && request.path ? request.path : '')));
+  const currentPath = typeof path !== 'undefined' ? path : '';
   const isActivePath = (href) => {
     if (href === '/') return currentPath === '/';
     return currentPath.startsWith(href);
