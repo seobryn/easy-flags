@@ -23,14 +23,14 @@ export class UserRepository {
 
   async listAll(): Promise<User[]> {
     const db = await getDb();
-    return db.all<User[]>(
+    return db.all<User>(
       "SELECT id, username, password, role_id FROM users ORDER BY id DESC",
     );
   }
 
   async listAllWithRoles(): Promise<Array<User & { role?: Role }>> {
     const db = await getDb();
-    return db.all<Array<User & { role?: Role }>>(
+    return db.all<User & { role?: Role }>(
       `SELECT u.*, r.* FROM users u
        LEFT JOIN roles r ON u.role_id = r.id
        ORDER BY u.id DESC`,

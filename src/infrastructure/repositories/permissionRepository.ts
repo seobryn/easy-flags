@@ -14,7 +14,7 @@ export class PermissionRepository {
 
   async listAll(): Promise<Permission[]> {
     const db = await getDb();
-    return db.all<Permission[]>("SELECT * FROM permissions ORDER BY name");
+    return db.all<Permission>("SELECT * FROM permissions ORDER BY name");
   }
 
   async create(name: string, description?: string): Promise<void> {
@@ -64,7 +64,7 @@ export class PermissionRepository {
 
   async getRolePermissions(roleId: number): Promise<Permission[]> {
     const db = await getDb();
-    return db.all<Permission[]>(
+    return db.all<Permission>(
       `SELECT p.* FROM permissions p
        INNER JOIN role_permissions rp ON p.id = rp.permission_id
        WHERE rp.role_id = ?`,

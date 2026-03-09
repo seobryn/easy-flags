@@ -4,7 +4,7 @@ import { Feature } from "../../domain/models";
 export class FeatureRepository {
   async listAll(): Promise<Feature[]> {
     const db = await getDb();
-    return db.all<Feature[]>("SELECT * FROM features");
+    return db.all<Feature>("SELECT * FROM features");
   }
 
   async create(key: string, description?: string): Promise<Feature> {

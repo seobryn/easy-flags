@@ -6,7 +6,7 @@ export class FeatureValueRepository {
     environmentId: number,
   ): Promise<number[]> {
     const db = await getDb();
-    const rows = await db.all<Array<{ feature_id: number }>>(
+    const rows = await db.all<{ feature_id: number }>(
       "SELECT DISTINCT feature_id FROM feature_values WHERE environment_id = ?",
       environmentId,
     );
@@ -56,13 +56,14 @@ export class FeatureValueRepository {
   async findValueByFeatureAndEnvironment(
     featureId: number,
     environmentId: number,
-  ): Promise<{ value: number } | undefined> {
+  ): Promise<number | undefined> {
     const db = await getDb();
-    return db.get<{ value: number }>(
+    const result = await db.all<{ value: number }>(
       "SELECT value FROM feature_values WHERE feature_id = ? AND environment_id = ?",
       featureId,
       environmentId,
     );
+    return result[0]?.value;
   }
 
   async upsert(

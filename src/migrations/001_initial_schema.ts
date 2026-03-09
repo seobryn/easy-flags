@@ -1,6 +1,4 @@
-import { Database } from "sqlite";
-import sqlite3 from "sqlite3";
-import { Migration } from "./runner";
+import { Migration, DatabaseWrapper } from "./runner";
 
 /**
  * Initial migration - Creates all base tables
@@ -12,7 +10,7 @@ import { Migration } from "./runner";
  * - Subscriptions
  */
 const migration: Migration = {
-  async up(db: Database<sqlite3.Database>) {
+  async up(db: DatabaseWrapper) {
     // Create roles table
     await db.exec(
       `CREATE TABLE IF NOT EXISTS roles (
@@ -102,21 +100,18 @@ const migration: Migration = {
     );
 
     if (!rolesCount || rolesCount.count === 0) {
-      await db.run(
-        "INSERT INTO roles (name, description) VALUES (?, ?)",
+      await db.run("INSERT INTO roles (name, description) VALUES (?, ?)", [
         "Admin",
         "Administrator with full access",
-      );
-      await db.run(
-        "INSERT INTO roles (name, description) VALUES (?, ?)",
+      ]);
+      await db.run("INSERT INTO roles (name, description) VALUES (?, ?)", [
         "Editor",
         "Can create and edit features and flags",
-      );
-      await db.run(
-        "INSERT INTO roles (name, description) VALUES (?, ?)",
+      ]);
+      await db.run("INSERT INTO roles (name, description) VALUES (?, ?)", [
         "Viewer",
         "Read-only access to features and flags",
-      );
+      ]);
     }
 
     // Seed default permissions
@@ -150,73 +145,71 @@ const migration: Migration = {
       for (const [name, desc] of permissions) {
         await db.run(
           "INSERT INTO permissions (name, description) VALUES (?, ?)",
-          name,
-          desc,
+          [name, desc],
         );
       }
 
       // Assign all permissions to Admin role
       const adminRole = await db.get<{ id: number }>(
         "SELECT id FROM roles WHERE name = ?",
-        "Admin",
+        ["Admin"],
       );
-      const allPerms = await db.all<Array<{ id: number }>>(
+      const allPerms = await db.all<{ id: number }>(
         "SELECT id FROM permissions",
       );
       for (const perm of allPerms) {
         await db.run(
           "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-          adminRole?.id,
-          perm.id,
+          [adminRole?.id, perm.id],
         );
       }
 
       // Assign permissions to Editor role
       const editorRole = await db.get<{ id: number }>(
         "SELECT id FROM roles WHERE name = ?",
-        "Editor",
+        ["Editor"],
       );
-      const editorPerms = await db.all<Array<{ id: number }>>(
+      const editorPerms = await db.all<{ id: number }>(
         "SELECT id FROM permissions WHERE name IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        "create_features",
-        "update_features",
-        "delete_features",
-        "create_environments",
-        "update_environments",
-        "delete_environments",
-        "manage_flags",
-        "view_features",
-        "create_users",
-        "update_users",
+        [
+          "create_features",
+          "update_features",
+          "delete_features",
+          "create_environments",
+          "update_environments",
+          "delete_environments",
+          "manage_flags",
+          "view_features",
+          "create_users",
+          "update_users",
+        ],
       );
       for (const perm of editorPerms) {
         await db.run(
           "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-          editorRole?.id,
-          perm.id,
+          [editorRole?.id, perm.id],
         );
       }
 
       // Assign permissions to Viewer role
       const viewerRole = await db.get<{ id: number }>(
         "SELECT id FROM roles WHERE name = ?",
-        "Viewer",
+        ["Viewer"],
       );
-      const viewerPerms = await db.all<Array<{ id: number }>>(
+      const viewerPerms = await db.all<{ id: number }>(
         "SELECT id FROM permissions WHERE name = ?",
-        "view_features",
+        ["view_features"],
       );
       for (const perm of viewerPerms) {
         await db.run(
           "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)",
-          viewerRole?.id,
-          perm.id,
+          [viewerRole?.id, perm.id],
         );
       }
     }
   },
 
-  async down(db: Database<sqlite3.Database>) {
+  async down(db: DatabaseWrapper) {
     // Drop all tables in reverse order (respecting foreign keys)
     await db.exec("DROP TABLE IF EXISTS subscriptions");
     await db.exec("DROP TABLE IF EXISTS feature_values");

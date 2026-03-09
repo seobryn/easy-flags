@@ -1,25 +1,140 @@
-import { Database } from "sqlite";
-import sqlite3 from "sqlite3";
+import { Database } from "sql.js";
 import fs from "fs";
 import path from "path";
+
+/**
+ * Wrapper to provide a sqlite-like interface for sql.js
+ */
+export class DatabaseWrapper {
+  constructor(
+    private db: Database,
+    private onChanges?: () => void,
+  ) {}
+
+  /**
+   * Normalize parameters - accepts both array and spread arguments
+   */
+  private normalizeParams(params?: any[] | any): any[] {
+    if (!params) return [];
+    if (Array.isArray(params)) return params;
+    // If single param but not array, wrap it
+    return [params];
+  }
+
+  /**
+   * Execute a SQL query that returns rows
+   */
+  async all<T = any>(sql: string, ...args: any[]): Promise<T[]> {
+    try {
+      const params = this.normalizeParams(
+        args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
+      );
+      const stmt = this.db.prepare(sql);
+      if (params && params.length > 0) {
+        stmt.bind(params);
+      }
+
+      const results: T[] = [];
+      while (stmt.step()) {
+        results.push(stmt.getAsObject() as T);
+      }
+      stmt.free();
+      return results;
+    } catch (error) {
+      console.error("Error executing query:", sql, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Execute a SQL query that returns a single row
+   */
+  async get<T = any>(sql: string, ...args: any[]): Promise<T | undefined> {
+    try {
+      const params = this.normalizeParams(
+        args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
+      );
+      const stmt = this.db.prepare(sql);
+      if (params && params.length > 0) {
+        stmt.bind(params);
+      }
+
+      let result: T | undefined;
+      if (stmt.step()) {
+        result = stmt.getAsObject() as T;
+      }
+      stmt.free();
+      return result;
+    } catch (error) {
+      console.error("Error executing query:", sql, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Execute a SQL statement that modifies data
+   */
+  async run(
+    sql: string,
+    ...args: any[]
+  ): Promise<{ changes?: number; lastID?: number }> {
+    try {
+      const params = this.normalizeParams(
+        args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
+      );
+      const stmt = this.db.prepare(sql);
+      if (params && params.length > 0) {
+        stmt.bind(params);
+      }
+      stmt.step();
+      stmt.free();
+      this.onChanges?.();
+      return {
+        changes: this.db.getRowsModified(),
+        lastID: this.db.exec("SELECT last_insert_rowid() as id")[0]
+          ?.values[0]?.[0] as number,
+      };
+    } catch (error) {
+      console.error("Error executing query:", sql, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Execute multiple SQL statements
+   */
+  async exec(sql: string): Promise<void> {
+    try {
+      this.db.run(sql);
+      this.onChanges?.();
+    } catch (error) {
+      console.error("Error executing SQL:", error);
+      throw error;
+    }
+  }
+}
 
 /**
  * Migration interface
  */
 export interface Migration {
-  up(db: Database<sqlite3.Database>): Promise<void>;
-  down(db: Database<sqlite3.Database>): Promise<void>;
+  up(db: DatabaseWrapper): Promise<void>;
+  down(db: DatabaseWrapper): Promise<void>;
 }
 
 /**
  * Run all pending migrations
- * @param db - The database instance
+ * @param db - The sql.js Database instance
  * @param migrationsDir - Directory containing migration files
+ * @param onChanges - Callback when database changes (for persistence)
  */
 export async function runMigrations(
-  db: Database<sqlite3.Database>,
+  sqlJsDb: Database,
   migrationsDir: string,
+  onChanges?: () => void,
 ): Promise<void> {
+  const db = new DatabaseWrapper(sqlJsDb, onChanges);
+
   // Create migrations table if it doesn't exist
   await db.exec(`
     CREATE TABLE IF NOT EXISTS migrations (
@@ -39,9 +154,7 @@ export async function runMigrations(
     .sort();
 
   // Get applied migrations
-  const applied = await db.all<Array<{ name: string }>>(
-    "SELECT name FROM migrations",
-  );
+  const applied = await db.all<{ name: string }>("SELECT name FROM migrations");
   const appliedNames = new Set(applied.map((row) => row.name));
 
   // Show migration status
@@ -82,7 +195,7 @@ export async function runMigrations(
       await migration.up(db);
 
       // Record the migration as applied
-      await db.run("INSERT INTO migrations (name) VALUES (?)", migrationName);
+      await db.run("INSERT INTO migrations (name) VALUES (?)", [migrationName]);
 
       console.log("✓");
     } catch (error) {
@@ -97,13 +210,17 @@ export async function runMigrations(
 
 /**
  * Rollback the last migration
- * @param db - The database instance
+ * @param db - The sql.js Database instance
  * @param migrationsDir - Directory containing migration files
+ * @param onChanges - Callback when database changes
  */
 export async function rollbackMigration(
-  db: Database<sqlite3.Database>,
+  sqlJsDb: Database,
   migrationsDir: string,
+  onChanges?: () => void,
 ): Promise<void> {
+  const db = new DatabaseWrapper(sqlJsDb, onChanges);
+
   // Get the last applied migration
   const lastMigration = await db.get<{ name: string }>(
     "SELECT name FROM migrations ORDER BY id DESC LIMIT 1",
@@ -124,7 +241,7 @@ export async function rollbackMigration(
     await migration.down(db);
 
     // Remove the migration record
-    await db.run("DELETE FROM migrations WHERE name = ?", lastMigration.name);
+    await db.run("DELETE FROM migrations WHERE name = ?", [lastMigration.name]);
 
     console.log(`✓ Rollback completed: ${lastMigration.name}`);
   } catch (error) {
@@ -138,13 +255,15 @@ export async function rollbackMigration(
 
 /**
  * Get the status of all migrations
- * @param db - The database instance
+ * @param db - The sql.js Database instance
  * @param migrationsDir - Directory containing migration files
  */
 export async function getMigrationStatus(
-  db: Database<sqlite3.Database>,
+  sqlJsDb: Database,
   migrationsDir: string,
 ): Promise<{ name: string; applied: boolean }[]> {
+  const db = new DatabaseWrapper(sqlJsDb);
+
   const files = fs
     .readdirSync(migrationsDir)
     .filter(
@@ -153,9 +272,7 @@ export async function getMigrationStatus(
     )
     .sort();
 
-  const applied = await db.all<Array<{ name: string }>>(
-    "SELECT name FROM migrations",
-  );
+  const applied = await db.all<{ name: string }>("SELECT name FROM migrations");
   const appliedNames = new Set(applied.map((row) => row.name));
 
   return files.map((file) => ({

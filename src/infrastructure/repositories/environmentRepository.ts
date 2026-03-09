@@ -4,7 +4,7 @@ import { Environment } from "../../domain/models";
 export class EnvironmentRepository {
   async listAll(): Promise<Environment[]> {
     const db = await getDb();
-    return db.all<Environment[]>("SELECT * FROM environments");
+    return db.all<Environment>("SELECT * FROM environments");
   }
 
   async create(name: string): Promise<Environment> {

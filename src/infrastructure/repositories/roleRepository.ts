@@ -14,7 +14,7 @@ export class RoleRepository {
 
   async listAll(): Promise<Role[]> {
     const db = await getDb();
-    return db.all<Role[]>("SELECT * FROM roles ORDER BY name");
+    return db.all<Role>("SELECT * FROM roles ORDER BY name");
   }
 
   async create(name: string, description?: string): Promise<void> {
@@ -51,7 +51,7 @@ export class RoleRepository {
     const role = await db.get<Role>("SELECT * FROM roles WHERE id = ?", id);
     if (!role) return undefined;
 
-    const permissions = await db.all<Permission[]>(
+    const permissions = await db.all<Permission>(
       `SELECT p.* FROM permissions p
        INNER JOIN role_permissions rp ON p.id = rp.permission_id
        WHERE rp.role_id = ?`,

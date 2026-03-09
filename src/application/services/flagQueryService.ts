@@ -22,14 +22,14 @@ export class FlagQueryService {
     const flags: Array<Feature & { value: boolean }> = [];
 
     for (const feature of features) {
-      const valueRow =
+      const value =
         await this.featureValueRepository.findValueByFeatureAndEnvironment(
           feature.id,
           environment.id,
         );
       flags.push({
         ...feature,
-        value: valueRow ? Boolean(valueRow.value) : false,
+        value: value ? Boolean(value) : false,
       });
     }
 
@@ -51,7 +51,7 @@ export class FlagQueryService {
     const feature = await this.featureRepository.findByKey(key);
     if (!feature) return null;
 
-    const valueRow =
+    const value =
       await this.featureValueRepository.findValueByFeatureAndEnvironment(
         feature.id,
         environment.id,
@@ -64,7 +64,7 @@ export class FlagQueryService {
         key: feature.key,
         description: feature.description,
       },
-      enabled: valueRow ? Boolean(valueRow.value) : false,
+      enabled: value ? Boolean(value) : false,
     };
   }
 }
