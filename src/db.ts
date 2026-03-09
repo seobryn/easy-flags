@@ -9,11 +9,43 @@ let dbInstance: DatabaseWrapper | null = null;
 let sqlJsInstance: SqlJsDatabase | null = null;
 
 /**
- * Initialize SQL.js database
+ * Initialize SQL.js database with proper WASM file location
  * Loads existing database from file or creates a new one
  */
 async function initializeDatabase(): Promise<SqlJsDatabase> {
-  const SQL = await initSqlJs();
+  // Configure sql.js to find the WASM file in different environments
+  const wasmLocateFile = (filename: string): string => {
+    // Try different locations based on deployment environment
+    const possiblePaths = [
+      // Production/Vercel: WASM in public/lib
+      path.join(process.cwd(), "public", "lib", filename),
+      // Development: WASM in node_modules
+      path.join(process.cwd(), "node_modules", "sql.js", "dist", filename),
+      // Alternative node_modules path
+      path.join(
+        process.cwd(),
+        "node_modules",
+        ".pnpm",
+        "sql.js@1.8.0",
+        "node_modules",
+        "sql.js",
+        "dist",
+        filename,
+      ),
+    ];
+
+    // Return the first path that exists
+    for (const filePath of possiblePaths) {
+      if (fs.existsSync(filePath)) {
+        return filePath;
+      }
+    }
+
+    // Fallback to node_modules relative path (will work in most cases)
+    return path.join(process.cwd(), "node_modules", "sql.js", "dist", filename);
+  };
+
+  const SQL = await initSqlJs({ locateFile: wasmLocateFile });
 
   let db: SqlJsDatabase;
 

@@ -6,6 +6,7 @@
         "web:dev": "ts-node-dev --respawn --transpile-only src/index.ts",
         "tailwind:dev": "pnpx @tailwindcss/cli -i ./src/styles/style.css -o ./public/styles/style.css --watch",
         "dev": "concurrently \"npm run web:dev\" \"npm run tailwind:dev\"",
+        "prebuild": "node scripts/copy-wasm.mjs",
         "build": "tsc",
         "start": "node dist/index.js",
         "migration:create": "node scripts/create-migration.mjs",

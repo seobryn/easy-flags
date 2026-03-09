@@ -1,0 +1,28 @@
+{
+    "buildCommand": "pnpm build",
+    "devCommand": "pnpm dev",
+    "outputDirectory": "dist",
+    "env": {
+        "NODE_ENV": "production"
+    },
+    "functions": {
+        "src/index.ts": {
+            "runtime": "nodejs18.x"
+        }
+    },
+    "headers": [
+        {
+            "source": "/lib/(.*)",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/wasm"
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=31536000, immutable"
+                }
+            ]
+        }
+    ]
+}
