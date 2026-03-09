@@ -1,3 +1,10 @@
+<% 
+  const currentPath = (typeof path !== 'undefined' ? path : (typeof url !== 'undefined' ? url : (request && request.path ? request.path : '')));
+  const isActivePath = (href) => {
+    if (href === '/') return currentPath === '/';
+    return currentPath.startsWith(href);
+  };
+%>
 <!-- Header / Navigation (unified) -->
 <div class="top flex items-center justify-between py-4">
   <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -25,19 +32,19 @@
       <nav class="nav flex gap-2 items-center" id="mainNav" role="navigation" aria-label="Main navigation">
         <% if (typeof user !== 'undefined' && user) { %>
           <% if (permissions && permissions.includes('view_environments')) { %>
-            <a href="/environments" class="nav-btn" data-nav="envs">Environments</a>
+            <a href="/environments" class="nav-btn<%= isActivePath('/environments') ? ' active' : '' %>" data-nav="envs">Environments</a>
           <% } %>
           <% if (permissions && permissions.includes('view_features')) { %>
-            <a href="/features" class="nav-btn" data-nav="features">Feature Flags</a>
+            <a href="/features" class="nav-btn<%= isActivePath('/features') ? ' active' : '' %>" data-nav="features">Feature Flags</a>
           <% } %>
           <% if (permissions && permissions.includes('view_users')) { %>
-            <a href="/users" class="nav-btn" data-nav="users">Users</a>
+            <a href="/users" class="nav-btn<%= isActivePath('/users') ? ' active' : '' %>" data-nav="users">Users</a>
           <% } %>
           <% if (permissions && permissions.includes('view_roles')) { %>
-            <a href="/roles" class="nav-btn" data-nav="roles">Roles</a>
+            <a href="/roles" class="nav-btn<%= isActivePath('/roles') ? ' active' : '' %>" data-nav="roles">Roles</a>
           <% } %>
-          <a href="/docs" class="nav-btn" data-nav="docs">Docs</a>
-          <a href="/api-reference" class="nav-btn">API</a>
+          <a href="/docs" class="nav-btn<%= isActivePath('/docs') ? ' active' : '' %>" data-nav="docs">Docs</a>
+          <a href="/api-reference" class="nav-btn<%= isActivePath('/api-reference') ? ' active' : '' %>">API</a>
           <button id="btnLogout" type="button" class="nav-btn">Logout</button>
         <% } else { %>
           <a href="/billing" class="nav-btn" data-nav="pricing">Pricing</a>
@@ -60,19 +67,19 @@
   </div>
   <% if (typeof user !== 'undefined' && user) { %>
     <% if (permissions && permissions.includes('view_environments')) { %>
-      <a href="/environments" class="nav-btn block w-full text-left py-2" data-nav="envs">Environments</a>
+      <a href="/environments" class="nav-btn block w-full text-left py-2<%= isActivePath('/environments') ? ' active' : '' %>" data-nav="envs">Environments</a>
     <% } %>
     <% if (permissions && permissions.includes('view_features')) { %>
-      <a href="/features" class="nav-btn block w-full text-left py-2" data-nav="features">Feature Flags</a>
+      <a href="/features" class="nav-btn block w-full text-left py-2<%= isActivePath('/features') ? ' active' : '' %>" data-nav="features">Feature Flags</a>
     <% } %>
     <% if (permissions && permissions.includes('view_users')) { %>
-      <a href="/users" class="nav-btn block w-full text-left py-2" data-nav="users">Users</a>
+      <a href="/users" class="nav-btn block w-full text-left py-2<%= isActivePath('/users') ? ' active' : '' %>" data-nav="users">Users</a>
     <% } %>
     <% if (permissions && permissions.includes('view_roles')) { %>
-      <a href="/roles" class="nav-btn block w-full text-left py-2" data-nav="roles">Roles</a>
+      <a href="/roles" class="nav-btn block w-full text-left py-2<%= isActivePath('/roles') ? ' active' : '' %>" data-nav="roles">Roles</a>
     <% } %>
-    <a href="/docs" class="nav-btn block w-full text-left py-2" data-nav="docs">Docs</a>
-    <a href="/api-reference" class="nav-btn block w-full text-left py-2">API</a>
+    <a href="/docs" class="nav-btn block w-full text-left py-2<%= isActivePath('/docs') ? ' active' : '' %>" data-nav="docs">Docs</a>
+    <a href="/api-reference" class="nav-btn block w-full text-left py-2<%= isActivePath('/api-reference') ? ' active' : '' %>">API</a>
     <button id="btnLogoutMobile" type="button" class="nav-btn block w-full text-left py-2">Logout</button>
   <% } else { %>
     <a href="/billing" class="nav-btn block w-full text-left py-2" data-nav="pricing">Pricing</a>
