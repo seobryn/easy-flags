@@ -18,6 +18,7 @@ import { PermissionRepository } from "./infrastructure/repositories/permissionRe
 import { errorHandler, asyncHandler } from "./utils/errorHandler";
 import { validateUserInput } from "./utils/validators";
 import { HTTP_STATUS, ERROR_MESSAGES } from "./utils/constants";
+import { closeDb } from "./db";
 
 const PORT = Number(process.env.PORT || 3000);
 
@@ -244,6 +245,15 @@ ensureAdmin()
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
+    // Graceful shutdown
+    const gracefulShutdown = async (signal: string) => {
+      console.log(`\n${signal} received, closing database connection...`);
+      await closeDb();
+      process.exit(0);
+    };
+
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"));
   })
   .catch((err) => {
     console.error("Failed to initialize DB", err);
