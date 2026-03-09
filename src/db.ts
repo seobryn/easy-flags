@@ -1,88 +1,49 @@
 import path from "path";
-import fs from "fs";
-import initSqlJs, { Database as SqlJsDatabase } from "sql.js";
+import { createClient, Client } from "@libsql/client";
 import { runMigrations, DatabaseWrapper } from "./migrations/runner";
 
-// Get database path from environment variable or use default
-const getDatabasePath = (): string => {
-  const dbUrl = process.env.DATABASE_URL || "./data.db";
-  // If it's a relative path starting with ./, resolve it from cwd
-  if (dbUrl.startsWith("./") || dbUrl.startsWith("../")) {
-    return path.resolve(process.cwd(), dbUrl);
+// Get database connection URL from environment variable or use default
+const getConnectionUrl = (): string => {
+  const dbUrl = process.env.DATABASE_URL || "file:./data.db";
+
+  // If it's a file path (relative or absolute), convert to file: URL
+  if (!dbUrl.startsWith("file:") && !dbUrl.startsWith("libsql:")) {
+    if (dbUrl.startsWith("/")) {
+      // Absolute path
+      return `file:${dbUrl}`;
+    } else if (dbUrl.startsWith("./") || dbUrl.startsWith("../")) {
+      // Relative path
+      return `file:${path.resolve(process.cwd(), dbUrl)}`;
+    } else {
+      // Assume it's a relative path
+      return `file:${path.resolve(process.cwd(), dbUrl)}`;
+    }
   }
-  // If it's an absolute path, use it directly
-  if (dbUrl.startsWith("/")) {
-    return dbUrl;
-  }
-  // Default: resolve relative to cwd
-  return path.resolve(process.cwd(), dbUrl);
+
+  return dbUrl;
 };
 
-const dbFile = getDatabasePath();
-
 let dbInstance: DatabaseWrapper | null = null;
-let sqlJsInstance: SqlJsDatabase | null = null;
+let libsqlClient: Client | null = null;
 
 /**
- * Initialize SQL.js database with proper WASM file location
- * Loads existing database from file or creates a new one
+ * Initialize libsql client and create database connection
  */
-async function initializeDatabase(): Promise<SqlJsDatabase> {
-  // Configure sql.js to find the WASM file in different environments
-  const wasmLocateFile = (filename: string): string => {
-    // Try different locations based on deployment environment
-    const possiblePaths = [
-      // Production/Vercel: WASM in public/lib
-      path.join(process.cwd(), "public", "lib", filename),
-      // Development: WASM in node_modules
-      path.join(process.cwd(), "node_modules", "sql.js", "dist", filename),
-      // Alternative node_modules path
-      path.join(
-        process.cwd(),
-        "node_modules",
-        ".pnpm",
-        "sql.js@1.8.0",
-        "node_modules",
-        "sql.js",
-        "dist",
-        filename,
-      ),
-    ];
+async function initializeDatabase(): Promise<Client> {
+  const connectionUrl = getConnectionUrl();
 
-    // Return the first path that exists
-    for (const filePath of possiblePaths) {
-      if (fs.existsSync(filePath)) {
-        return filePath;
-      }
-    }
+  // Create client for local or remote database
+  const client = createClient({
+    url: connectionUrl,
+    ...(process.env.DATABASE_AUTH_TOKEN && {
+      authToken: process.env.DATABASE_AUTH_TOKEN,
+    }),
+  });
 
-    // Fallback to node_modules relative path (will work in most cases)
-    return path.join(process.cwd(), "node_modules", "sql.js", "dist", filename);
-  };
+  // Test the connection
+  await client.execute("SELECT 1");
 
-  const SQL = await initSqlJs({ locateFile: wasmLocateFile });
-
-  let db: SqlJsDatabase;
-
-  // Try to load existing database from file
-  if (fs.existsSync(dbFile)) {
-    const fileBuffer = fs.readFileSync(dbFile);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    // Create new database
-    db = new SQL.Database();
-  }
-
-  return db;
-}
-
-/**
- * Persist database to file
- */
-function persistDatabase(db: SqlJsDatabase): void {
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbFile, buffer);
+  return client;
 }
 
 /**
@@ -91,31 +52,26 @@ function persistDatabase(db: SqlJsDatabase): void {
 export async function getDb(): Promise<DatabaseWrapper> {
   if (dbInstance) return dbInstance;
 
-  sqlJsInstance = await initializeDatabase();
+  libsqlClient = await initializeDatabase();
+
+  // Create wrapped database instance
+  dbInstance = new DatabaseWrapper(libsqlClient);
 
   // Run pending migrations
   const migrationsDir = path.join(__dirname, "migrations");
-  await runMigrations(sqlJsInstance, migrationsDir, () =>
-    persistDatabase(sqlJsInstance!),
-  );
-
-  // Create wrapped database instance
-  dbInstance = new DatabaseWrapper(sqlJsInstance, () =>
-    persistDatabase(sqlJsInstance!),
-  );
-
-  // Persist database after initialization
-  persistDatabase(sqlJsInstance);
+  await runMigrations(dbInstance, migrationsDir);
 
   return dbInstance;
 }
 
 /**
- * Persist database when needed
+ * Close database connection
  */
-export function saveDatabaseState(): void {
-  if (sqlJsInstance) {
-    persistDatabase(sqlJsInstance);
+export async function closeDb(): Promise<void> {
+  if (libsqlClient) {
+    await libsqlClient.close();
+    libsqlClient = null;
+    dbInstance = null;
   }
 }
 

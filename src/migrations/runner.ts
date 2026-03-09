@@ -1,15 +1,12 @@
-import { Database } from "sql.js";
+import { Client } from "@libsql/client";
 import fs from "fs";
 import path from "path";
 
 /**
- * Wrapper to provide a sqlite-like interface for sql.js
+ * Wrapper to provide a unified interface for libsql client
  */
 export class DatabaseWrapper {
-  constructor(
-    private db: Database,
-    private onChanges?: () => void,
-  ) {}
+  constructor(private client: Client) {}
 
   /**
    * Normalize parameters - accepts both array and spread arguments
@@ -29,17 +26,13 @@ export class DatabaseWrapper {
       const params = this.normalizeParams(
         args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
       );
-      const stmt = this.db.prepare(sql);
-      if (params && params.length > 0) {
-        stmt.bind(params);
-      }
 
-      const results: T[] = [];
-      while (stmt.step()) {
-        results.push(stmt.getAsObject() as T);
-      }
-      stmt.free();
-      return results;
+      const result = await this.client.execute({
+        sql,
+        args: params,
+      });
+
+      return result.rows as T[];
     } catch (error) {
       console.error("Error executing query:", sql, error);
       throw error;
@@ -54,17 +47,13 @@ export class DatabaseWrapper {
       const params = this.normalizeParams(
         args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
       );
-      const stmt = this.db.prepare(sql);
-      if (params && params.length > 0) {
-        stmt.bind(params);
-      }
 
-      let result: T | undefined;
-      if (stmt.step()) {
-        result = stmt.getAsObject() as T;
-      }
-      stmt.free();
-      return result;
+      const result = await this.client.execute({
+        sql,
+        args: params,
+      });
+
+      return result.rows[0] as T | undefined;
     } catch (error) {
       console.error("Error executing query:", sql, error);
       throw error;
@@ -82,17 +71,24 @@ export class DatabaseWrapper {
       const params = this.normalizeParams(
         args.length === 1 && Array.isArray(args[0]) ? args[0] : args,
       );
-      const stmt = this.db.prepare(sql);
-      if (params && params.length > 0) {
-        stmt.bind(params);
+
+      const result = await this.client.execute({
+        sql,
+        args: params,
+      });
+
+      // Get last insert row id if available
+      let lastID: number | undefined;
+      if (sql.trim().toUpperCase().startsWith("INSERT")) {
+        const idResult = await this.client.execute(
+          "SELECT last_insert_rowid() as id",
+        );
+        lastID = idResult.rows[0]?.id as number | undefined;
       }
-      stmt.step();
-      stmt.free();
-      this.onChanges?.();
+
       return {
-        changes: this.db.getRowsModified(),
-        lastID: this.db.exec("SELECT last_insert_rowid() as id")[0]
-          ?.values[0]?.[0] as number,
+        changes: result.rows.length > 0 ? 1 : result.rows.length,
+        lastID,
       };
     } catch (error) {
       console.error("Error executing query:", sql, error);
@@ -105,8 +101,15 @@ export class DatabaseWrapper {
    */
   async exec(sql: string): Promise<void> {
     try {
-      this.db.run(sql);
-      this.onChanges?.();
+      // Split SQL by semicolon and execute each statement
+      const statements = sql
+        .split(";")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      for (const statement of statements) {
+        await this.client.execute(statement);
+      }
     } catch (error) {
       console.error("Error executing SQL:", error);
       throw error;
@@ -124,17 +127,13 @@ export interface Migration {
 
 /**
  * Run all pending migrations
- * @param db - The sql.js Database instance
+ * @param db - The DatabaseWrapper instance
  * @param migrationsDir - Directory containing migration files
- * @param onChanges - Callback when database changes (for persistence)
  */
 export async function runMigrations(
-  sqlJsDb: Database,
+  db: DatabaseWrapper,
   migrationsDir: string,
-  onChanges?: () => void,
 ): Promise<void> {
-  const db = new DatabaseWrapper(sqlJsDb, onChanges);
-
   // Create migrations table if it doesn't exist
   await db.exec(`
     CREATE TABLE IF NOT EXISTS migrations (
@@ -214,17 +213,13 @@ export async function runMigrations(
 
 /**
  * Rollback the last migration
- * @param db - The sql.js Database instance
+ * @param db - The DatabaseWrapper instance
  * @param migrationsDir - Directory containing migration files
- * @param onChanges - Callback when database changes
  */
 export async function rollbackMigration(
-  sqlJsDb: Database,
+  db: DatabaseWrapper,
   migrationsDir: string,
-  onChanges?: () => void,
 ): Promise<void> {
-  const db = new DatabaseWrapper(sqlJsDb, onChanges);
-
   // Get the last applied migration
   const lastMigration = await db.get<{ name: string }>(
     "SELECT name FROM migrations ORDER BY id DESC LIMIT 1",
@@ -258,15 +253,13 @@ export async function rollbackMigration(
 
 /**
  * Get the status of all migrations
- * @param db - The sql.js Database instance
+ * @param db - The DatabaseWrapper instance
  * @param migrationsDir - Directory containing migration files
  */
 export async function getMigrationStatus(
-  sqlJsDb: Database,
+  db: DatabaseWrapper,
   migrationsDir: string,
 ): Promise<{ name: string; applied: boolean }[]> {
-  const db = new DatabaseWrapper(sqlJsDb);
-
   const files = fs
     .readdirSync(migrationsDir)
     .filter(
