@@ -43,16 +43,16 @@ export default function Header({}: HeaderProps) {
             </a>
           </div>
 
-          <div className="hidden md:flex gap-8">
+          <div className="hidden md:flex gap-8 items-center">
             <a
               href="/docs"
-              className="text-slate-300 hover:text-cyan-400 transition"
+              className="text-cyan-100 hover:text-cyan-300 transition"
             >
               Docs
             </a>
             <a
               href="/billing"
-              className="text-slate-300 hover:text-cyan-400 transition"
+              className="text-cyan-100 hover:text-cyan-300 transition"
             >
               Pricing
             </a>
