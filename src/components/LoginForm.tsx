@@ -9,9 +9,18 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    
+    // Client-side validation
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      console.log("Attempting login with username:", username);
+      
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -19,18 +28,26 @@ export default function LoginForm() {
         body: JSON.stringify({ username, password }),
       });
 
+      console.log("Login response status:", response.status);
+
       const data = await response.json();
+      
+      console.log("Login response data:", data);
 
       if (!response.ok) {
-        setError(data.error || "Login failed");
+        const errorMsg = data.error || data.message || "Login failed";
+        console.error("Login error:", errorMsg);
+        setError(errorMsg);
         return;
       }
 
+      console.log("Login successful, redirecting to spaces...");
       // Redirect to dashboard
       window.location.href = "/spaces";
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.error(err);
+      const errorMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      console.error("Login exception:", err);
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }

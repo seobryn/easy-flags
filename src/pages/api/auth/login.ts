@@ -8,7 +8,19 @@ import { successResponse, badRequestResponse } from "@/utils/api";
 
 export const POST: APIRoute = async (context) => {
   try {
-    const body = await context.request.json();
+    let body;
+    try {
+      body = await context.request.json();
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      return new Response(
+        JSON.stringify(
+          badRequestResponse("Invalid request format. Please send valid JSON."),
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     const { username, password } = body;
 
     if (!username || !password) {
@@ -16,7 +28,7 @@ export const POST: APIRoute = async (context) => {
         JSON.stringify(
           badRequestResponse("Username and password are required"),
         ),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -29,12 +41,12 @@ export const POST: APIRoute = async (context) => {
         JSON.stringify(
           badRequestResponse("Username and password cannot be empty"),
         ),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
     const user = {
-      id: Math.random(),
+      id: Math.floor(Math.random() * 1000000),
       username,
       email: `${username}@example.com`,
       role_id: 1,
@@ -42,6 +54,8 @@ export const POST: APIRoute = async (context) => {
 
     const token = signToken(user);
     setAuthCookie(context, token);
+
+    console.log(`✅ Login successful for user: ${username}`);
 
     return new Response(
       JSON.stringify(
@@ -54,8 +68,18 @@ export const POST: APIRoute = async (context) => {
     );
   } catch (error) {
     console.error("Login error:", error);
+    console.error(
+      "Error details:",
+      error instanceof Error ? error.message : String(error),
+    );
     return new Response(
-      JSON.stringify(badRequestResponse("Invalid request. Please try again.")),
+      JSON.stringify(
+        badRequestResponse(
+          error instanceof Error
+            ? `Login failed: ${error.message}`
+            : "Login failed. Please try again.",
+        ),
+      ),
       { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }

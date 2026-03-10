@@ -24,9 +24,17 @@ export default function RegisterForm() {
       return;
     }
 
+    // Client-side validation
+    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim()) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      console.log("Attempting registration with email:", formData.email);
+      
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,17 +46,26 @@ export default function RegisterForm() {
         }),
       });
 
+      console.log("Registration response status:", response.status);
+
       const data = await response.json();
+      
+      console.log("Registration response data:", data);
 
       if (!response.ok) {
-        setError(data.error || "Registration failed");
+        const errorMsg = data.error || data.message || "Registration failed";
+        console.error("Registration error:", errorMsg);
+        setError(errorMsg);
         return;
       }
 
+      console.log("Registration successful, redirecting to spaces...");
       // Redirect to dashboard
       window.location.href = "/spaces";
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      const errorMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      console.error("Registration exception:", err);
+      setError(errorMsg);
       console.error(err);
     } finally {
       setIsLoading(false);
