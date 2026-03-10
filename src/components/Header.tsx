@@ -37,11 +37,9 @@ export default function Header({}: HeaderProps) {
     <header className="bg-slate-900/50 border-b border-cyan-700/30 backdrop-blur">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <a href="/" className="text-2xl font-bold text-gradient">
-              Easy Flags
-            </a>
-          </div>
+          <a href="/" className="text-2xl font-bold text-gradient">
+            Easy Flags
+          </a>
 
           <div className="hidden md:flex gap-8 items-center">
             <a
@@ -70,44 +68,39 @@ export default function Header({}: HeaderProps) {
                 >
                   Settings
                 </a>
-              </>
-            ) : null}
-          </div>
-
-          <div className="flex items-center gap-4">
-            {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className="flex items-center gap-2 text-slate-300 hover:text-cyan-400"
-                >
-                  <span>{user.username}</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+                <div className="relative">
+                  <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="flex items-center gap-2 text-slate-300 hover:text-cyan-400"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 14l-7 7m0 0l-7-7m7 7V3"
-                    />
-                  </svg>
-                </button>
-
-                {isOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-cyan-700/30 rounded-lg shadow-lg z-50">
-                    <button
-                      onClick={handleLogout}
-                      className="block w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-cyan-400 transition rounded-lg"
+                    <span>{user.username}</span>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      Logout
-                    </button>
-                  </div>
-                )}
-              </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                      />
+                    </svg>
+                  </button>
+
+                  {isOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-slate-800 border border-cyan-700/30 rounded-lg shadow-lg z-50">
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 hover:text-cyan-400 transition rounded-lg"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <>
                 <a
