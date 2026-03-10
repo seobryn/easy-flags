@@ -82,6 +82,7 @@ export default function BillingPanel() {
         // Fetch prices from Stripe
         try {
           const pricesResponse = await fetch("/api/stripe/prices");
+
           if (pricesResponse.ok) {
             const pricesData = await pricesResponse.json();
             console.log("Stripe prices response:", pricesData);
