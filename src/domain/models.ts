@@ -23,15 +23,33 @@ export interface RolePermission {
   permission_id: number;
 }
 
+export interface Space {
+  id: number;
+  name: string;
+  description?: string;
+  owner_id: number;
+  created_at: string;
+}
+
+export interface SpaceUser {
+  id: number;
+  space_id: number;
+  user_id: number;
+  role_id: number;
+  created_at: string;
+}
+
 export interface Environment {
   id: number;
   name: string;
+  space_id?: number;
 }
 
 export interface Feature {
   id: number;
   key: string;
   description: string | null;
+  space_id?: number;
 }
 
 export interface FeatureValue {

@@ -133,22 +133,28 @@ export const createMockUserRepository = () => ({
 
 export const createMockFeatureRepository = () => ({
   listAll: jest.fn(),
+  listBySpaceId: jest.fn(),
   create: jest.fn(),
   findById: jest.fn(),
+  findByIdAndSpaceId: jest.fn(),
   findByKey: jest.fn(),
   deleteById: jest.fn(),
+  deleteByIdAndSpaceId: jest.fn(),
   deleteByIds: jest.fn(),
   deleteAll: jest.fn(),
+  countBySpaceId: jest.fn(),
 });
 
 export const createMockFeatureValueRepository = () => ({
   upsert: jest.fn(),
+  upsertWithSpaceValidation: jest.fn(),
   deleteByFeatureId: jest.fn(),
   deleteByEnvironmentId: jest.fn(),
   deleteAll: jest.fn(),
   listFeatureIdsByEnvironmentId: jest.fn(),
   deleteByFeatureIds: jest.fn(),
   findByFeatureAndEnvironment: jest.fn(),
+  findByFeatureAndEnvironmentAndSpaceId: jest.fn(),
   findValueByFeatureAndEnvironment: jest.fn(),
 });
 
@@ -176,10 +182,14 @@ export const createMockPermissionRepository = () => ({
 
 export const createMockEnvironmentRepository = () => ({
   listAll: jest.fn(),
+  listBySpaceId: jest.fn(),
   findById: jest.fn(),
+  findByIdAndSpaceId: jest.fn(),
   findByName: jest.fn(),
   create: jest.fn(),
   updateName: jest.fn(),
   deleteById: jest.fn(),
+  deleteByIdAndSpaceId: jest.fn(),
   countAll: jest.fn(),
+  countBySpaceId: jest.fn(),
 });

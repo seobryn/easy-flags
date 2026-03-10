@@ -10,6 +10,7 @@ import createFlagRouter from "./routes/flagRoutes";
 import createRoleRouter from "./routes/roleRoutes";
 import createPermissionRouter from "./routes/permissionRoutes";
 import createUserRouter from "./routes/userRoutes";
+import createSpaceRouter from "./routes/spaceRoutes";
 import { EnvironmentRepository } from "./infrastructure/repositories/environmentRepository";
 import { FeatureRepository } from "./infrastructure/repositories/featureRepository";
 import { FeatureValueRepository } from "./infrastructure/repositories/featureValueRepository";
@@ -104,6 +105,7 @@ router.post("/stripe/create-checkout-session", async (req, res) => {
 });
 
 // Mount protected domain routers
+router.use("/spaces", createSpaceRouter());
 router.use("/environments", createEnvironmentRouter(environmentService));
 router.use("/features", createFeatureRouter(featureService));
 router.use(

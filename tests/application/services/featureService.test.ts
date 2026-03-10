@@ -44,31 +44,46 @@ describe("FeatureService", () => {
   });
 
   describe("createFeature", () => {
-    it("should create a feature with key and description", async () => {
+    it("should create a feature with key, description and spaceId", async () => {
       mockFeatureRepository.create.mockResolvedValue(mockFeatures.betaFeature);
 
       const result = await featureService.createFeature(
         "BETA_FEATURE",
         "Beta feature for testing",
+        1,
       );
 
       expect(mockFeatureRepository.create).toHaveBeenCalledWith(
         "BETA_FEATURE",
         "Beta feature for testing",
+        1,
       );
       expect(result).toEqual(mockFeatures.betaFeature);
     });
 
-    it("should create a feature with only key", async () => {
+    it("should create a feature with key and spaceId", async () => {
       mockFeatureRepository.create.mockResolvedValue(mockFeatures.betaFeature);
 
-      const result = await featureService.createFeature("BETA_FEATURE");
+      const result = await featureService.createFeature(
+        "BETA_FEATURE",
+        undefined,
+        1,
+      );
 
       expect(mockFeatureRepository.create).toHaveBeenCalledWith(
         "BETA_FEATURE",
         undefined,
+        1,
       );
       expect(result).toEqual(mockFeatures.betaFeature);
+    });
+
+    it("should throw error when spaceId is not provided", async () => {
+      await expect(
+        featureService.createFeature("BETA_FEATURE", "Beta feature", undefined),
+      ).rejects.toThrow(
+        "spaceId is required - all features must belong to a space",
+      );
     });
   });
 
@@ -141,6 +156,7 @@ describe("FeatureService", () => {
 
       expect(mockFeatureRepository.findByKey).toHaveBeenCalledWith(
         "BETA_FEATURE",
+        undefined,
       );
       expect(result).toEqual(mockFeatures.betaFeature);
     });

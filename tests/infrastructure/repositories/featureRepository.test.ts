@@ -45,13 +45,14 @@ describe("FeatureRepository", () => {
   });
 
   describe("create", () => {
-    it("should create a feature with description", async () => {
+    it("should create a feature with description and spaceId", async () => {
       mockDb.run.mockResolvedValue({ lastID: 1 });
       mockDb.get.mockResolvedValue(mockFeatures.betaFeature);
 
       const result = await featureRepository.create(
         "BETA_FEATURE",
         "Beta feature for testing",
+        1,
       );
 
       expect(mockDb.run).toHaveBeenCalled();
@@ -59,15 +60,27 @@ describe("FeatureRepository", () => {
       expect(result).toEqual(mockFeatures.betaFeature);
     });
 
-    it("should create a feature without description", async () => {
+    it("should create a feature with spaceId and no description", async () => {
       mockDb.run.mockResolvedValue({ lastID: 1 });
       mockDb.get.mockResolvedValue(mockFeatures.betaFeature);
 
-      const result = await featureRepository.create("BETA_FEATURE");
+      const result = await featureRepository.create(
+        "BETA_FEATURE",
+        undefined,
+        1,
+      );
 
       expect(mockDb.run).toHaveBeenCalled();
       const call = (mockDb.run as jest.Mock).mock.calls[0];
       expect(call[2]).toBeNull(); // description should be null
+    });
+
+    it("should throw error when spaceId is not provided", async () => {
+      await expect(
+        featureRepository.create("BETA_FEATURE", "Beta feature", undefined),
+      ).rejects.toThrow(
+        "spaceId is required - all features must belong to a space",
+      );
     });
   });
 

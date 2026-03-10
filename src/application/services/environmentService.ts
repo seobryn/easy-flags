@@ -15,8 +15,17 @@ export class EnvironmentService {
     return this.environmentRepository.listAll();
   }
 
-  async createEnvironment(name: string): Promise<Environment> {
-    return this.environmentRepository.create(name);
+  async listEnvironmentsBySpace(spaceId: number): Promise<Environment[]> {
+    return this.environmentRepository.listBySpaceId(spaceId);
+  }
+
+  async createEnvironment(name: string, spaceId: number): Promise<Environment> {
+    if (!spaceId) {
+      throw new Error(
+        "spaceId is required - all environments must belong to a space. Use /api/spaces/:spaceId/environments endpoint.",
+      );
+    }
+    return this.environmentRepository.create(name, spaceId);
   }
 
   async updateEnvironmentName(
@@ -57,7 +66,10 @@ export class EnvironmentService {
     }
   }
 
-  async findByName(name: string): Promise<Environment | undefined> {
-    return this.environmentRepository.findByName(name);
+  async findByName(
+    name: string,
+    spaceId?: number,
+  ): Promise<Environment | undefined> {
+    return this.environmentRepository.findByName(name, spaceId);
   }
 }

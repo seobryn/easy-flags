@@ -12,8 +12,21 @@ export class FeatureService {
     return this.featureRepository.listAll();
   }
 
-  async createFeature(key: string, description?: string): Promise<Feature> {
-    return this.featureRepository.create(key, description);
+  async listFeaturesBySpace(spaceId: number): Promise<Feature[]> {
+    return this.featureRepository.listBySpaceId(spaceId);
+  }
+
+  async createFeature(
+    key: string,
+    description?: string,
+    spaceId?: number,
+  ): Promise<Feature> {
+    if (!spaceId) {
+      throw new Error(
+        "spaceId is required - all features must belong to a space. Use /api/spaces/:spaceId/features endpoint.",
+      );
+    }
+    return this.featureRepository.create(key, description, spaceId);
   }
 
   async deleteFeature(id: number): Promise<boolean> {
@@ -29,7 +42,7 @@ export class FeatureService {
     return this.featureValueRepository.upsert(featureId, environmentId, value);
   }
 
-  async findByKey(key: string): Promise<Feature | undefined> {
-    return this.featureRepository.findByKey(key);
+  async findByKey(key: string, spaceId?: number): Promise<Feature | undefined> {
+    return this.featureRepository.findByKey(key, spaceId);
   }
 }

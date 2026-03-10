@@ -57,17 +57,29 @@ describe("EnvironmentService", () => {
   });
 
   describe("createEnvironment", () => {
-    it("should create a new environment", async () => {
+    it("should create a new environment with spaceId", async () => {
       mockEnvironmentRepository.create.mockResolvedValue(
         mockEnvironments.development,
       );
 
-      const result = await environmentService.createEnvironment("development");
+      const result = await environmentService.createEnvironment(
+        "development",
+        1,
+      );
 
       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(
         "development",
+        1,
       );
       expect(result).toEqual(mockEnvironments.development);
+    });
+
+    it("should throw error when spaceId is not provided", async () => {
+      await expect(
+        environmentService.createEnvironment("development", 0),
+      ).rejects.toThrow(
+        "spaceId is required - all environments must belong to a space",
+      );
     });
   });
 
@@ -181,6 +193,7 @@ describe("EnvironmentService", () => {
 
       expect(mockEnvironmentRepository.findByName).toHaveBeenCalledWith(
         "development",
+        undefined,
       );
       expect(result).toEqual(mockEnvironments.development);
     });
