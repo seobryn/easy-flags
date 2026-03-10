@@ -86,7 +86,7 @@ export default function EnvironmentDetailView({
           spaceId={spaceId}
           spaceName="Acme Corporation"
           currentTab="environments"
-          subPage={{ name: envName }}
+          subPage={{ name: envName, path: `/spaces/${spaceId}/environments` }}
         />
 
         {/* Header Section */}

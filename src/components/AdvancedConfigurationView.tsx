@@ -126,9 +126,9 @@ export default function AdvancedConfigurationView({
     <div className="min-h-screen bg-slate-900">
       <SpaceNavigation
         spaceId={spaceId}
-        spaceName="Space"
+        spaceName="Acme Corporation"
         currentTab="features"
-        subPage={{ name: featureName }}
+        subPage={{ name: featureName, path: `/spaces/${spaceId}/features` }}
       />
 
       <div className="max-w-6xl mx-auto py-12 px-4">

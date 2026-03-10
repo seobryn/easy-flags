@@ -31,15 +31,23 @@ export default function SpaceNavigation({
             ← Back to Spaces
           </a>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold text-gradient">
+            <a
+              href={`/spaces/${spaceId}`}
+              className="text-3xl font-bold text-gradient hover:opacity-80 transition"
+              title="Go to space overview"
+            >
               {spaceName || `Space ${spaceId}`}
-            </h1>
+            </a>
             {subPage && (
               <>
                 <span className="text-slate-500">/</span>
-                <h1 className="text-3xl font-bold text-slate-300">
+                <a
+                  href={subPage.path || `#`}
+                  className="text-3xl font-bold text-slate-300 hover:text-cyan-300 transition"
+                  title={`Go to ${subPage.name}`}
+                >
                   {subPage.name}
-                </h1>
+                </a>
               </>
             )}
           </div>
