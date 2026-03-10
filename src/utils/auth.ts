@@ -40,11 +40,13 @@ export function setAuthCookie(
   token: string,
   maxAge: number = 86400,
 ): void {
+  const isProduction = process.env.NODE_ENV === "production";
   context.cookies.set("ff_token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     sameSite: "lax",
     maxAge,
+    path: "/",
   });
 }
 

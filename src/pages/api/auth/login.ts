@@ -21,10 +21,20 @@ export const POST: APIRoute = async (context) => {
     }
 
     // TODO: Validate credentials against database
-    // For demo purposes, we'll accept any username/password combination
+    // For demo purposes, we'll accept any non-empty username/password combination
     // In production, use the UserRepository and AuthService
+    
+    if (username.trim() === "" || password.trim() === "") {
+      return new Response(
+        JSON.stringify(
+          badRequestResponse("Username and password cannot be empty"),
+        ),
+        { status: 400 },
+      );
+    }
+
     const user = {
-      id: 1,
+      id: Math.random(),
       username,
       email: `${username}@example.com`,
       role_id: 1,
@@ -40,13 +50,13 @@ export const POST: APIRoute = async (context) => {
           token,
         }),
       ),
-      { status: 200 },
+      { status: 200, headers: { "Content-Type": "application/json" } },
     );
   } catch (error) {
     console.error("Login error:", error);
     return new Response(
-      JSON.stringify(badRequestResponse("Invalid username or password")),
-      { status: 400 },
+      JSON.stringify(badRequestResponse("Invalid request. Please try again.")),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 };

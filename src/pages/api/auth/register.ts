@@ -12,7 +12,16 @@ export const POST: APIRoute = async (context) => {
         JSON.stringify(
           badRequestResponse("Username, email, and password are required"),
         ),
-        { status: 400 },
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
+    if (username.trim() === "" || email.trim() === "" || password.trim() === "") {
+      return new Response(
+        JSON.stringify(
+          badRequestResponse("Username, email, and password cannot be empty"),
+        ),
+        { status: 400, headers: { "Content-Type": "application/json" } },
       );
     }
 
@@ -20,7 +29,7 @@ export const POST: APIRoute = async (context) => {
     // For demo purposes, we'll accept any input
     // In production, use the UserRepository and AuthService
     const user = {
-      id: Math.floor(Math.random() * 1000),
+      id: Math.floor(Math.random() * 1000000),
       username,
       email,
       role_id: 2, // Default role
@@ -36,13 +45,13 @@ export const POST: APIRoute = async (context) => {
           token,
         }),
       ),
-      { status: 201 },
+      { status: 201, headers: { "Content-Type": "application/json" } },
     );
   } catch (error) {
     console.error("Registration error:", error);
     return new Response(
       JSON.stringify(badRequestResponse("Registration failed")),
-      { status: 400 },
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 };
