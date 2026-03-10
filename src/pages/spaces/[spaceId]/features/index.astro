@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import FeaturesView from "@/components/FeaturesView";
+
+export const prerender = false;
+
+const { spaceId } = Astro.params;
+---
+
+<BaseLayout title="Features" includeHeader={true}>
+  <FeaturesView client:load spaceId={spaceId} />
+</BaseLayout>

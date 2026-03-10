@@ -40,9 +40,9 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<"admin" | "editor" | "viewer">(
-    "editor",
-  );
+  const [inviteRole, setInviteRole] = useState<"admin" | "editor" | "viewer">("editor");
+  const [selectedMemberForEdit, setSelectedMemberForEdit] = useState<TeamMember | null>(null);
+  const [editingRole, setEditingRole] = useState<"admin" | "editor" | "viewer">("editor");
 
   const handleInviteMember = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,67 +62,106 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
     setShowInviteModal(false);
   };
 
+  const handleEditMember = (member: TeamMember) => {
+    setSelectedMemberForEdit(member);
+    setEditingRole(member.role);
+  };
+
+  const handleSavePermissions = () => {
+    if (!selectedMemberForEdit) return;
+
+    setMembers(
+      members.map((m) =>
+        m.id === selectedMemberForEdit.id ? { ...m, role: editingRole } : m
+      )
+    );
+    setSelectedMemberForEdit(null);
+  };
+
+  const handleRemoveMember = (memberId: number) => {
+    setMembers(members.filter((m) => m.id !== memberId));
+    setSelectedMemberForEdit(null);
+  };
+
   const roleDescriptions: Record<string, string> = {
     admin: "Full access including team management",
     editor: "Can modify features and environments",
     viewer: "Read-only access",
   };
 
-  const roleColors: Record<string, string> = {
-    admin: "bg-red-500/20 text-red-300",
-    editor: "bg-yellow-500/20 text-yellow-300",
-    viewer: "bg-blue-500/20 text-blue-300",
+  const roleIcons: Record<string, string> = {
+    admin: "👑",
+    editor: "✏️",
+    viewer: "👁️",
+  };
+
+  const roleColors: Record<string, { bg: string; text: string; border: string }> = {
+    admin: { bg: "bg-red-500/20", text: "text-red-300", border: "border-red-500/30" },
+    editor: { bg: "bg-yellow-500/20", text: "text-yellow-300", border: "border-yellow-500/30" },
+    viewer: { bg: "bg-blue-500/20", text: "text-blue-300", border: "border-blue-500/30" },
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-12 px-4">
+    <div className="min-h-screen bg-slate-900">
       <SpaceNavigation
         spaceId={spaceId}
         spaceName="Acme Corporation"
         currentTab="permissions"
       />
 
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-cyan-300">Team & Permissions</h2>
-          <button
-            onClick={() => setShowInviteModal(true)}
-            className="btn-primary"
-          >
-            + Invite Member
-          </button>
+      <div className="max-w-6xl mx-auto py-12 px-4">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-white mb-2">Team & Permissions</h1>
+          <p className="text-slate-400">
+            Manage team members and control access to this space
+          </p>
         </div>
 
-        <p className="text-slate-400 mb-6">
-          Manage team members and their access levels for this space.
-        </p>
-
+        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Team Members Section */}
-          <div className="lg:col-span-2">
-            <div className="card">
-              <h3 className="text-lg font-bold text-cyan-300 mb-4">
-                Team Members
-              </h3>
+          <div className="lg:col-span-2 space-y-6">
+            {/* Members Card */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">👥</span>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Team Members</h2>
+                    <p className="text-xs text-slate-400">{members.length} in this space</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                >
+                  + Invite
+                </button>
+              </div>
 
               <div className="space-y-3">
                 {members.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-slate-600/50 transition"
+                    className="flex items-center justify-between p-4 bg-slate-900/50 border border-slate-700 rounded hover:border-slate-600 transition"
                   >
-                    <div>
-                      <p className="font-medium text-white">{member.name}</p>
-                      <p className="text-sm text-slate-400">{member.email}</p>
+                    <div className="flex-1">
+                      <p className="font-semibold text-white">{member.name}</p>
+                      <p className="text-xs text-slate-400">{member.email}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-3 py-1 rounded text-xs font-semibold ${roleColors[member.role]}`}
+                        className={`flex items-center justify-center gap-1 w-24 px-3 py-1 rounded text-xs font-semibold border ${roleColors[member.role].bg} ${roleColors[member.role].text} ${roleColors[member.role].border}`}
                       >
-                        {member.role.charAt(0).toUpperCase() +
-                          member.role.slice(1)}
+                        <span>{roleIcons[member.role]}</span>
+                        {member.role.charAt(0).toUpperCase() + member.role.slice(1)}
                       </span>
-                      <button className="text-slate-400 hover:text-slate-200">
+                      <button
+                        onClick={() => handleEditMember(member)}
+                        className="text-slate-500 hover:text-slate-300 p-1 hover:bg-slate-800 rounded transition"
+                        title="Edit permissions"
+                      >
                         ⋮
                       </button>
                     </div>
@@ -132,22 +171,23 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
             </div>
 
             {/* Pending Invitations */}
-            <div className="card mt-6">
-              <h3 className="text-lg font-bold text-cyan-300 mb-4">
-                Pending Invitations
-              </h3>
-              <p className="text-slate-400 text-center py-8">
-                No pending invitations
-              </p>
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">📬</span>
+                <h2 className="text-xl font-bold text-white">Pending Invitations</h2>
+              </div>
+              <p className="text-slate-500 text-center py-8 text-sm">No pending invitations</p>
             </div>
           </div>
 
-          {/* Roles Reference */}
-          <div>
-            <div className="card">
-              <h3 className="text-lg font-bold text-cyan-300 mb-4">
-                Role Permissions
-              </h3>
+          {/* Sidebar - Roles Reference */}
+          <div className="space-y-6">
+            {/* Role Permissions Card */}
+            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-2xl">🔐</span>
+                <h2 className="text-xl font-bold text-white">Roles</h2>
+              </div>
 
               <div className="space-y-3">
                 {(
@@ -157,21 +197,24 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                     { role: "viewer", desc: roleDescriptions.viewer },
                   ] as const
                 ).map(({ role, desc }) => (
-                  <div key={role} className="p-3 bg-slate-800/50 rounded-lg">
-                    <div
-                      className={`inline-block px-2 py-1 rounded text-xs font-semibold ${roleColors[role]} mb-2`}
-                    >
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                  <div
+                    key={role}
+                    className={`p-3 border rounded-lg ${roleColors[role].bg} ${roleColors[role].border}`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-lg">{roleIcons[role]}</span>
+                      <p className={`text-sm font-semibold ${roleColors[role].text}`}>
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </p>
                     </div>
-                    <p className="text-sm text-slate-400">{desc}</p>
+                    <p className="text-xs text-slate-400">{desc}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 p-3 bg-slate-800/50 border border-cyan-500/20 rounded-lg">
-                <p className="text-xs text-slate-400">
-                  <span className="text-cyan-300 font-semibold">Tip:</span> A
-                  space must have at least one admin.
+              <div className="mt-4 pt-4 border-t border-slate-700">
+                <p className="text-xs text-slate-500">
+                  <span className="text-cyan-300 font-semibold">💡 Tip:</span> A space must have at least one admin.
                 </p>
               </div>
             </div>
@@ -182,28 +225,27 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
       {/* Invite Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-slate-800 border border-cyan-700/30 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
-            <h2 className="text-xl font-bold text-cyan-300 mb-4">
-              Invite Team Member
-            </h2>
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 max-w-md w-full mx-4 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-1">Invite Team Member</h2>
+            <p className="text-sm text-slate-400 mb-6">Add a new member to your team</p>
 
             <form onSubmit={handleInviteMember} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Email Address *
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Email Address
                 </label>
                 <input
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
                   Role
                 </label>
                 <select
@@ -211,33 +253,148 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                   onChange={(e) =>
                     setInviteRole(e.target.value as "admin" | "editor" | "viewer")
                   }
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
                 >
-                  <option value="viewer">Viewer (Read-only)</option>
-                  <option value="editor">Editor (Modify features)</option>
-                  <option value="admin">Admin (Full access)</option>
+                  <option value="viewer">👁️ Viewer (Read-only)</option>
+                  <option value="editor">✏️ Editor (Modify features)</option>
+                  <option value="admin">👑 Admin (Full access)</option>
                 </select>
                 <p className="text-xs text-slate-500 mt-2">
                   {roleDescriptions[inviteRole]}
                 </p>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowInviteModal(false)}
-                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition"
+                  className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 btn-primary rounded-lg"
+                  className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
                 >
                   Send Invite
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Permissions Modal */}
+      {selectedMemberForEdit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-lg w-full mx-4 shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-slate-700 to-slate-800 px-6 py-8 border-b border-slate-700">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center text-xl border border-cyan-500/30">
+                  👤
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">
+                    {selectedMemberForEdit.name}
+                  </h2>
+                  <p className="text-sm text-slate-400">{selectedMemberForEdit.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Current Role */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-3">
+                  Assign Role
+                </label>
+                <div className="space-y-2">
+                  {(["admin", "editor", "viewer"] as const).map((role) => (
+                    <label key={role} className="flex items-center gap-3 p-3 rounded-lg border border-slate-700 cursor-pointer hover:border-slate-600 hover:bg-slate-700/30 transition">
+                      <input
+                        type="radio"
+                        name="role"
+                        value={role}
+                        checked={editingRole === role}
+                        onChange={(e) => setEditingRole(e.target.value as "admin" | "editor" | "viewer")}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">{roleIcons[role]}</span>
+                          <span className="font-semibold text-white">
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 ml-6">{roleDescriptions[role]}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Permissions Overview */}
+              <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-slate-300 mb-3">
+                  Permissions for {editingRole.charAt(0).toUpperCase() + editingRole.slice(1)}
+                </h3>
+                <div className="space-y-2 text-xs text-slate-400">
+                  {editingRole === "admin" && (
+                    <>
+                      <div className="flex items-center gap-2">✓ Manage team members</div>
+                      <div className="flex items-center gap-2">✓ Create and delete features</div>
+                      <div className="flex items-center gap-2">✓ Manage environments</div>
+                      <div className="flex items-center gap-2">✓ Configure permissions</div>
+                      <div className="flex items-center gap-2">✓ View analytics</div>
+                    </>
+                  )}
+                  {editingRole === "editor" && (
+                    <>
+                      <div className="flex items-center gap-2">✓ Create and modify features</div>
+                      <div className="flex items-center gap-2">✓ Manage feature rollouts</div>
+                      <div className="flex items-center gap-2">✓ Configure targeting rules</div>
+                      <div className="flex items-center gap-2">✗ Manage team members</div>
+                      <div className="flex items-center gap-2">✗ Configure permissions</div>
+                    </>
+                  )}
+                  {editingRole === "viewer" && (
+                    <>
+                      <div className="flex items-center gap-2">✓ View features</div>
+                      <div className="flex items-center gap-2">✓ View analytics</div>
+                      <div className="flex items-center gap-2">✗ Modify features</div>
+                      <div className="flex items-center gap-2">✗ Manage team members</div>
+                      <div className="flex items-center gap-2">✗ Configure permissions</div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setSelectedMemberForEdit(null)}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() =>
+                    handleRemoveMember(selectedMemberForEdit.id)
+                  }
+                  className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded text-sm font-semibold transition"
+                >
+                  Remove
+                </button>
+                <button
+                  onClick={handleSavePermissions}
+                  className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,53 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import AdvancedConfigurationView from "@/components/AdvancedConfigurationView";
+
+export const prerender = false;
+
+const { spaceId, featureId } = Astro.params;
+
+// Mock data - in production this would come from a database
+const mockFeatures: Record<string, {
+  id: string;
+  name: string;
+  key: string;
+  type: "boolean" | "string" | "json";
+}> = {
+  "1": {
+    id: "1",
+    name: "New Dashboard",
+    key: "new_dashboard",
+    type: "boolean",
+  },
+  "2": {
+    id: "2",
+    name: "Dark Mode",
+    key: "dark_mode",
+    type: "boolean",
+  },
+  "3": {
+    id: "3",
+    name: "Beta Analytics",
+    key: "beta_analytics",
+    type: "string",
+  },
+};
+
+const feature = mockFeatures[featureId || ""] || {
+  id: featureId || "unknown",
+  name: "Unknown Feature",
+  key: "unknown_feature",
+  type: "boolean" as const,
+};
+---
+
+<BaseLayout title={`${feature.name} - Advanced Configuration`} includeHeader={true}>
+  <AdvancedConfigurationView
+    client:load
+    spaceId={spaceId}
+    featureId={featureId}
+    featureName={feature.name}
+    featureKey={feature.key}
+    featureType={feature.type}
+  />
+</BaseLayout>
