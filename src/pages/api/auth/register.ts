@@ -16,7 +16,11 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    if (username.trim() === "" || email.trim() === "" || password.trim() === "") {
+    if (
+      username.trim() === "" ||
+      email.trim() === "" ||
+      password.trim() === ""
+    ) {
       return new Response(
         JSON.stringify(
           badRequestResponse("Username, email, and password cannot be empty"),

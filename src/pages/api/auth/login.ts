@@ -23,7 +23,7 @@ export const POST: APIRoute = async (context) => {
     // TODO: Validate credentials against database
     // For demo purposes, we'll accept any non-empty username/password combination
     // In production, use the UserRepository and AuthService
-    
+
     if (username.trim() === "" || password.trim() === "") {
       return new Response(
         JSON.stringify(

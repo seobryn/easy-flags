@@ -10,6 +10,7 @@
         "start": "node ./dist/server/entry.mjs",
         "type-check": "tsc --noEmit",
         "astro": "astro",
+        "db:init": "node scripts/init.mjs",
         "migration:create": "node scripts/create-migration.mjs",
         "test": "jest",
         "test:watch": "jest --watch"
