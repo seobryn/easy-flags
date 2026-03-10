@@ -1,0 +1,8 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SpacesDashboard from "@/components/SpacesDashboard";
+---
+
+<BaseLayout title="Spaces - Feature Flags" includeHeader={true}>
+  <SpacesDashboard client:load />
+</BaseLayout>

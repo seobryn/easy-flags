@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import HeroSection from "@/components/HeroSection";
+import QuickStartSection from "@/components/QuickStartSection";
+import WhyLoveSection from "@/components/WhyLoveSection";
+---
+
+<BaseLayout title="Feature Flags UI" includeHeader={true}>
+  <HeroSection client:load />
+  <QuickStartSection client:load />
+  <WhyLoveSection client:load />
+</BaseLayout>

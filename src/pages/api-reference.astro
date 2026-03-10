@@ -1,0 +1,45 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="API Reference" includeHeader={true}>
+  <article class="max-w-4xl mx-auto py-12">
+    <h1 class="text-4xl font-bold text-gradient mb-6">API Reference</h1>
+
+    <div class="card space-y-6">
+      <section>
+        <h2 class="text-2xl font-bold text-cyan-300 mb-3">Authentication</h2>
+        <p class="text-slate-400 mb-4">
+          All API requests require a valid JWT token in the Authorization header.
+        </p>
+        <pre class="bg-slate-900 p-4 rounded-lg overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">
+          POST /api/auth/login
+        </h3>
+        <p class="text-slate-400 mb-4">Authenticate a user and get a JWT token.</p>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">GET /api/spaces</h3>
+        <p class="text-slate-400 mb-4">List all spaces for the authenticated user.</p>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">
+          POST /api/spaces/:spaceId/features
+        </h3>
+        <p class="text-slate-400 mb-4">Create a new feature in the specified space.</p>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">
+          GET /api/spaces/:spaceId/environments
+        </h3>
+        <p class="text-slate-400 mb-4">Get all environments in a space.</p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>

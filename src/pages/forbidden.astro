@@ -1,0 +1,18 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Forbidden" includeHeader={true}>
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="text-center">
+      <div class="text-9xl font-bold text-gradient mb-4">403</div>
+      <h1 class="text-4xl font-bold text-cyan-300 mb-4">Forbidden</h1>
+      <p class="text-slate-400 mb-8">
+        You don't have permission to access this resource.
+      </p>
+      <a href="/" class="btn-primary inline-block">
+        Return to Home
+      </a>
+    </div>
+  </div>
+</BaseLayout>

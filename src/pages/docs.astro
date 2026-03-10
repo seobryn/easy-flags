@@ -1,0 +1,49 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Documentation" includeHeader={true}>
+  <article class="max-w-4xl mx-auto py-12">
+    <h1 class="text-4xl font-bold text-gradient mb-6">Documentation</h1>
+
+    <div class="card space-y-6">
+      <section>
+        <h2 class="text-2xl font-bold text-cyan-300 mb-3">Getting Started</h2>
+        <p class="text-slate-400 mb-4">
+          Welcome to Easy Flags! This guide will help you set up feature flags
+          in your application.
+        </p>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">Creating a Space</h3>
+        <p class="text-slate-400 mb-4">
+          A space is your primary organizational unit. All feature flags and
+          environments belong to a space.
+        </p>
+        <ol class="list-decimal list-inside text-slate-400 space-y-2 ml-4">
+          <li>Navigate to Spaces</li>
+          <li>Click "Create Space"</li>
+          <li>Enter your space name and description</li>
+          <li>Invite team members</li>
+        </ol>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">Creating Features</h3>
+        <p class="text-slate-400 mb-4">
+          Features are the core of feature flag management. Create features to
+          control rollouts.
+        </p>
+      </section>
+
+      <section>
+        <h3 class="text-xl font-bold text-cyan-300 mb-3">Environments</h3>
+        <p class="text-slate-400 mb-4">
+          Environments allow you to have different feature flag values for
+          different stages of your application.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>

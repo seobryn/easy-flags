@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import BillingPanel from "@/components/BillingPanel";
+---
+
+<BaseLayout title="Billing" includeHeader={true}>
+  <article class="max-w-4xl mx-auto py-12">
+    <h1 class="text-4xl font-bold text-gradient mb-6">Billing & Plans</h1>
+
+    <BillingPanel client:load />
+  </article>
+</BaseLayout>

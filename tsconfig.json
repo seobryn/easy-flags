@@ -1,20 +1,26 @@
 {
+    "extends": "astro/tsconfigs/strict",
     "compilerOptions": {
-        "target": "ES2020",
-        "module": "CommonJS",
-        "outDir": "dist",
-        "rootDir": ".",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-    },
-    "include": [
-        "src/**/*",
-        "tests/**/*"
-    ],
-    "exclude": [
-        "node_modules",
-        "dist"
-    ]
+        "jsxImportSource": "react",
+        "strictNullChecks": true,
+        "resolveJsonModule": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ],
+            "@components/*": [
+                "src/components/*"
+            ],
+            "@layouts/*": [
+                "src/layouts/*"
+            ],
+            "@utils/*": [
+                "src/utils/*"
+            ],
+            "@api/*": [
+                "src/api/*"
+            ]
+        }
+    }
 }
