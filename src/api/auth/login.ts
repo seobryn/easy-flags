@@ -9,22 +9,24 @@ import { successResponse, badRequestResponse } from "@/utils/api";
 export const POST: APIRoute = async (context) => {
   try {
     const body = await context.request.json();
-    const { email, password } = body;
+    const { username, password } = body;
 
-    if (!email || !password) {
+    if (!username || !password) {
       return new Response(
-        JSON.stringify(badRequestResponse("Email and password are required")),
+        JSON.stringify(
+          badRequestResponse("Username and password are required"),
+        ),
         { status: 400 },
       );
     }
 
     // TODO: Validate credentials against database
-    // For demo purposes, we'll accept any email/password combination
+    // For demo purposes, we'll accept any username/password combination
     // In production, use the UserRepository and AuthService
     const user = {
       id: 1,
-      username: email.split("@")[0],
-      email,
+      username,
+      email: `${username}@example.com`,
       role_id: 1,
     };
 
@@ -43,7 +45,7 @@ export const POST: APIRoute = async (context) => {
   } catch (error) {
     console.error("Login error:", error);
     return new Response(
-      JSON.stringify(badRequestResponse("Invalid email or password")),
+      JSON.stringify(badRequestResponse("Invalid username or password")),
       { status: 400 },
     );
   }
