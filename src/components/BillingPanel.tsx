@@ -53,16 +53,29 @@ export default function BillingPanel() {
             pricesData.data &&
             pricesData.data.length > 0
           ) {
-            // Convert Stripe prices directly to billing plans
-            const stripePlans: BillingPlan[] = pricesData.data.map(
-              (price: StripePrice) => ({
+            // Convert Stripe prices directly to billing plans and sort them
+            const planOrder = ["lab", "basic", "pro"];
+            
+            const stripePlans: BillingPlan[] = pricesData.data
+              .map((price: StripePrice) => ({
                 name: price.product?.name || "Plan",
                 price: Math.ceil((price.unit_amount || 0) / 100),
                 features: [],
                 priceId: price.id,
-              }),
-            );
-            console.log("Mapped plans:", stripePlans);
+              }))
+              .sort((a: BillingPlan, b: BillingPlan) => {
+                const indexA = planOrder.indexOf(a.name.toLowerCase());
+                const indexB = planOrder.indexOf(b.name.toLowerCase());
+                
+                // If plan name not in our order, push to the end
+                if (indexA === -1 && indexB === -1) return 0;
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+                
+                return indexA - indexB;
+              });
+
+            console.log("Mapped and sorted plans:", stripePlans);
             setPlans(stripePlans);
           } else {
             setError("No pricing plans available");
