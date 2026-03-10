@@ -183,9 +183,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <a
                 href={`/spaces/${spaceId}/environments`}
-                className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 transition-all duration-300 p-6 text-center"
+                className="group overflow-hidden rounded-lg bg-slate-800/50 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 p-6 text-center"
               >
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all duration-300"></div>
                 <div className="relative">
                   <p className="text-3xl mb-3">🌍</p>
                   <p className="font-semibold text-white text-sm">
@@ -196,9 +195,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
 
               <a
                 href={`/spaces/${spaceId}/features`}
-                className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 transition-all duration-300 p-6 text-center"
+                className="group overflow-hidden rounded-lg bg-slate-800/50 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 p-6 text-center"
               >
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all duration-300"></div>
                 <div className="relative">
                   <p className="text-3xl mb-3">⚙️</p>
                   <p className="font-semibold text-white text-sm">
@@ -209,9 +207,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
 
               <a
                 href={`/spaces/${spaceId}/permissions`}
-                className="group relative overflow-hidden rounded-lg bg-gradient-to-br from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 transition-all duration-300 p-6 text-center"
+                className="group overflow-hidden rounded-lg bg-slate-800/50 border border-slate-700 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all duration-300 p-6 text-center"
               >
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-all duration-300"></div>
                 <div className="relative">
                   <p className="text-3xl mb-3">👥</p>
                   <p className="font-semibold text-white text-sm">
