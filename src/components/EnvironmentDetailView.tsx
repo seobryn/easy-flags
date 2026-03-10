@@ -81,16 +81,16 @@ export default function EnvironmentDetailView({
 
   return (
     <div className="min-h-screen bg-slate-900">
-      <SpaceNavigation
-        spaceId={spaceId}
-        spaceName="Acme Corporation"
-        currentTab="environments"
-        subPage={{ name: envName }}
-      />
-
       <div className="max-w-6xl mx-auto py-12 px-4">
+        <SpaceNavigation
+          spaceId={spaceId}
+          spaceName="Acme Corporation"
+          currentTab="environments"
+          subPage={{ name: envName }}
+        />
+
         {/* Header Section */}
-        <div className="mb-12">
+        <div className="mb-12 mt-12">
           <div className="flex flex-col mb-6">
             <p className="text-slate-400">
               {envDescription || "Configure and manage this environment's settings, API keys, and deployments."}
