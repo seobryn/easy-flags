@@ -183,8 +183,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             {stats.environmentsCount === 0
               ? "No environments"
               : stats.environmentsCount === 1
-              ? "1 environment"
-              : `${stats.environmentsCount} environments`}
+                ? "1 environment"
+                : `${stats.environmentsCount} environments`}
           </p>
           <p className="text-xs text-slate-500 mb-6">Configured</p>
           <a
@@ -208,8 +208,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             {stats.featuresCount === 0
               ? "No features"
               : stats.featuresCount === 1
-              ? "1 feature"
-              : `${stats.featuresCount} features`}
+                ? "1 feature"
+                : `${stats.featuresCount} features`}
           </p>
           <p className="text-xs text-slate-500 mb-6">Active and configured</p>
           <a
@@ -235,22 +235,10 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             {stats.teamMembersCount === 0
               ? "No members"
               : stats.teamMembersCount === 1
-              ? "1 member"
-              : `${stats.teamMembersCount} members`}
+                ? "1 member"
+                : `${stats.teamMembersCount} members`}
           </p>
           <p className="text-xs text-slate-500 mb-6">Space collaborators</p>
-          <a
-            href={`/spaces/${spaceId}/permissions`}
-            className="inline-block text-green-400 hover:text-green-300 text-sm font-semibold"
-          >
-            Manage →
-          </a>
-        </div>
-          </p>
-          <p className="text-2xl font-bold text-green-300 mb-4">Active Users</p>
-          <p className="text-xs text-slate-500 mb-6">
-            1 admin, 2 editors, 2 viewers
-          </p>
           <a
             href={`/spaces/${spaceId}/permissions`}
             className="inline-block text-green-400 hover:text-green-300 text-sm font-semibold"
@@ -272,8 +260,8 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             {stats.apiKeysCount === 0
               ? "No keys"
               : stats.apiKeysCount === 1
-              ? "1 key"
-              : `${stats.apiKeysCount} keys`}
+                ? "1 key"
+                : `${stats.apiKeysCount} keys`}
           </p>
           <p className="text-xs text-slate-500 mb-6">Ready for integration</p>
           <a
