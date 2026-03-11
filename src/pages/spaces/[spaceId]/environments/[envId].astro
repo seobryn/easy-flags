@@ -19,17 +19,17 @@ const { spaceId: spaceSlug, envId: envSlug } = Astro.params;
 
 // Verify space exists first
 const spaceService = new SpaceService();
-const space = await spaceService.getSpaceBySlug(spaceSlug as string);
+const space = (await spaceService.getSpaceBySlug(spaceSlug as string))!;
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
 // Verify environment exists and belongs to the space (lookup by slug)
 const environmentService = new EnvironmentService();
-const env = await environmentService.getEnvironmentBySlug(
+const env = (await environmentService.getEnvironmentBySlug(
   space.id,
   envSlug as string,
-);
+))!;
 if (!env) {
   return Astro.redirect("/404");
 }
@@ -40,8 +40,8 @@ const title = `${env.name} - Configuration`;
 <BaseLayout title={title} includeHeader={true}>
   <EnvironmentDetailView
     client:load
-    spaceId={spaceId}
-    envId={env.id.toString()}
+    spaceId={space.slug}
+    envId={env.slug}
     envName={env.name}
     envDescription={env.description}
     createdAt={env.created_at}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Space {
   id: number;
@@ -131,7 +131,7 @@ export default function SpacesDashboard() {
           {spaces.map((space) => (
             <a
               key={space.id}
-              href={`/spaces/${space.id}`}
+              href={`/spaces/${space.slug}`}
               className="card group hover:shadow-2xl"
             >
               <h3 className="text-xl font-bold text-cyan-300 group-hover:text-cyan-200 transition mb-2">

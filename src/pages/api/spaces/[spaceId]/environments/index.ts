@@ -31,7 +31,9 @@ export const GET: APIRoute = async (context) => {
     }
 
     const environmentService = new EnvironmentService();
-    const environments = await environmentService.getSpaceEnvironments(space.id);
+    const environments = await environmentService.getSpaceEnvironments(
+      space.id,
+    );
     return new Response(JSON.stringify(environments), { status: 200 });
   } catch (error) {
     return new Response(

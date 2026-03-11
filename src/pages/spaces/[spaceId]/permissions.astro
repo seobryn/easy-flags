@@ -14,11 +14,12 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
-const { spaceId: spaceSlug } = Astro.params;
+const { spaceId } = Astro.params;
 
 // Verify space exists
 const spaceService = new SpaceService();
-const space = await spaceService.getSpaceBySlug(spaceSlug as string);
+const space = await spaceService.getSpaceBySlug(spaceId as string);
+
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }

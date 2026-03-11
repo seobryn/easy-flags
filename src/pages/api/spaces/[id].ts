@@ -28,13 +28,13 @@ export const GET: APIRoute = async (context) => {
       // Get single space by slug - verify user has access
       const spaceSlug = params.id as string;
       const space = await spaceService.getSpaceBySlug(spaceSlug);
-      
+
       if (!space) {
         return new Response(JSON.stringify({ error: "Space not found" }), {
           status: 404,
         });
       }
-      
+
       const { isAuthorized } = await checkSpaceAdminAuth(context, space.id);
 
       // For GET, allow any member to view the space (viewers should only be read)
@@ -104,7 +104,7 @@ export const PUT: APIRoute = async (context) => {
     const spaceSlug = params.id as string;
     const spaceService = new SpaceService();
     const space = await spaceService.getSpaceBySlug(spaceSlug);
-    
+
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -153,7 +153,7 @@ export const DELETE: APIRoute = async (context) => {
     const spaceSlug = params.id as string;
     const spaceService = new SpaceService();
     const space = await spaceService.getSpaceBySlug(spaceSlug);
-    
+
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,

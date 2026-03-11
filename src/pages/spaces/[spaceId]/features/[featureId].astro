@@ -20,17 +20,15 @@ const featureIdNum = parseInt(featureId as string);
 
 // Verify space exists first
 const spaceService = new SpaceService();
-const space = await spaceService.getSpaceBySlug(spaceSlug as string);
+const space = (await spaceService.getSpaceBySlug(spaceSlug as string))!;
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
 // Verify feature exists and belongs to the space
 const featureService = new FeatureService();
-const feature = await featureService.getFeature(featureIdNum);
-if (
-  !validateNestedResource(feature, "space_id", space.id, Astro, "Feature")
-) {
+const feature = (await featureService.getFeature(featureIdNum))!;
+if (!validateNestedResource(feature, "space_id", space.id, Astro, "Feature")) {
   return Astro.redirect("/404");
 }
 
@@ -40,7 +38,7 @@ const title = `${feature.name} - Advanced Configuration`;
 <BaseLayout title={title} includeHeader={true}>
   <AdvancedConfigurationView
     client:load
-    spaceId={spaceId}
+    spaceId={spaceSlug}
     featureId={featureId}
     featureName={feature.name}
     featureKey={feature.key}
