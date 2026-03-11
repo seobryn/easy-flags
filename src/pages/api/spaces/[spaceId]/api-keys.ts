@@ -19,11 +19,11 @@ export const GET: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -53,11 +53,11 @@ export const POST: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,

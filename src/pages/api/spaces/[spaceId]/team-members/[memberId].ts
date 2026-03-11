@@ -6,7 +6,7 @@ import type { APIRoute } from "astro";
 import { getUserFromContext } from "@/utils/auth";
 import { unauthorizedResponse } from "@/utils/api";
 import { checkSpaceAdminAuth } from "@/utils/permissions";
-import { TeamMemberService } from "@application/services";
+import { TeamMemberService, SpaceService } from "@application/services";
 import { getRepositoryRegistry } from "@infrastructure/registry";
 
 export const prerender = false;
@@ -21,10 +21,19 @@ export const PUT: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
+
+    // Get space by slug
+    const spaceService = new SpaceService();
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
+    if (!space) {
+      return new Response(JSON.stringify({ error: "Space not found" }), {
+        status: 404,
+      });
+    }
 
     // Only space admins can modify team member roles
-    const { isAuthorized } = await checkSpaceAdminAuth(context, spaceId);
+    const { isAuthorized } = await checkSpaceAdminAuth(context, space.id);
     if (!isAuthorized) {
       return new Response(
         JSON.stringify({
@@ -62,10 +71,19 @@ export const DELETE: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
+
+    // Get space by slug
+    const spaceService = new SpaceService();
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
+    if (!space) {
+      return new Response(JSON.stringify({ error: "Space not found" }), {
+        status: 404,
+      });
+    }
 
     // Only space admins can remove team members
-    const { isAuthorized } = await checkSpaceAdminAuth(context, spaceId);
+    const { isAuthorized } = await checkSpaceAdminAuth(context, space.id);
     if (!isAuthorized) {
       return new Response(
         JSON.stringify({
@@ -89,7 +107,7 @@ export const DELETE: APIRoute = async (context) => {
       });
     }
 
-    await teamMemberService.removeTeamMember(spaceId, member.user_id);
+    await teamMemberService.removeTeamMember(space.id, member.user_id);
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
     return new Response(

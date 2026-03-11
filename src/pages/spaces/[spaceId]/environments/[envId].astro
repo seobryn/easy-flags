@@ -15,23 +15,21 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
-const { spaceId, envId } = Astro.params;
-const spaceIdNum = parseInt(spaceId as string);
-const envSlug = envId as string;
+const { spaceId: spaceSlug, envId: envSlug } = Astro.params;
 
 // Verify space exists first
 const spaceService = new SpaceService();
-const space = (await spaceService.getSpace(spaceIdNum))!;
+const space = await spaceService.getSpaceBySlug(spaceSlug as string);
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
 // Verify environment exists and belongs to the space (lookup by slug)
 const environmentService = new EnvironmentService();
-const env = (await environmentService.getEnvironmentBySlug(
-  spaceIdNum,
-  envSlug,
-))!;
+const env = await environmentService.getEnvironmentBySlug(
+  space.id,
+  envSlug as string,
+);
 if (!env) {
   return Astro.redirect("/404");
 }

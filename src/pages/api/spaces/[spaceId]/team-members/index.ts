@@ -21,11 +21,11 @@ export const GET: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -33,7 +33,7 @@ export const GET: APIRoute = async (context) => {
     }
 
     const teamMemberService = new TeamMemberService();
-    const members = await teamMemberService.getTeamMembers(spaceId);
+    const members = await teamMemberService.getTeamMembers(space.id);
     return new Response(JSON.stringify(members), { status: 200 });
   } catch (error) {
     return new Response(
@@ -55,11 +55,11 @@ export const POST: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -67,7 +67,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Only space admins can add team members
-    const { isAuthorized } = await checkSpaceAdminAuth(context, spaceId);
+    const { isAuthorized } = await checkSpaceAdminAuth(context, space.id);
     if (!isAuthorized) {
       return new Response(
         JSON.stringify({
@@ -83,16 +83,16 @@ export const POST: APIRoute = async (context) => {
 
     // Find user by email
     const userRepo = registry.getUserRepository();
-    const user = await userRepo.findByEmail(body.email);
-    if (!user) {
+    const targetUser = await userRepo.findByEmail(body.email);
+    if (!targetUser) {
       return new Response(JSON.stringify({ error: "User not found" }), {
         status: 404,
       });
     }
 
     const member = await teamMemberService.addTeamMember(
-      spaceId,
-      user.id,
+      space.id,
+      targetUser.id,
       body.role_id || 4,
     );
     return new Response(JSON.stringify(member), { status: 201 });

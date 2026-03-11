@@ -12,16 +12,16 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
-const { spaceId } = Astro.params;
+const { spaceId: spaceSlug } = Astro.params;
 
 // Verify space exists
 const spaceService = new SpaceService();
-const space = await spaceService.getSpace(parseInt(spaceId as string));
+const space = await spaceService.getSpaceBySlug(spaceSlug as string);
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 ---
 
 <BaseLayout title="Features" includeHeader={true}>
-  <FeaturesView client:load spaceId={spaceId} />
+  <FeaturesView client:load spaceId={spaceSlug} />
 </BaseLayout>

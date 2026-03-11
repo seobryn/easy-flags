@@ -19,11 +19,11 @@ export const GET: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -31,7 +31,7 @@ export const GET: APIRoute = async (context) => {
     }
 
     const environmentService = new EnvironmentService();
-    const environments = await environmentService.getSpaceEnvironments(spaceId);
+    const environments = await environmentService.getSpaceEnvironments(space.id);
     return new Response(JSON.stringify(environments), { status: 200 });
   } catch (error) {
     return new Response(
@@ -53,11 +53,11 @@ export const POST: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -66,7 +66,7 @@ export const POST: APIRoute = async (context) => {
 
     const environmentService = new EnvironmentService();
     const body = await context.request.json();
-    const environment = await environmentService.createEnvironment(spaceId, {
+    const environment = await environmentService.createEnvironment(space.id, {
       name: body.name,
       description: body.description,
       type: body.type || "other",

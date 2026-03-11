@@ -15,22 +15,21 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
-const { spaceId, featureId } = Astro.params;
-const spaceIdNum = parseInt(spaceId as string);
+const { spaceId: spaceSlug, featureId } = Astro.params;
 const featureIdNum = parseInt(featureId as string);
 
 // Verify space exists first
 const spaceService = new SpaceService();
-const space = await spaceService.getSpace(spaceIdNum);
+const space = await spaceService.getSpaceBySlug(spaceSlug as string);
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
 // Verify feature exists and belongs to the space
 const featureService = new FeatureService();
-const feature = (await featureService.getFeature(featureIdNum))!;
+const feature = await featureService.getFeature(featureIdNum);
 if (
-  !validateNestedResource(feature, "space_id", spaceIdNum, Astro, "Feature")
+  !validateNestedResource(feature, "space_id", space.id, Astro, "Feature")
 ) {
   return Astro.redirect("/404");
 }

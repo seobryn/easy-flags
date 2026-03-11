@@ -13,7 +13,7 @@ interface SpaceStats {
   environmentsCount: number;
   featuresCount: number;
   teamMembersCount: number;
-  apiKeysCount: number;
+  // apiKeysCount: number;
   recentActivity: Array<{
     icon: string;
     action: string;
@@ -32,7 +32,7 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
     environmentsCount: 0,
     featuresCount: 0,
     teamMembersCount: 0,
-    apiKeysCount: 0,
+    // apiKeysCount: 0,
     recentActivity: [],
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +52,7 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
             fetchEnvironmentsCount(),
             fetchFeaturesCount(),
             fetchTeamMembersCount(),
-            fetchApiKeysCount(),
+            // fetchApiKeysCount(),
           ]);
         } else {
           setSpace(null);
@@ -124,24 +124,6 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
     }
   };
 
-  const fetchApiKeysCount = async () => {
-    try {
-      const response = await fetch(`/api/spaces/${spaceId}/api-keys`, {
-        credentials: "include",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const count = Array.isArray(data) ? data.length : 0;
-        setStats((prev) => ({
-          ...prev,
-          apiKeysCount: count,
-        }));
-      }
-    } catch (error) {
-      console.error("Failed to fetch API keys:", error);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -197,7 +179,7 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
       </div>
 
       {/* Quick Stats - Top Priority */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-32">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-32">
         {/* Environments */}
         <div className="group card bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/30 hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 p-6">
           <div className="flex items-start justify-between mb-6">
@@ -272,31 +254,6 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
           <a
             href={`/spaces/${spaceId}/permissions`}
             className="inline-block text-green-400 hover:text-green-300 text-sm font-semibold"
-          >
-            Manage →
-          </a>
-        </div>
-
-        {/* API Keys */}
-        <div className="group card bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/30 hover:border-orange-500/50 hover:shadow-lg hover:shadow-orange-500/20 transition-all duration-300 p-6">
-          <div className="flex items-start justify-between mb-6">
-            <div className="text-4xl">🔑</div>
-            <span className="text-xs font-bold text-orange-400 bg-orange-500/20 px-2 py-1 rounded">
-              {stats.apiKeysCount}
-            </span>
-          </div>
-          <p className="text-slate-400 text-sm mb-3 font-medium">API Keys</p>
-          <p className="text-2xl font-bold text-orange-300 mb-4">
-            {stats.apiKeysCount === 0
-              ? "No keys"
-              : stats.apiKeysCount === 1
-                ? "1 key"
-                : `${stats.apiKeysCount} keys`}
-          </p>
-          <p className="text-xs text-slate-500 mb-6">Ready for integration</p>
-          <a
-            href="#"
-            className="inline-block text-orange-400 hover:text-orange-300 text-sm font-semibold"
           >
             Manage →
           </a>

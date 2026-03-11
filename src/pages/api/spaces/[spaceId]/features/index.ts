@@ -19,11 +19,11 @@ export const GET: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -31,7 +31,7 @@ export const GET: APIRoute = async (context) => {
     }
 
     const featureService = new FeatureService();
-    const features = await featureService.getSpaceFeatures(spaceId);
+    const features = await featureService.getSpaceFeatures(space.id);
     return new Response(JSON.stringify(features), { status: 200 });
   } catch (error) {
     return new Response(
@@ -53,11 +53,11 @@ export const POST: APIRoute = async (context) => {
 
   try {
     const { params } = context;
-    const spaceId = parseInt(params.spaceId as string);
+    const spaceSlug = params.spaceId as string;
 
     // Verify space exists
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpace(spaceId);
+    const space = await spaceService.getSpaceBySlug(spaceSlug);
     if (!space) {
       return new Response(JSON.stringify({ error: "Space not found" }), {
         status: 404,
@@ -66,7 +66,7 @@ export const POST: APIRoute = async (context) => {
 
     const featureService = new FeatureService();
     const body = await context.request.json();
-    const feature = await featureService.createFeature(spaceId, {
+    const feature = await featureService.createFeature(space.id, {
       key: body.key,
       name: body.name,
       description: body.description,
