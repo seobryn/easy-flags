@@ -499,7 +499,10 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
 
   async regenerateApiKey(id: number): Promise<Environment> {
     const db = await this.getDb();
-    const newApiKey = `env_${id}_${Math.random().toString(36).substring(2, 13)}`;
+    // Generate unique API key using hex encoding (matches database generation)
+    const crypto = await import("crypto");
+    const randomBytes = crypto.default.randomBytes(8).toString("hex");
+    const newApiKey = `env_${randomBytes.substring(0, 8)}_${randomBytes.substring(8)}`;
 
     await db.execute({
       sql: `UPDATE environments SET api_key = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
