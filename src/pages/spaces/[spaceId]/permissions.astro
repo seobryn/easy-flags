@@ -2,7 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 import { checkResourceExists } from "@/utils/resource-validation";
-import PermissionsView from "@/components/react/PermissionsView";
+import PermissionsView from "@/components/react/spaces/PermissionsView";
 import { SpaceService } from "@application/services";
 
 export const prerender = false;
