@@ -3,19 +3,31 @@
 // Development-only database inspection page
 import DatabaseInspector from "@/components/react/DatabaseInspector";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
-import { isGlobalAdmin } from "@/utils/permissions";
+import { isGlobalAdmin, ROLES } from "@/utils/permissions";
 import { getUserFromContext } from "@/utils/auth";
 
 // Require authentication
+console.log("[db-inspector] Checking auth...");
 if (!requireAuth(Astro)) {
+  console.log("[db-inspector] User not authenticated, redirecting to login");
   return Astro.redirect(getLoginUrl(Astro));
 }
 
 // Check if user is a global admin
 const user = getUserFromContext(Astro);
+console.log("[db-inspector] User object:", user);
+console.log("[db-inspector] User role_id:", user?.role_id);
+console.log("[db-inspector] ROLES.ADMIN value:", ROLES.ADMIN);
+console.log("[db-inspector] Is global admin?", isGlobalAdmin(user));
+
 if (!user || !isGlobalAdmin(user)) {
+  console.log(
+    "[db-inspector] User is not a global admin. Redirecting to home.",
+  );
   return Astro.redirect("/");
 }
+
+console.log("[db-inspector] Access granted to admin user:", user.username);
 ---
 
 <!doctype html>
