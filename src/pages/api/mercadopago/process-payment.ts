@@ -60,7 +60,7 @@ export const POST: APIRoute = async (context) => {
       payment_method_id: body.payment_method_id,
       transaction_amount: body.transaction_amount,
       installments: body.installments || 1,
-      issuer_id: body.issuer_id,
+      issuer_id: body.issuer_id!,
       payer: body.payer,
       description: body.description,
     });

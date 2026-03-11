@@ -21,7 +21,6 @@
         "@astrojs/tailwind": "^5.0.0",
         "@libsql/client": "^0.5.0",
         "@mercadopago/sdk-js": "^2.0.0",
-        "@mercadopago/sdk-nodejs": "^2.0.0",
         "@types/jsonwebtoken": "^9.0.10",
         "astro": "^4.2.0",
         "bcryptjs": "^2.4.3",
