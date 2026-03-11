@@ -1,0 +1,16 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import SettingsView from "@/components/react/SettingsView";
+import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
+
+export const prerender = false;
+
+// Require authentication
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
+---
+
+<BaseLayout title="Settings - Feature Flags" includeHeader={true}>
+  <SettingsView client:load />
+</BaseLayout>

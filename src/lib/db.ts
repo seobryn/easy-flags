@@ -148,6 +148,25 @@ export async function initializeDatabase(): Promise<void> {
       FOREIGN KEY (environment_id) REFERENCES environments(id)
     );
 
+    CREATE TABLE IF NOT EXISTS user_api_keys (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      key TEXT UNIQUE NOT NULL,
+      last_used DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS user_preferences (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL UNIQUE,
+      email_notifications BOOLEAN DEFAULT 1,
+      security_alerts BOOLEAN DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+
     CREATE TABLE IF NOT EXISTS advanced_configurations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       feature_flag_id INTEGER NOT NULL,

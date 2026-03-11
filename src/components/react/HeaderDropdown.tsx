@@ -12,7 +12,6 @@ export default function HeaderDropdown({ username }: HeaderDropdownProps) {
       const response = await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
-        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
