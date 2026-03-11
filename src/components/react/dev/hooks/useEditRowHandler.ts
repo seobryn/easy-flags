@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import type { ColumnInfo } from "../types";
 import { useInspectorAPI } from "./useInspectorAPI";
 
-export interface UseAddRowHandlerProps {
+interface UseEditRowHandlerProps {
   selectedTable: string | null;
   schema: ColumnInfo[];
   onSuccess: () => void;
@@ -11,15 +11,15 @@ export interface UseAddRowHandlerProps {
 }
 
 /**
- * Custom hook for handling add row operations with type conversion
+ * Custom hook for handling edit row operations with type conversion
  */
-export function useAddRowHandler({
+export function useEditRowHandler({
   selectedTable,
   schema,
   onSuccess,
   onError,
   onLoadingChange,
-}: UseAddRowHandlerProps) {
+}: UseEditRowHandlerProps) {
   const api = useInspectorAPI();
 
   const convertFormDataToTypes = useCallback(
@@ -41,36 +41,29 @@ export function useAddRowHandler({
 
       return convertedData;
     },
-    [schema],
+    [schema]
   );
 
-  const addRow = useCallback(
-    async (formData: Record<string, string>) => {
+  const editRow = useCallback(
+    async (rowId: string | number, formData: Record<string, string>) => {
       if (!selectedTable) return;
 
       onLoadingChange?.(true);
 
       try {
         const convertedData = convertFormDataToTypes(formData);
-        await api.addRow(selectedTable, convertedData);
+        await api.updateRow(selectedTable, rowId, convertedData);
         onSuccess();
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to add row";
+          err instanceof Error ? err.message : "Failed to update row";
         onError?.(message);
       } finally {
         onLoadingChange?.(false);
       }
     },
-    [
-      selectedTable,
-      api,
-      convertFormDataToTypes,
-      onSuccess,
-      onError,
-      onLoadingChange,
-    ],
+    [selectedTable, api, convertFormDataToTypes, onSuccess, onError, onLoadingChange]
   );
 
-  return { addRow, convertFormDataToTypes };
+  return { editRow, convertFormDataToTypes };
 }

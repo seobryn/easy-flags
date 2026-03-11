@@ -6,6 +6,7 @@ interface DataTableProps {
   paginatedData: Record<string, unknown>[];
   deleting: string | number | null;
   onDeleteRow: (rowId: string | number) => void;
+  onEditRow: (rowId: string | number, rowData: Record<string, string>) => void;
 }
 
 export function DataTable({
@@ -13,6 +14,7 @@ export function DataTable({
   paginatedData,
   deleting,
   onDeleteRow,
+  onEditRow,
 }: DataTableProps) {
   return (
     <div className="overflow-x-auto">
@@ -45,13 +47,27 @@ export function DataTable({
                 className="border-b border-slate-700/50 hover:bg-slate-700/30"
               >
                 <td className="px-3 py-2 whitespace-nowrap">
-                  <button
-                    onClick={() => onDeleteRow(rowId)}
-                    disabled={deleting === rowId}
-                    className="px-2 py-1 text-xs bg-red-900/40 text-red-300 rounded border border-red-700/30 hover:bg-red-900/60 disabled:opacity-50 transition-colors font-medium"
-                  >
-                    {deleting === rowId ? "..." : "🗑️"}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        const rowData: Record<string, string> = {};
+                        schema.forEach((col) => {
+                          rowData[col.name] = String(row[col.name] ?? "");
+                        });
+                        onEditRow(rowId, rowData);
+                      }}
+                      className="px-2 py-1 text-xs bg-blue-900/40 text-blue-300 rounded border border-blue-700/30 hover:bg-blue-900/60 disabled:opacity-50 transition-colors font-medium"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => onDeleteRow(rowId)}
+                      disabled={deleting === rowId}
+                      className="px-2 py-1 text-xs bg-red-900/40 text-red-300 rounded border border-red-700/30 hover:bg-red-900/60 disabled:opacity-50 transition-colors font-medium"
+                    >
+                      {deleting === rowId ? "..." : "🗑️"}
+                    </button>
+                  </div>
                 </td>
                 {schema.map((col) => (
                   <td

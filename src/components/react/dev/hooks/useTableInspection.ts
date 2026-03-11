@@ -114,7 +114,12 @@ export function useTableInspection(): UseTableInspectionReturn {
       setError(null);
 
       try {
-        await api.deleteRow(selectedTable, rowId);
+        const primaryKeyColumn = schema.find((col) => col.pk === 1);
+        if (!primaryKeyColumn) {
+          throw new Error("Could not determine primary key");
+        }
+
+        await api.deleteRow(selectedTable, rowId, primaryKeyColumn.name);
         await refetchData();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to delete row");
@@ -122,7 +127,7 @@ export function useTableInspection(): UseTableInspectionReturn {
         setDeleting(null);
       }
     },
-    [api, selectedTable, refetchData],
+    [api, selectedTable, schema, refetchData],
   );
 
   const handleRowLimitChange = useCallback(

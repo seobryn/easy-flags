@@ -11,7 +11,8 @@ interface InspectorRequest {
     | "getTableData"
     | "getTableSchema"
     | "addRow"
-    | "deleteRow";
+    | "deleteRow"
+    | "updateRow";
   table?: string;
   limit?: number;
   rowData?: Record<string, unknown>;
@@ -161,6 +162,63 @@ export const POST: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({ success: true, message: "Row deleted successfully" }),
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    if (body.action === "updateRow") {
+      if (!body.table || body.rowId === undefined || !body.rowData) {
+        return new Response(
+          JSON.stringify({
+            error: "Table name, row ID, and row data required",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      // Get table schema to find primary key
+      const schemaResult = await db.execute(`PRAGMA table_info(${body.table})`);
+      const schema = schemaResult.rows as unknown as Array<{
+        cid: number;
+        name: string;
+        type: string;
+        notnull: number;
+        dflt_value: unknown;
+        pk: number;
+      }>;
+      const primaryKeyColumn = schema.find((col) => col.pk === 1);
+
+      if (!primaryKeyColumn) {
+        return new Response(
+          JSON.stringify({ error: "Could not determine primary key for table" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      const columns = Object.keys(body.rowData);
+      const values = Object.values(body.rowData);
+      const setClause = columns.map((col) => `${col} = ?`).join(", ");
+
+      // Add rowId as the last argument for the WHERE clause
+      values.push(body.rowId);
+
+      const query = `UPDATE ${body.table} SET ${setClause} WHERE ${primaryKeyColumn.name} = ?`;
+
+      await db.execute({
+        sql: query,
+        args: values as InArgs,
+      });
+
+      return new Response(
+        JSON.stringify({ success: true, message: "Row updated successfully" }),
         {
           headers: { "Content-Type": "application/json" },
         },

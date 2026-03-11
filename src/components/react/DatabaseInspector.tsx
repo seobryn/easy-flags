@@ -5,13 +5,16 @@ import {
   FilterSection,
   PaginationControls,
   AddRowModal,
+  EditRowModal,
   DataTable,
 } from "./dev";
 import {
   useTableInspection,
   useDataManipulation,
   useAddRowModal,
+  useEditRowModal,
   useAddRowHandler,
+  useEditRowHandler,
 } from "./dev/hooks";
 
 export default function DatabaseInspector() {
@@ -22,6 +25,7 @@ export default function DatabaseInspector() {
     itemsPerPage: 20,
   });
   const addRowModal = useAddRowModal();
+  const editRowModal = useEditRowModal();
 
   // Handler for adding rows
   const { addRow: addRowToTable } = useAddRowHandler({
@@ -31,11 +35,15 @@ export default function DatabaseInspector() {
       addRowModal.closeAddModal();
       tableInspection.refetchData();
     },
-    onError: (error) => {
-      // Error is managed internally in useTableInspection
-    },
-    onLoadingChange: () => {
-      // Loading is managed in useTableInspection
+  });
+
+  // Handler for editing rows
+  const { editRow: editRowInTable } = useEditRowHandler({
+    selectedTable: tableInspection.selectedTable,
+    schema: tableInspection.schema,
+    onSuccess: () => {
+      editRowModal.closeEditModal();
+      tableInspection.refetchData();
     },
   });
 
@@ -219,6 +227,9 @@ export default function DatabaseInspector() {
                           paginatedData={dataManipulation.getPaginatedData()}
                           deleting={tableInspection.deleting}
                           onDeleteRow={tableInspection.deleteRow}
+                          onEditRow={(rowId, rowData) => {
+                            editRowModal.openEditModal(rowId, rowData);
+                          }}
                         />
 
                         <PaginationControls
@@ -256,6 +267,20 @@ export default function DatabaseInspector() {
         onFormChange={addRowModal.handleFormChange}
         onAddRow={() => addRowToTable(addRowModal.formData)}
         onClose={addRowModal.closeAddModal}
+      />
+
+      {/* Edit Row Modal */}
+      <EditRowModal
+        isOpen={editRowModal.showEditModal}
+        selectedTable={tableInspection.selectedTable}
+        schema={tableInspection.schema}
+        formData={editRowModal.formData}
+        loading={tableInspection.loading}
+        onFormChange={editRowModal.handleFormChange}
+        onEditRow={() =>
+          editRowInTable(editRowModal.editingRowId ?? "", editRowModal.formData)
+        }
+        onClose={editRowModal.closeEditModal}
       />
     </div>
   );

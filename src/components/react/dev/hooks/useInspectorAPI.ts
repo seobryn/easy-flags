@@ -46,8 +46,11 @@ export function useInspectorAPI() {
   const addRow = (table: string, rowData: ConvertedData) =>
     makeRequest("addRow", { table, rowData });
 
-  const deleteRow = (table: string, rowId: string | number) =>
-    makeRequest("deleteRow", { table, rowId });
+  const deleteRow = (table: string, rowId: string | number, primaryKey: string) =>
+    makeRequest("deleteRow", { table, rowId, primaryKey });
+
+  const updateRow = (table: string, rowId: string | number, rowData: ConvertedData) =>
+    makeRequest("updateRow", { table, rowId, rowData });
 
   return {
     makeRequest,
@@ -56,5 +59,6 @@ export function useInspectorAPI() {
     fetchTableData,
     addRow,
     deleteRow,
+    updateRow,
   };
 }
