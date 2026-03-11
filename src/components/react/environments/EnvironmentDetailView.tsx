@@ -6,6 +6,7 @@ interface EnvironmentDetailViewProps {
   envId: string | undefined;
   envName: string;
   envDescription?: string;
+  createdAt?: string;
 }
 
 interface EnvironmentConfig {
@@ -20,6 +21,7 @@ export default function EnvironmentDetailView({
   envId,
   envName,
   envDescription,
+  createdAt,
 }: EnvironmentDetailViewProps) {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [configs, setConfigs] = useState<EnvironmentConfig[]>([]);
@@ -248,76 +250,17 @@ export default function EnvironmentDetailView({
                 </h2>
               </div>
 
-              <div className="space-y-2">
-                {["New Dashboard", "Dark Mode", "Beta Analytics"].map(
-                  (feature, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-3 bg-slate-900/50 border border-slate-700 rounded hover:border-slate-600 transition"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">✓</span>
-                        <span className="text-white">{feature}</span>
-                      </div>
-                      <span className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded">
-                        Active
-                      </span>
-                    </div>
-                  ),
-                )}
+              <div className="text-center py-8">
+                <p className="text-slate-400 text-sm">
+                  Features will be displayed here once deployed to this
+                  environment
+                </p>
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Status Card */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">📊</span>
-                <h3 className="text-lg font-bold text-white">Status</h3>
-              </div>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Health</span>
-                  <span className="flex items-center gap-2">
-                    <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-                    <span className="text-green-400 font-semibold">
-                      Healthy
-                    </span>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Uptime</span>
-                  <span className="text-slate-300 font-semibold">99.98%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Response Time</span>
-                  <span className="text-slate-300 font-semibold">45ms</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">📈</span>
-                <h3 className="text-lg font-bold text-white">Analytics</h3>
-              </div>
-
-              <div className="space-y-4 text-sm">
-                <div>
-                  <p className="text-slate-400 mb-2">Requests Today</p>
-                  <p className="text-2xl font-bold text-cyan-400">45.2K</p>
-                </div>
-                <div>
-                  <p className="text-slate-400 mb-2">Error Rate</p>
-                  <p className="text-2xl font-bold text-green-400">0.02%</p>
-                </div>
-              </div>
-            </div>
-
             {/* Environment Info */}
             <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -334,7 +277,15 @@ export default function EnvironmentDetailView({
                 </div>
                 <div>
                   <p className="text-slate-500 font-semibold mb-1">Created</p>
-                  <p className="text-slate-300">March 10, 2026</p>
+                  <p className="text-slate-300">
+                    {createdAt
+                      ? new Date(createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "N/A"}
+                  </p>
                 </div>
               </div>
             </div>

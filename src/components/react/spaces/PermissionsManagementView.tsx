@@ -42,7 +42,12 @@ export default function PermissionsManagementView({
         </div>
       )}
 
-      {activeTab === "space" && <PermissionsView spaceId={spaceId} />}
+      {activeTab === "space" && (
+        <PermissionsView
+          spaceId={spaceId}
+          canManageFeaturePermissions={canManageFeaturePermissions}
+        />
+      )}
       {activeTab === "features" && canManageFeaturePermissions && (
         <FeaturesPermissionsView spaceId={spaceId} />
       )}

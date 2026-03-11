@@ -37,9 +37,13 @@ interface SpaceMemberAPI {
 
 interface PermissionsViewProps {
   spaceId: string | undefined;
+  canManageFeaturePermissions?: boolean;
 }
 
-export default function PermissionsView({ spaceId }: PermissionsViewProps) {
+export default function PermissionsView({
+  spaceId,
+  canManageFeaturePermissions,
+}: PermissionsViewProps) {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -412,15 +416,17 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                     <span className="text-cyan-300 font-semibold">💡 Tip:</span>{" "}
                     A space must have at least one admin.
                   </p>
-                  <div className="bg-slate-900/50 border border-slate-600/50 rounded p-2">
-                    <p className="text-xs text-slate-400">
-                      <span className="text-yellow-300 font-semibold">
-                        ⓘ Note:
-                      </span>{" "}
-                      Super Admin roles are managed by system administrators
-                      only. Contact support to manage Super Admin permissions.
-                    </p>
-                  </div>
+                  {canManageFeaturePermissions && (
+                    <div className="bg-slate-900/50 border border-slate-600/50 rounded p-2">
+                      <p className="text-xs text-slate-400">
+                        <span className="text-yellow-300 font-semibold">
+                          ⓘ Note:
+                        </span>{" "}
+                        Super Admin roles are managed by system administrators
+                        only. Contact support to manage Super Admin permissions.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -476,9 +482,11 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                 <p className="text-xs text-slate-500 mt-2">
                   {roleDescriptions[inviteRole]}
                 </p>
-                <p className="text-xs text-slate-600 mt-1">
-                  ⓘ System roles are managed by Super Admins
-                </p>
+                {canManageFeaturePermissions && (
+                  <p className="text-xs text-slate-600 mt-1">
+                    ⓘ System roles are managed by Super Admins
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-3 pt-4">
