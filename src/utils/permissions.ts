@@ -6,6 +6,7 @@ import { getDatabase } from "@/lib/db";
  * Role IDs
  */
 export const ROLES = {
+  SUPER_USER: 0,
   ADMIN: 1,
   EDITOR: 2,
   VIEWER: 3,
@@ -15,10 +16,57 @@ export const ROLES = {
  * Role names
  */
 export const ROLE_NAMES = {
+  [ROLES.SUPER_USER]: "super_user",
   [ROLES.ADMIN]: "admin",
   [ROLES.EDITOR]: "editor",
   [ROLES.VIEWER]: "viewer",
 } as const;
+
+/**
+ * Feature names - granular control
+ */
+export const FEATURES = {
+  FEATURE_FLAGS: "feature_flags",
+  SPACES: "spaces",
+  ENVIRONMENTS: "environments",
+  BILLING: "billing",
+  SETTINGS: "settings",
+  DATABASE_INSPECTOR: "database_inspector",
+  API_REFERENCE: "api_reference",
+} as const;
+
+/**
+ * Default feature permissions by role
+ */
+export const DEFAULT_FEATURE_PERMISSIONS: Record<
+  number,
+  (typeof FEATURES)[keyof typeof FEATURES][]
+> = {
+  [ROLES.SUPER_USER]: [
+    FEATURES.FEATURE_FLAGS,
+    FEATURES.SPACES,
+    FEATURES.ENVIRONMENTS,
+    FEATURES.BILLING,
+    FEATURES.SETTINGS,
+    FEATURES.DATABASE_INSPECTOR,
+    FEATURES.API_REFERENCE,
+  ],
+  [ROLES.ADMIN]: [
+    FEATURES.FEATURE_FLAGS,
+    FEATURES.SPACES,
+    FEATURES.ENVIRONMENTS,
+    FEATURES.BILLING,
+    FEATURES.SETTINGS,
+    FEATURES.API_REFERENCE,
+  ],
+  [ROLES.EDITOR]: [
+    FEATURES.FEATURE_FLAGS,
+    FEATURES.SPACES,
+    FEATURES.ENVIRONMENTS,
+    FEATURES.API_REFERENCE,
+  ],
+  [ROLES.VIEWER]: [FEATURES.FEATURE_FLAGS, FEATURES.API_REFERENCE],
+};
 
 /**
  * Check if a user is a global admin
@@ -26,6 +74,102 @@ export const ROLE_NAMES = {
 export function isGlobalAdmin(user: UserPayload | null): boolean {
   if (!user) return false;
   return user.role_id === ROLES.ADMIN;
+}
+
+/**
+ * Check if a user is a super user
+ */
+export function isSuperUser(user: UserPayload | null): boolean {
+  if (!user) return false;
+  return user.role_id === ROLES.SUPER_USER;
+}
+
+/**
+ * Check if a user has access to a specific feature
+ */
+export function hasFeatureAccess(
+  user: UserPayload | null,
+  feature: (typeof FEATURES)[keyof typeof FEATURES],
+): boolean {
+  if (!user) return false;
+
+  // Super users have access to all features
+  if (user.role_id === ROLES.SUPER_USER) return true;
+
+  // Check default feature permissions by role
+  const allowedFeatures = DEFAULT_FEATURE_PERMISSIONS[user.role_id];
+  return allowedFeatures ? allowedFeatures.includes(feature) : false;
+}
+
+/**
+ * Require feature access or throw error
+ */
+export function requireFeatureAccess(
+  user: UserPayload | null,
+  feature: (typeof FEATURES)[keyof typeof FEATURES],
+): boolean {
+  if (!hasFeatureAccess(user, feature)) {
+    throw new Error(`User does not have access to ${feature} feature`);
+  }
+  return true;
+}
+
+/**
+ * Check feature access asynchronously from database
+ */
+export async function hasFeatureAccessFromDB(
+  userId: number,
+  feature: (typeof FEATURES)[keyof typeof FEATURES],
+): Promise<boolean> {
+  try {
+    const db = await getDatabase();
+
+    // Get user's role
+    const userResult = await db.execute({
+      sql: "SELECT role_id FROM users WHERE id = ?",
+      args: [userId],
+    });
+
+    if (userResult.rows.length === 0) {
+      return false;
+    }
+
+    const roleId = userResult.rows[0]?.role_id as number;
+
+    // Check if super user (role_id = 0)
+    if (roleId === ROLES.SUPER_USER) {
+      return true;
+    }
+
+    // Check feature permissions table
+    const permResult = await db.execute({
+      sql: "SELECT feature_name FROM feature_permissions WHERE role_id = ? AND feature_name = ?",
+      args: [roleId, feature],
+    });
+
+    return permResult.rows.length > 0;
+  } catch (error) {
+    console.error("Error checking feature access from DB:", error);
+    return false;
+  }
+}
+
+/**
+ * Middleware: Check feature access
+ */
+export async function checkFeatureAuth(
+  context: APIContext,
+  feature: (typeof FEATURES)[keyof typeof FEATURES],
+): Promise<{ isAuthorized: boolean; user: UserPayload | null }> {
+  const user = getUserFromContext(context);
+
+  if (!user) {
+    return { isAuthorized: false, user: null };
+  }
+
+  // Check from database for more granular control
+  const hasAccess = await hasFeatureAccessFromDB(user.id, feature);
+  return { isAuthorized: hasAccess, user };
 }
 
 /**

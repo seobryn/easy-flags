@@ -195,6 +195,15 @@ export async function initializeDatabase(): Promise<void> {
       FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id)
     );
 
+    CREATE TABLE IF NOT EXISTS feature_permissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      role_id INTEGER NOT NULL,
+      feature_name TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (role_id) REFERENCES roles(id),
+      UNIQUE(role_id, feature_name)
+    );
+
     CREATE TABLE IF NOT EXISTS migrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT UNIQUE NOT NULL,
@@ -235,23 +244,86 @@ export async function seedDatabase(): Promise<void> {
       return;
     }
 
-    // Insert default roles
+    // Insert default roles with specific IDs
     await database.execute({
-      sql: "INSERT INTO roles (name, description) VALUES (?, ?)",
-      args: ["admin", "Administrator with full access"],
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [
+        0,
+        "super_user",
+        "Super User with access to system administration tools",
+      ],
     });
 
     await database.execute({
-      sql: "INSERT INTO roles (name, description) VALUES (?, ?)",
-      args: ["editor", "Editor can modify features and settings"],
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [1, "admin", "Administrator with full access"],
     });
 
     await database.execute({
-      sql: "INSERT INTO roles (name, description) VALUES (?, ?)",
-      args: ["viewer", "Viewer can only read features"],
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [2, "editor", "Editor can modify features and settings"],
     });
 
-    // Insert default admin user
+    await database.execute({
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [3, "viewer", "Viewer can only read features"],
+    });
+
+    // Seed feature permissions
+    const FEATURES = {
+      FEATURE_FLAGS: "feature_flags",
+      SPACES: "spaces",
+      ENVIRONMENTS: "environments",
+      BILLING: "billing",
+      SETTINGS: "settings",
+      DATABASE_INSPECTOR: "database_inspector",
+      API_REFERENCE: "api_reference",
+    };
+
+    // Super user permissions (all features)
+    const superUserFeatures = Object.values(FEATURES);
+    for (const feature of superUserFeatures) {
+      await database.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [0, feature],
+      });
+    }
+
+    // Admin permissions (all except database_inspector)
+    const adminFeatures = Object.values(FEATURES).filter(
+      (f) => f !== FEATURES.DATABASE_INSPECTOR,
+    );
+    for (const feature of adminFeatures) {
+      await database.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [1, feature],
+      });
+    }
+
+    // Editor permissions
+    const editorFeatures = [
+      FEATURES.FEATURE_FLAGS,
+      FEATURES.SPACES,
+      FEATURES.ENVIRONMENTS,
+      FEATURES.API_REFERENCE,
+    ];
+    for (const feature of editorFeatures) {
+      await database.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [2, feature],
+      });
+    }
+
+    // Viewer permissions
+    const viewerFeatures = [FEATURES.FEATURE_FLAGS, FEATURES.API_REFERENCE];
+    for (const feature of viewerFeatures) {
+      await database.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [3, feature],
+      });
+    }
+
+    // Insert default admin user (role_id should now be 1 for admin)
     const adminUser = {
       username: process.env.ADMIN_USER || "admin",
       email: "admin@example.com",
@@ -270,7 +342,7 @@ export async function seedDatabase(): Promise<void> {
     });
 
     console.log(
-      "Database seeded successfully with admin user:",
+      "Database seeded successfully with roles and admin user:",
       adminUser.username,
     );
   } catch (error) {

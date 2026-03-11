@@ -5,7 +5,7 @@ export const prerender = false;
 
 import DatabaseInspector from "@/components/react/DatabaseInspector";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
-import { isGlobalAdmin, ROLES } from "@/utils/permissions";
+import { isSuperUser, FEATURES } from "@/utils/permissions";
 import { getUserFromContext } from "@/utils/auth";
 
 // Require authentication
@@ -15,21 +15,20 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
-// Check if user is a global admin
+// Check if user is a super user
 const user = getUserFromContext(Astro);
 console.log("[db-inspector] User object:", user);
 console.log("[db-inspector] User role_id:", user?.role_id);
-console.log("[db-inspector] ROLES.ADMIN value:", ROLES.ADMIN);
-console.log("[db-inspector] Is global admin?", isGlobalAdmin(user));
+console.log("[db-inspector] Is super user?", isSuperUser(user));
 
-if (!user || !isGlobalAdmin(user)) {
+if (!user || !isSuperUser(user)) {
   console.log(
-    "[db-inspector] User is not a global admin. Redirecting to home.",
+    "[db-inspector] User is not a super user. Redirecting to forbidden.",
   );
-  return Astro.redirect("/");
+  return Astro.redirect("/forbidden");
 }
 
-console.log("[db-inspector] Access granted to admin user:", user.username);
+console.log("[db-inspector] Access granted to super user:", user.username);
 ---
 
 <!doctype html>
