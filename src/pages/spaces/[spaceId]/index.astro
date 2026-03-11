@@ -15,7 +15,9 @@ const { spaceId } = Astro.params;
 // Verify space exists
 const spaceService = new SpaceService();
 const space = await spaceService.getSpace(parseInt(spaceId as string));
-checkResourceExists(space, Astro, "Space");
+if (!checkResourceExists(space, Astro, "Space")) {
+  return Astro.redirect("/404");
+}
 ---
 
 <BaseLayout title="Space Details" includeHeader={true}>

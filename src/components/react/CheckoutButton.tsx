@@ -21,7 +21,7 @@ export default function CheckoutButton({ plan }: CheckoutButtonProps) {
     try {
       // Check if user is logged in
       const userResponse = await fetch("/api/auth/me", {
-        credentials: 'include',
+        credentials: "include",
       });
       if (!userResponse.ok) {
         window.location.href = "/login";

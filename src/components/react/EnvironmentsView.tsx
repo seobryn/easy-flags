@@ -79,7 +79,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
       setIsLoading(true);
       setError(null);
       const response = await fetch(`/api/spaces/${spaceId}/environments`, {
-        credentials: 'include',
+        credentials: "include",
       });
       if (response.ok) {
         const data = await response.json();
@@ -109,7 +109,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
       const response = await fetch(`/api/spaces/${spaceId}/environments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           name: newEnvName,
           description: newEnvDescription || null,
@@ -146,7 +146,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          credentials: 'include',
+          credentials: "include",
           body: JSON.stringify({
             name: newEnvName,
             description: newEnvDescription || null,
@@ -195,7 +195,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         `/api/spaces/${spaceId}/environments/${id}`,
         {
           method: "DELETE",
-          credentials: 'include',
+          credentials: "include",
         },
       );
 

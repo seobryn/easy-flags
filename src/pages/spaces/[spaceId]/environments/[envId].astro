@@ -20,20 +20,20 @@ const envIdNum = parseInt(envId as string);
 // Verify space exists first
 const spaceService = new SpaceService();
 const space = await spaceService.getSpace(spaceIdNum);
-checkResourceExists(space, Astro, "Space");
+if (!checkResourceExists(space, Astro, "Space")) {
+  return Astro.redirect("/404");
+}
 
 // Verify environment exists and belongs to the space
 const environmentService = new EnvironmentService();
-const environment = await environmentService.getEnvironment(envIdNum);
-validateNestedResource(
-  environment,
-  "space_id",
-  spaceIdNum,
-  Astro,
-  "Environment",
-);
+const env = await environmentService.getEnvironment(envIdNum);
+if (
+  !validateNestedResource(env, "space_id", spaceIdNum, Astro, "Environment")
+) {
+  return Astro.redirect("/404");
+}
 
-const title = `${environment.name} - Configuration`;
+const title = `${env.name} - Configuration`;
 ---
 
 <BaseLayout title={title} includeHeader={true}>
@@ -41,7 +41,7 @@ const title = `${environment.name} - Configuration`;
     client:load
     spaceId={spaceId}
     envId={envId}
-    envName={environment.name}
-    envDescription={environment.description}
+    envName={env.name}
+    envDescription={env.description}
   />
 </BaseLayout>

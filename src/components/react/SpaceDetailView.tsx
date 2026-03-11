@@ -41,7 +41,7 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
     const fetchSpace = async () => {
       try {
         const response = await fetch(`/api/spaces/${spaceId}`, {
-          credentials: 'include',
+          credentials: "include",
         });
         if (response.ok) {
           const data = await response.json();

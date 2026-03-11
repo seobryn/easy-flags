@@ -43,7 +43,7 @@ export default function SpacesDashboard() {
       const response = await fetch("/api/spaces", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({
           name: newSpaceName,
           description: newSpaceDescription,
@@ -100,7 +100,9 @@ export default function SpacesDashboard() {
           <div className="ml-4">├─ 🌍 Environment: Production</div>
           <div className="ml-4">├─ 🌍 Environment: Staging</div>
           <div className="ml-4">├─ 🌍 Environment: Development</div>
-          <div className="ml-4">└─ ⚙️ Features (configured per environment)</div>
+          <div className="ml-4">
+            └─ ⚙️ Features (configured per environment)
+          </div>
         </div>
       </div>
 

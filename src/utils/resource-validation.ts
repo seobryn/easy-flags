@@ -19,12 +19,12 @@ export function checkResourceExists(
   resource: any,
   astroContext: AstroGlobal,
   resourceName: string = "Resource",
-): void {
-  if (!resource) {
+): boolean {
+  if (!resource || resource === null || resource === undefined) {
     console.warn(`${resourceName} not found, redirecting to 404`);
-    astroContext.redirect("/404");
-    return;
+    return false;
   }
+  return true;
 }
 
 /**
@@ -53,18 +53,17 @@ export function validateNestedResource(
   expectedParentId: number,
   astroContext: AstroGlobal,
   resourceName: string = "Resource",
-): void {
+): boolean {
   if (!resource) {
     console.warn(`${resourceName} not found, redirecting to 404`);
-    astroContext.redirect("/404");
-    return;
+    return false;
   }
 
   if (resource[parentFieldName] !== expectedParentId) {
     console.warn(`${resourceName} parent ID mismatch, redirecting to 404`);
-    astroContext.redirect("/404");
-    return;
+    return false;
   }
+  return true;
 }
 
 /**

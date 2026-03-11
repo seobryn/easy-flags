@@ -20,12 +20,18 @@ const featureIdNum = parseInt(featureId as string);
 // Verify space exists first
 const spaceService = new SpaceService();
 const space = await spaceService.getSpace(spaceIdNum);
-checkResourceExists(space, Astro, "Space");
+if (!checkResourceExists(space, Astro, "Space")) {
+  return Astro.redirect("/404");
+}
 
 // Verify feature exists and belongs to the space
 const featureService = new FeatureService();
-const feature = await featureService.getFeature(featureIdNum);
-validateNestedResource(feature, "space_id", spaceIdNum, Astro, "Feature");
+const feature = (await featureService.getFeature(featureIdNum))!;
+if (
+  !validateNestedResource(feature, "space_id", spaceIdNum, Astro, "Feature")
+) {
+  return Astro.redirect("/404");
+}
 
 const title = `${feature.name} - Advanced Configuration`;
 ---
