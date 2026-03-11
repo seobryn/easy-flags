@@ -41,7 +41,7 @@ const title = `${env.name} - Configuration`;
   <EnvironmentDetailView
     client:load
     spaceId={space.slug}
-    envId={env.slug}
+    envId={env.id.toString()}
     envName={env.name}
     envDescription={env.description}
     createdAt={env.created_at}

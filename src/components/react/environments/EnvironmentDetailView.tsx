@@ -24,9 +24,11 @@ export default function EnvironmentDetailView({
   createdAt,
 }: EnvironmentDetailViewProps) {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
   const [configs, setConfigs] = useState<EnvironmentConfig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [spaceName, setSpaceName] = useState("Space");
+  const [formData, setFormData] = useState({ key: "", defaultValue: "", overriddenValue: "" });
 
   useEffect(() => {
     fetchEnvironmentData();
@@ -96,6 +98,44 @@ export default function EnvironmentDetailView({
 
   const colors = getEnvironmentColor(envName);
   const apiKey = `env_${envId}_${Math.random().toString(36).substring(2, 15)}`;
+
+  const handleAddConfig = async () => {
+    if (!formData.key.trim() || !formData.defaultValue.trim()) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/environments/${envId}/configs`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          key: formData.key,
+          value: formData.defaultValue,
+          overriddenValue: formData.overriddenValue || null,
+        }),
+      });
+
+      if (response.ok) {
+        // Add the new config to the list
+        const newConfig = await response.json();
+        setConfigs([...configs, {
+          id: newConfig.id,
+          key: newConfig.key,
+          defaultValue: newConfig.default_value,
+          overriddenValue: newConfig.overridden_value,
+        }]);
+        setFormData({ key: "", defaultValue: "", overriddenValue: "" });
+        setShowConfigModal(false);
+      } else {
+        alert("Failed to add configuration");
+      }
+    } catch (error) {
+      console.error("Error adding configuration:", error);
+      alert("Error adding configuration");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -236,7 +276,7 @@ export default function EnvironmentDetailView({
                 ))}
               </div>
 
-              <button className="mt-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition">
+              <button className="mt-4 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition" onClick={() => setShowConfigModal(true)}>
                 + Add Configuration
               </button>
             </div>
@@ -324,6 +364,81 @@ export default function EnvironmentDetailView({
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-md w-full mx-4 shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-cyan-500/20 to-slate-800 px-6 py-8 border-b border-slate-700">
+              <h2 className="text-2xl font-bold text-white">Add Configuration</h2>
+              <p className="text-sm text-slate-400 mt-2">
+                Add a new configuration variable for this environment
+              </p>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Key *
+                </label>
+                <input
+                  type="text"
+                  value={formData.key}
+                  onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+                  placeholder="e.g., DATABASE_URL"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Default Value *
+                </label>
+                <input
+                  type="text"
+                  value={formData.defaultValue}
+                  onChange={(e) => setFormData({ ...formData, defaultValue: e.target.value })}
+                  placeholder="e.g., postgres://localhost:5432/db"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Overridden Value (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={formData.overriddenValue}
+                  onChange={(e) => setFormData({ ...formData, overriddenValue: e.target.value })}
+                  placeholder="Override for this environment"
+                  className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => {
+                    setShowConfigModal(false);
+                    setFormData({ key: "", defaultValue: "", overriddenValue: "" });
+                  }}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddConfig}
+                  className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                >
+                  Add Configuration
+                </button>
+              </div>
             </div>
           </div>
         </div>
