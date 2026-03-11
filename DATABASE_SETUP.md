@@ -108,10 +108,13 @@ ADMIN_PASS=password                       # Default admin password
 # JWT
 JWT_SECRET=your-secret-key               # Used for signing authentication tokens
 
-# Mercadopago (Optional)
-MERCADOPAGO_ACCESS_TOKEN=                # Mercadopago API access token for billing
-MERCADOPAGO_WEBHOOK_URL=                 # Mercadopago webhook URL
-MERCADOPAGO_WEBHOOK_SECRET=              # Mercadopago webhook secret
+# Mercadopago (Optional - for card payments)
+# Sign up at https://www.mercadopago.com.co/developers
+# Get your credentials from: https://www.mercadopago.com.co/developers/panel/app
+PUBLIC_MERCADOPAGO_PUBLIC_KEY=            # Frontend public key for tokenization
+MERCADOPAGO_ACCESS_TOKEN=                 # Backend secret key for payment processing
+MERCADOPAGO_WEBHOOK_URL=                  # Webhook URL (e.g., https://your-domain.com/api/mercadopago/webhook)
+MERCADOPAGO_WEBHOOK_SECRET=               # Webhook secret for signature verification
 ```
 
 ## Turso Setup (Production)

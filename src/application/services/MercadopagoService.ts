@@ -8,6 +8,22 @@ interface MercadopagoPrice {
   description: string | null;
 }
 
+interface PaymentRequest {
+  token: string;
+  payment_method_id: string;
+  transaction_amount: number;
+  installments: number;
+  issuer_id: number;
+  payer: {
+    email: string;
+    identification: {
+      type: string;
+      number: string;
+    };
+  };
+  description: string;
+}
+
 export class MercadopagoService {
   static async getPrices(): Promise<MercadopagoPrice[]> {
     try {
@@ -48,62 +64,19 @@ export class MercadopagoService {
     }
   }
 
-  static async createPreference(
-    planId: string,
-    userId: string,
-    userEmail: string,
-    successUrl: string,
-    cancelUrl: string,
-  ) {
+  static async createPayment(paymentData: PaymentRequest) {
     try {
-      console.log(`Creating Mercadopago preference for plan: ${planId}`);
+      console.log("Creating Mercadopago payment...");
 
-      // Get the plan details
-      const prices = await this.getPrices();
-      const plan = prices.find((p) => p.id === planId);
-
-      if (!plan) {
-        throw new Error(`Plan not found: ${planId}`);
-      }
-
-      const preferenceData = {
-        items: [
-          {
-            title: plan.title,
-            description: plan.description,
-            unit_price: plan.unit_amount / 100, // Convert cents to dollars
-            quantity: 1,
-            currency_id: plan.currency,
-          },
-        ],
-        payer: {
-          email: userEmail,
-        },
-        back_urls: {
-          success: successUrl,
-          failure: cancelUrl,
-          pending: cancelUrl,
-        },
-        auto_return: "approved",
-        notification_url: `${process.env.MERCADOPAGO_WEBHOOK_URL || ""}`,
-        metadata: {
-          userId: userId,
-          planId: planId,
-        },
-      };
-
-      const preference =
-        await MercadopagoClient.createPreference(preferenceData);
-      return preference;
+      const payment = await MercadopagoClient.createPayment(paymentData);
+      return payment;
     } catch (error: any) {
       console.error(
-        "Error creating Mercadopago preference:",
+        "Error creating Mercadopago payment:",
         error.message,
         error,
       );
-      throw new Error(
-        error.message || "Failed to create Mercadopago preference",
-      );
+      throw new Error(error.message || "Failed to create Mercadopago payment");
     }
   }
 }

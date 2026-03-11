@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MercadopagoCheckoutForm from "./MercadopagoCheckoutForm";
 
 interface BillingPlan {
   name: string;
@@ -14,68 +15,55 @@ interface CheckoutButtonProps {
 }
 
 export default function CheckoutButton({ plan }: CheckoutButtonProps) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const handleCheckout = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Check if user is logged in
-      const userResponse = await fetch("/api/auth/me");
-      if (!userResponse.ok) {
-        window.location.href = "/login";
-        return;
-      }
-
-      if (!plan.priceId) {
-        setError("Price information not available for this plan");
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/mercadopago/checkout-preference", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          planId: plan.priceId,
-          successUrl: `${window.location.origin}/payment-success`,
-          cancelUrl: `${window.location.origin}/payment-error`,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.initPoint) {
-          window.location.href = data.initPoint;
-        }
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Failed to create checkout preference");
-      }
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setError("An error occurred during checkout");
-    } finally {
-      setLoading(false);
+    // Check if user is logged in
+    const userResponse = await fetch("/api/auth/me");
+    if (!userResponse.ok) {
+      window.location.href = "/login";
+      return;
     }
+
+    // Show payment form
+    setShowPaymentForm(true);
   };
+
+  if (showPaymentForm && plan.price > 0) {
+    return (
+      <div className="space-y-4 mb-6">
+        <button
+          onClick={() => setShowPaymentForm(false)}
+          className="text-sm text-slate-400 hover:text-slate-300 transition"
+        >
+          ← Back
+        </button>
+        <MercadopagoCheckoutForm
+          planId={plan.priceId || ""}
+          planTitle={plan.name}
+          amount={plan.price * 100} // Convert to cents
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-2 mb-6">
-      <button
-        onClick={handleCheckout}
-        disabled={loading}
-        className={`w-full btn-primary ${
-          loading ? "opacity-50 cursor-not-allowed" : ""
-        }`}
-      >
-        {loading ? "Processing..." : "Get Started"}
-      </button>
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      {plan.price === 0 ? (
+        <a
+          href="/spaces"
+          className="block w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-4 rounded-lg text-center transition"
+        >
+          Get Started
+        </a>
+      ) : (
+        <button
+          onClick={handleCheckout}
+          className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-4 rounded-lg transition"
+        >
+          Get Started
+        </button>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference } from "mercadopago";
+import { MercadoPagoConfig, Payment } from "mercadopago";
 
 let mercadopagoInstance: MercadoPagoConfig | null = null;
 
@@ -25,15 +25,15 @@ export class MercadopagoClient {
     return getMercadopagoClient();
   }
 
-  static createPreference(data: any) {
+  static async createPayment(data: any) {
     const client = getMercadopagoClient();
-    const preference = new Preference(client);
-    return preference.create(data);
+    const payment = new Payment(client);
+    return payment.create(data);
   }
 
-  static async getPreference(preferenceId: string) {
+  static async getPayment(paymentId: number) {
     const client = getMercadopagoClient();
-    const preference = new Preference(client);
-    return preference.get(preferenceId);
+    const payment = new Payment(client);
+    return payment.get(paymentId);
   }
 }

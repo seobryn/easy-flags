@@ -3,10 +3,20 @@ import { MercadopagoService } from "@/application/services/MercadopagoService";
 
 export const prerender = false;
 
-interface CheckoutPreferenceRequest {
-  planId: string;
-  successUrl: string;
-  cancelUrl: string;
+interface ProcessPaymentRequest {
+  token: string;
+  payment_method_id: string;
+  transaction_amount: number;
+  installments: number;
+  issuer_id?: number;
+  payer: {
+    email: string;
+    identification: {
+      type: string;
+      number: string;
+    };
+  };
+  description: string;
 }
 
 export const POST: APIRoute = async (context) => {
@@ -29,14 +39,13 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    const body = (await context.request.json()) as CheckoutPreferenceRequest;
-    const { planId, successUrl, cancelUrl } = body;
+    const body = (await context.request.json()) as ProcessPaymentRequest;
 
-    if (!planId) {
+    if (!body.token || !body.payment_method_id || !body.transaction_amount) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Plan ID is required",
+          error: "Missing required payment fields",
         }),
         {
           status: 400,
@@ -45,20 +54,23 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    const preference = await MercadopagoService.createPreference(
-      planId,
-      user.data.id,
-      user.data.email,
-      successUrl || "http://localhost:3001/payment-success",
-      cancelUrl || "http://localhost:3001/payment-error",
-    );
+    // Create payment
+    const payment = await MercadopagoService.createPayment({
+      token: body.token,
+      payment_method_id: body.payment_method_id,
+      transaction_amount: body.transaction_amount,
+      installments: body.installments || 1,
+      issuer_id: body.issuer_id,
+      payer: body.payer,
+      description: body.description,
+    });
 
     return new Response(
       JSON.stringify({
         success: true,
-        preferenceId: preference.id,
-        initPoint: preference.init_point,
-        sandboxInitPoint: preference.sandbox_init_point,
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
       }),
       {
         status: 200,
@@ -66,11 +78,11 @@ export const POST: APIRoute = async (context) => {
       },
     );
   } catch (error: any) {
-    console.error("Error creating Mercadopago preference:", error);
+    console.error("Error processing Mercadopago payment:", error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message || "Failed to create checkout preference",
+        error: error.message || "Failed to process payment",
       }),
       {
         status: 500,
