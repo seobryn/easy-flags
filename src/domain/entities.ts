@@ -50,11 +50,18 @@ export interface SpaceMember {
 // Environments
 // ====================
 
+export type EnvironmentType =
+  | "production"
+  | "staging"
+  | "development"
+  | "other";
+
 export interface Environment {
   id: number;
   space_id: number;
   name: string;
   description?: string;
+  type: EnvironmentType;
   created_at: string;
   updated_at: string;
 }
@@ -164,6 +171,7 @@ export interface UpdateSpaceDTO {
 export interface CreateEnvironmentDTO {
   name: string;
   description?: string;
+  type: EnvironmentType;
 }
 
 export interface CreateFeatureDTO {

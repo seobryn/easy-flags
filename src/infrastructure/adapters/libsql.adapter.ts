@@ -385,8 +385,8 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
   ): Promise<Environment> {
     const db = await this.getDb();
     const result = await db.execute({
-      sql: `INSERT INTO environments (space_id, name, description) VALUES (?, ?, ?)`,
-      args: [spaceId, dto.name, dto.description || null],
+      sql: `INSERT INTO environments (space_id, name, description, type) VALUES (?, ?, ?, ?)`,
+      args: [spaceId, dto.name, dto.description || null, dto.type || "other"],
     });
     const created = await this.findById(Number(result.lastInsertRowid));
     if (!created) throw new Error("Failed to create environment");
@@ -408,6 +408,10 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
     if (dto.description !== undefined) {
       updates.push("description = ?");
       args.push(dto.description || null);
+    }
+    if (dto.type) {
+      updates.push("type = ?");
+      args.push(dto.type);
     }
 
     updates.push("updated_at = CURRENT_TIMESTAMP");

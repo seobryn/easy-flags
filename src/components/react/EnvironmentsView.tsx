@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import SpaceNavigation from "./SpaceNavigation";
 
+type EnvironmentType = "production" | "staging" | "development" | "other";
+
 interface Environment {
   id: number;
   name: string;
   description?: string;
+  type: EnvironmentType;
   created_at: string;
 }
 
@@ -12,8 +15,15 @@ interface EnvironmentsViewProps {
   spaceId: string | undefined;
 }
 
-const getEnvironmentColor = (name: string) => {
-  switch (name.toLowerCase()) {
+const ENVIRONMENT_TYPES: EnvironmentType[] = [
+  "production",
+  "staging",
+  "development",
+  "other",
+];
+
+const getEnvironmentColor = (type: EnvironmentType) => {
+  switch (type) {
     case "production":
       return {
         bg: "from-red-900/20 to-red-900/10",
@@ -35,7 +45,7 @@ const getEnvironmentColor = (name: string) => {
         accent: "text-blue-400",
         badge: "bg-blue-500/20 text-blue-300",
       };
-    default:
+    case "other":
       return {
         bg: "from-cyan-900/20 to-cyan-900/10",
         border: "border-cyan-500/30",
@@ -55,6 +65,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
   const [editingEnv, setEditingEnv] = useState<Environment | null>(null);
   const [newEnvName, setNewEnvName] = useState("");
   const [newEnvDescription, setNewEnvDescription] = useState("");
+  const [newEnvType, setNewEnvType] = useState<EnvironmentType>("other");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -94,6 +105,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         body: JSON.stringify({
           name: newEnvName,
           description: newEnvDescription || null,
+          type: newEnvType,
         }),
       });
 
@@ -102,6 +114,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         setEnvironments([...environments, newEnv]);
         setNewEnvName("");
         setNewEnvDescription("");
+        setNewEnvType("other");
         setShowCreateModal(false);
       } else {
         setError("Failed to create environment");
@@ -128,6 +141,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
           body: JSON.stringify({
             name: newEnvName,
             description: newEnvDescription || null,
+            type: newEnvType,
           }),
         },
       );
@@ -142,6 +156,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         setEditingEnv(null);
         setNewEnvName("");
         setNewEnvDescription("");
+        setNewEnvType("other");
         setShowEditModal(false);
       } else {
         setError("Failed to update environment");
@@ -158,6 +173,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
     setEditingEnv(env);
     setNewEnvName(env.name);
     setNewEnvDescription(env.description || "");
+    setNewEnvType(env.type);
     setShowEditModal(true);
   };
 
@@ -219,6 +235,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                 setEditingEnv(null);
                 setNewEnvName("");
                 setNewEnvDescription("");
+                setNewEnvType("other");
                 setShowCreateModal(true);
               }}
               disabled={isLoading}
@@ -268,7 +285,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         {!isLoading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {environments.map((env) => {
-              const colors = getEnvironmentColor(env.name);
+              const colors = getEnvironmentColor(env.type);
               return (
                 <div
                   key={env.id}
@@ -331,7 +348,13 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
           <div className="text-center py-12 card">
             <p className="text-slate-400 mb-4">No environments yet</p>
             <button
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                setEditingEnv(null);
+                setNewEnvName("");
+                setNewEnvDescription("");
+                setNewEnvType("other");
+                setShowCreateModal(true);
+              }}
               className="text-cyan-400 hover:text-cyan-300 font-semibold"
             >
               Create your first environment
@@ -380,6 +403,28 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-2">
+                  Environment Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {ENVIRONMENT_TYPES.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setNewEnvType(type)}
+                      className={`px-3 py-2 rounded-lg font-medium transition capitalize ${
+                        newEnvType === type
+                          ? "bg-cyan-600 text-white ring-2 ring-cyan-400"
+                          : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -389,6 +434,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                     setEditingEnv(null);
                     setNewEnvName("");
                     setNewEnvDescription("");
+                    setNewEnvType("other");
                   }}
                   className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg transition font-medium"
                 >

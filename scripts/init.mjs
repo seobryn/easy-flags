@@ -106,6 +106,7 @@ async function initializeSchema(client) {
       space_id INTEGER NOT NULL,
       name TEXT NOT NULL,
       description TEXT,
+      type TEXT DEFAULT 'other',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (space_id) REFERENCES spaces(id),
