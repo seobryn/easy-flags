@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import type { ColumnInfo } from "./dev";
 import {
   SchemaTable,
   FilterSection,
@@ -228,7 +227,10 @@ export default function DatabaseInspector() {
                           paginatedData={dataManipulation.getPaginatedData()}
                           deleting={tableInspection.deleting}
                           onRequestDeleteRow={(rowId, rowData) => {
-                            deleteConfirmModal.openDeleteConfirm(rowId, rowData);
+                            deleteConfirmModal.openDeleteConfirm(
+                              rowId,
+                              rowData,
+                            );
                           }}
                           onEditRow={(rowId, rowData) => {
                             editRowModal.openEditModal(rowId, rowData);

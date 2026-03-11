@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import SpaceNavigation from "./SpaceNavigation";
+import { useEffect, useState } from "react";
+import SpaceNavigation from "@/components/react/shared/SpaceNavigation";
 
 interface FeatureEnvironmentConfig {
   environmentId: number;

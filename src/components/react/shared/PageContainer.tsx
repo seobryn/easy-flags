@@ -1,15 +1,10 @@
-import React from "react";
-import SpaceNavigation from "./SpaceNavigation";
+import SpaceNavigation from "@/components/react/shared/SpaceNavigation";
 
 interface PageContainerProps {
   children: React.ReactNode;
   spaceId: string | undefined;
   spaceName?: string;
-  currentTab?:
-    | "overview"
-    | "environments"
-    | "features"
-    | "permissions";
+  currentTab?: "overview" | "environments" | "features" | "permissions";
   subPage?: {
     name: string;
     path?: string;

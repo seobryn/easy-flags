@@ -1,5 +1,3 @@
-import React from "react";
-
 interface DeleteConfirmModalProps {
   isOpen: boolean;
   rowId: string | number | null;
@@ -25,21 +23,25 @@ export function DeleteConfirmModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-slate-800 border border-red-600/30 rounded-xl shadow-2xl max-w-md w-full">
         <div className="flex-shrink-0 p-6 border-b border-slate-700/50">
-          <h2 className="text-xl font-bold text-red-400">
-            Confirm Deletion
-          </h2>
+          <h2 className="text-xl font-bold text-red-400">Confirm Deletion</h2>
         </div>
 
         <div className="p-6 space-y-4">
           <p className="text-slate-300">
-            You are about to permanently delete a row from <span className="font-semibold text-cyan-300">{tableName}</span>.
+            You are about to permanently delete a row from{" "}
+            <span className="font-semibold text-cyan-300">{tableName}</span>.
           </p>
 
           {rowData && Object.keys(rowData).length > 0 && (
             <div className="bg-slate-700/30 rounded p-4 space-y-2 max-h-48 overflow-y-auto">
-              <p className="text-xs font-semibold text-slate-400 mb-2">Row Data:</p>
+              <p className="text-xs font-semibold text-slate-400 mb-2">
+                Row Data:
+              </p>
               {Object.entries(rowData).map(([key, value]) => (
-                <div key={key} className="text-xs text-slate-400 flex justify-between gap-2">
+                <div
+                  key={key}
+                  className="text-xs text-slate-400 flex justify-between gap-2"
+                >
                   <span className="font-mono text-slate-500">{key}:</span>
                   <span className="font-mono text-slate-300 text-right truncate">
                     {value === null ? (

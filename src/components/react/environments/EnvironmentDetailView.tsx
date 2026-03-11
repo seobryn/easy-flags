@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import PageContainer from "./PageContainer";
+import { useEffect, useState } from "react";
+import PageContainer from "@/components/react/shared/PageContainer";
 
 interface EnvironmentDetailViewProps {
   spaceId: string | undefined;

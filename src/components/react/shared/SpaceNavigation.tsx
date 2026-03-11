@@ -1,13 +1,7 @@
-import React from "react";
-
 interface SpaceNavigationProps {
   spaceId: string | undefined;
   spaceName?: string;
-  currentTab?:
-    | "overview"
-    | "environments"
-    | "features"
-    | "permissions";
+  currentTab?: "overview" | "environments" | "features" | "permissions";
   subPage?: {
     name: string;
     path?: string;
@@ -27,7 +21,10 @@ export default function SpaceNavigation({
     <div className="space-y-6 mb-8">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <a href="/spaces" className="text-cyan-400 hover:text-cyan-300 text-sm mb-2 inline-block">
+          <a
+            href="/spaces"
+            className="text-cyan-400 hover:text-cyan-300 text-sm mb-2 inline-block"
+          >
             ← Back to Spaces
           </a>
           <div className="flex items-center gap-2">

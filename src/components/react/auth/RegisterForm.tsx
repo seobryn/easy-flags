@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -25,7 +25,11 @@ export default function RegisterForm() {
     }
 
     // Client-side validation
-    if (!formData.username.trim() || !formData.email.trim() || !formData.password.trim()) {
+    if (
+      !formData.username.trim() ||
+      !formData.email.trim() ||
+      !formData.password.trim()
+    ) {
       setError("Please fill in all fields");
       return;
     }
@@ -34,7 +38,7 @@ export default function RegisterForm() {
 
     try {
       console.log("Attempting registration with email:", formData.email);
-      
+
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +53,7 @@ export default function RegisterForm() {
       console.log("Registration response status:", response.status);
 
       const data = await response.json();
-      
+
       console.log("Registration response data:", data);
 
       if (!response.ok) {
@@ -63,7 +67,10 @@ export default function RegisterForm() {
       // Redirect to dashboard
       window.location.href = "/spaces";
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again.";
       console.error("Registration exception:", err);
       setError(errorMsg);
       console.error(err);

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import SpaceNavigation from "./SpaceNavigation";
+import { useState, useEffect } from "react";
+import SpaceNavigation from "@/components/react/shared/SpaceNavigation";
 
 type EnvironmentType = "production" | "staging" | "development" | "other";
 

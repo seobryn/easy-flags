@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import PageContainer from "./PageContainer";
+import { useState } from "react";
+import PageContainer from "@/components/react/shared/PageContainer";
 
 interface TeamMember {
   id: number;
@@ -126,12 +126,12 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
   return (
     <>
       <PageContainer
-      spaceId={spaceId}
-      spaceName="Acme Corporation"
-      currentTab="permissions"
-    >
-      {/* Header */}
-      <div className="mb-12 mt-12">
+        spaceId={spaceId}
+        spaceName="Acme Corporation"
+        currentTab="permissions"
+      >
+        {/* Header */}
+        <div className="mb-12 mt-12">
           <h1 className="text-4xl font-bold text-white mb-2">
             Team & Permissions
           </h1>
