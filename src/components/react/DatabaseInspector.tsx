@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import type { ColumnInfo } from "./dev";
 import {
   SchemaTable,
@@ -6,6 +6,7 @@ import {
   PaginationControls,
   AddRowModal,
   EditRowModal,
+  DeleteConfirmModal,
   DataTable,
 } from "./dev";
 import {
@@ -13,6 +14,7 @@ import {
   useDataManipulation,
   useAddRowModal,
   useEditRowModal,
+  useDeleteConfirmModal,
   useAddRowHandler,
   useEditRowHandler,
 } from "./dev/hooks";
@@ -26,6 +28,7 @@ export default function DatabaseInspector() {
   });
   const addRowModal = useAddRowModal();
   const editRowModal = useEditRowModal();
+  const deleteConfirmModal = useDeleteConfirmModal();
 
   // Handler for adding rows
   const { addRow: addRowToTable } = useAddRowHandler({
@@ -226,7 +229,9 @@ export default function DatabaseInspector() {
                           schema={tableInspection.schema}
                           paginatedData={dataManipulation.getPaginatedData()}
                           deleting={tableInspection.deleting}
-                          onDeleteRow={tableInspection.deleteRow}
+                          onRequestDeleteRow={(rowId, rowData) => {
+                            deleteConfirmModal.openDeleteConfirm(rowId, rowData);
+                          }}
                           onEditRow={(rowId, rowData) => {
                             editRowModal.openEditModal(rowId, rowData);
                           }}
@@ -281,6 +286,22 @@ export default function DatabaseInspector() {
           editRowInTable(editRowModal.editingRowId ?? "", editRowModal.formData)
         }
         onClose={editRowModal.closeEditModal}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={deleteConfirmModal.isOpen}
+        rowId={deleteConfirmModal.rowId}
+        rowData={deleteConfirmModal.rowData}
+        tableName={tableInspection.selectedTable}
+        loading={tableInspection.deleting === deleteConfirmModal.rowId}
+        onConfirm={() => {
+          if (deleteConfirmModal.rowId !== null) {
+            tableInspection.deleteRow(deleteConfirmModal.rowId);
+            deleteConfirmModal.closeDeleteConfirm();
+          }
+        }}
+        onCancel={deleteConfirmModal.closeDeleteConfirm}
       />
     </div>
   );

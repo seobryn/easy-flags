@@ -5,7 +5,7 @@ interface DataTableProps {
   schema: ColumnInfo[];
   paginatedData: Record<string, unknown>[];
   deleting: string | number | null;
-  onDeleteRow: (rowId: string | number) => void;
+  onRequestDeleteRow: (rowId: string | number, rowData: Record<string, unknown>) => void;
   onEditRow: (rowId: string | number, rowData: Record<string, string>) => void;
 }
 
@@ -13,7 +13,7 @@ export function DataTable({
   schema,
   paginatedData,
   deleting,
-  onDeleteRow,
+  onRequestDeleteRow,
   onEditRow,
 }: DataTableProps) {
   return (
@@ -61,7 +61,13 @@ export function DataTable({
                       ✏️
                     </button>
                     <button
-                      onClick={() => onDeleteRow(rowId)}
+                      onClick={() => {
+                        const rowData: Record<string, unknown> = {};
+                        schema.forEach((col) => {
+                          rowData[col.name] = row[col.name] || null;
+                        });
+                        onRequestDeleteRow(rowId, rowData);
+                      }}
                       disabled={deleting === rowId}
                       className="px-2 py-1 text-xs bg-red-900/40 text-red-300 rounded border border-red-700/30 hover:bg-red-900/60 disabled:opacity-50 transition-colors font-medium"
                     >
