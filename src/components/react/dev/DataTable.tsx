@@ -5,7 +5,10 @@ interface DataTableProps {
   schema: ColumnInfo[];
   paginatedData: Record<string, unknown>[];
   deleting: string | number | null;
-  onRequestDeleteRow: (rowId: string | number, rowData: Record<string, unknown>) => void;
+  onRequestDeleteRow: (
+    rowId: string | number,
+    rowData: Record<string, unknown>,
+  ) => void;
   onEditRow: (rowId: string | number, rowData: Record<string, string>) => void;
 }
 
@@ -22,7 +25,7 @@ export function DataTable({
         <thead>
           <tr className="bg-slate-700/50 border-b-2 border-cyan-700/30 sticky top-0">
             <th className="text-left px-3 py-2 font-semibold text-cyan-300 whitespace-nowrap w-12">
-              Action
+              Actions
             </th>
             {schema.map((col) => (
               <th

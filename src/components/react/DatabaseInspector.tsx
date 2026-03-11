@@ -154,11 +154,19 @@ export default function DatabaseInspector() {
                 {tableInspection.viewTab === "records" && (
                   <div className="bg-slate-800/80 rounded-xl shadow-lg p-6 border border-cyan-700/30">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-cyan-300">
-                        Data{" "}
-                        {tableInspection.data.length > 0 &&
-                          `(page ${dataManipulation.currentPage} of ${dataManipulation.getTotalPages()}, showing ${dataManipulation.getPaginatedData().length} of ${dataManipulation.getFilteredData().length} rows)`}
-                      </h2>
+                      <div>
+                        <h2 className="text-lg font-semibold text-cyan-300">
+                          Data
+                        </h2>
+                        {tableInspection.data.length > 0 && (
+                          <p className="text-xs text-slate-400 mt-1">
+                            📄 Page {dataManipulation.currentPage} of{" "}
+                            {dataManipulation.getTotalPages()} •{" "}
+                            {dataManipulation.getPaginatedData().length} of{" "}
+                            {dataManipulation.getFilteredData().length} records
+                          </p>
+                        )}
+                      </div>
                       <div className="flex gap-2 items-center flex-wrap">
                         <label className="text-sm text-slate-300 font-medium">
                           Per Page:
