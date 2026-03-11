@@ -251,18 +251,25 @@ export default function DatabaseInspector() {
                                   )}
                                 </td>
                                 <td className="px-4 py-2 text-slate-400">
-                                  <div className="flex gap-1 flex-wrap">
-                                    {col.pk && (
-                                      <span className="px-2 py-1 bg-purple-900/40 text-purple-300 rounded text-xs border border-purple-700/30">
-                                        PK
-                                      </span>
-                                    )}
-                                    {col.notnull && (
-                                      <span className="px-2 py-1 bg-red-900/40 text-red-300 rounded text-xs border border-red-700/30">
-                                        NOT NULL
-                                      </span>
-                                    )}
-                                  </div>
+                                  {(col.pk || col.notnull) && (
+                                    <div className="flex gap-1 flex-wrap">
+                                      {col.pk && (
+                                        <span className="px-2 py-1 bg-purple-900/40 text-purple-300 rounded text-xs border border-purple-700/30">
+                                          PK
+                                        </span>
+                                      )}
+                                      {col.notnull && (
+                                        <span className="px-2 py-1 bg-red-900/40 text-red-300 rounded text-xs border border-red-700/30">
+                                          NOT NULL
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+                                  {!col.pk && !col.notnull && (
+                                    <span className="text-slate-500 italic">
+                                      -
+                                    </span>
+                                  )}
                                 </td>
                               </tr>
                             ))}
