@@ -1,53 +1,63 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import AdvancedConfigurationView from "@/components/AdvancedConfigurationView";
+import AdvancedConfigurationView from "@/components/react/AdvancedConfigurationView";
+import { FeatureService } from "@application/services";
 
 export const prerender = false;
 
 const { spaceId, featureId } = Astro.params;
 
-// Mock data - in production this would come from a database
-const mockFeatures: Record<string, {
-  id: string;
-  name: string;
-  key: string;
-  type: "boolean" | "string" | "json";
-}> = {
-  "1": {
-    id: "1",
-    name: "New Dashboard",
-    key: "new_dashboard",
-    type: "boolean",
-  },
-  "2": {
-    id: "2",
-    name: "Dark Mode",
-    key: "dark_mode",
-    type: "boolean",
-  },
-  "3": {
-    id: "3",
-    name: "Beta Analytics",
-    key: "beta_analytics",
-    type: "string",
-  },
-};
+let feature = null;
+let errorMessage = "";
 
-const feature = mockFeatures[featureId || ""] || {
-  id: featureId || "unknown",
-  name: "Unknown Feature",
-  key: "unknown_feature",
-  type: "boolean" as const,
-};
+try {
+  if (featureId) {
+    const featureService = new FeatureService();
+    feature = await featureService.getFeature(parseInt(featureId));
+
+    if (!feature) {
+      errorMessage = "Feature not found";
+    }
+  }
+} catch (error) {
+  errorMessage = "Failed to load feature";
+  console.error("Error fetching feature:", error);
+}
+
+const title = feature
+  ? `${feature.name} - Advanced Configuration`
+  : "Feature - Advanced Configuration";
 ---
 
-<BaseLayout title={`${feature.name} - Advanced Configuration`} includeHeader={true}>
-  <AdvancedConfigurationView
-    client:load
-    spaceId={spaceId}
-    featureId={featureId}
-    featureName={feature.name}
-    featureKey={feature.key}
-    featureType={feature.type}
-  />
+<BaseLayout title={title} includeHeader={true}>
+  {
+    errorMessage ? (
+      <div class="max-w-4xl mx-auto py-12 px-4">
+        <div class="card text-center py-12">
+          <p class="text-red-400 mb-4">{errorMessage}</p>
+          <a
+            href={`/spaces/${spaceId}/features`}
+            class="text-cyan-400 hover:text-cyan-300"
+          >
+            Back to Features
+          </a>
+        </div>
+      </div>
+    ) : feature ? (
+      <AdvancedConfigurationView
+        client:load
+        spaceId={spaceId}
+        featureId={featureId}
+        featureName={feature.name}
+        featureKey={feature.key}
+        featureType={feature.type}
+      />
+    ) : (
+      <div class="max-w-4xl mx-auto py-12 px-4">
+        <div class="card text-center py-12">
+          <p class="text-slate-400 mb-4">Loading feature...</p>
+        </div>
+      </div>
+    )
+  }
 </BaseLayout>

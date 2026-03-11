@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import ContactForm from "@/components/ContactForm";
+import ContactForm from "@/components/react/ContactForm";
 ---
 
 <BaseLayout title="Contact Us" includeHeader={true}>
@@ -9,8 +9,8 @@ import ContactForm from "@/components/ContactForm";
 
     <div class="card mb-8">
       <p class="text-slate-400 mb-6">
-        Have questions or feedback? We'd love to hear from you. Fill out the form
-        below and we'll get back to you as soon as possible.
+        Have questions or feedback? We'd love to hear from you. Fill out the
+        form below and we'll get back to you as soon as possible.
       </p>
 
       <ContactForm client:load />

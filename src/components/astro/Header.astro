@@ -1,0 +1,133 @@
+---
+import { getUserFromContext } from "@/utils/auth";
+import HeaderDropdown from "@/components/react/HeaderDropdown";
+
+const user = getUserFromContext(Astro);
+// Get current path safely - for prerendered pages, this will be undefined
+let currentPath = "";
+try {
+  const url = new URL(Astro.request.url);
+  currentPath = url.pathname;
+} catch (e) {
+  // In prerendered context, Astro.request.url won't be available
+  currentPath = "";
+}
+
+const isActive = (path: string) => {
+  if (!currentPath) return false; // Don't highlight links in prerendered pages
+  return currentPath === path;
+};
+
+const navItems = {
+  pricing: {
+    href: "/billing",
+    label: "Pricing",
+    showFor: !user,
+  },
+  spaces: {
+    href: "/spaces",
+    label: "Spaces",
+    showFor: !!user,
+  },
+  settings: {
+    href: "/settings",
+    label: "Settings",
+    showFor: !!user,
+  },
+  docs: {
+    href: "/docs",
+    label: "Docs",
+    showFor: true,
+  },
+  login: {
+    href: "/login",
+    label: "Login",
+    showFor: !user,
+  },
+};
+
+const getNavLinkClass = (href: string) => {
+  const isCurrentPath = isActive(href);
+  if (user) {
+    return `transition ${
+      isCurrentPath
+        ? "text-cyan-300 font-semibold"
+        : "text-slate-300 hover:text-cyan-400"
+    }`;
+  } else {
+    return `transition ${
+      isCurrentPath
+        ? "text-cyan-300 font-semibold"
+        : "text-cyan-100 hover:text-cyan-300"
+    }`;
+  }
+};
+---
+
+<header class="bg-slate-900/50 border-b border-cyan-700/30 backdrop-blur">
+  <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-gradient"> Easy Flags </a>
+
+      <div class="hidden md:flex gap-8 items-center">
+        {
+          navItems.pricing.showFor && (
+            <a
+              href={navItems.pricing.href}
+              class={getNavLinkClass(navItems.pricing.href)}
+            >
+              {navItems.pricing.label}
+            </a>
+          )
+        }
+
+        {
+          navItems.spaces.showFor && (
+            <a
+              href={navItems.spaces.href}
+              class={getNavLinkClass(navItems.spaces.href)}
+            >
+              {navItems.spaces.label}
+            </a>
+          )
+        }
+
+        {
+          navItems.settings.showFor && (
+            <a
+              href={navItems.settings.href}
+              class={getNavLinkClass(navItems.settings.href)}
+            >
+              {navItems.settings.label}
+            </a>
+          )
+        }
+
+        <a
+          href={navItems.docs.href}
+          class={getNavLinkClass(navItems.docs.href)}
+        >
+          {navItems.docs.label}
+        </a>
+
+        {
+          user ? (
+            <HeaderDropdown client:load username={user.username} />
+          ) : (
+            <>
+              <a
+                href={navItems.login.href}
+                class={getNavLinkClass(navItems.login.href)}
+              >
+                {navItems.login.label}
+              </a>
+              <a href="/create-account" class="btn-primary text-sm">
+                Sign Up
+              </a>
+            </>
+          )
+        }
+      </div>
+    </div>
+  </nav>
+</header>

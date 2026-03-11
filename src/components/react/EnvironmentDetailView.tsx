@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageContainer from "./PageContainer";
 
 interface EnvironmentDetailViewProps {
@@ -22,26 +22,38 @@ export default function EnvironmentDetailView({
   envDescription,
 }: EnvironmentDetailViewProps) {
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
-  const [configs, setConfigs] = useState<EnvironmentConfig[]>([
-    {
-      id: "1",
-      key: "API_TIMEOUT",
-      defaultValue: "30000",
-      overriddenValue: "60000",
-    },
-    {
-      id: "2",
-      key: "MAX_RETRIES",
-      defaultValue: "3",
-      overriddenValue: "5",
-    },
-    {
-      id: "3",
-      key: "LOG_LEVEL",
-      defaultValue: "info",
-      overriddenValue: "debug",
-    },
-  ]);
+  const [configs, setConfigs] = useState<EnvironmentConfig[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [spaceName, setSpaceName] = useState("Space");
+
+  useEffect(() => {
+    fetchEnvironmentData();
+  }, [envId, spaceId]);
+
+  const fetchEnvironmentData = async () => {
+    if (!envId || !spaceId) return;
+
+    try {
+      setIsLoading(true);
+      // Fetch environment configs
+      const configResponse = await fetch(`/api/environments/${envId}/configs`);
+      if (configResponse.ok) {
+        const configData = await configResponse.json();
+        setConfigs(configData);
+      }
+
+      // Fetch space data to get space name
+      const spaceResponse = await fetch(`/api/spaces/${spaceId}`);
+      if (spaceResponse.ok) {
+        const spaceData = await spaceResponse.json();
+        setSpaceName(spaceData.name || "Space");
+      }
+    } catch (error) {
+      console.error("Failed to fetch environment data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getEnvironmentColor = (name: string) => {
     switch (name.toLowerCase()) {
@@ -79,11 +91,23 @@ export default function EnvironmentDetailView({
   const colors = getEnvironmentColor(envName);
   const apiKey = `env_${envId}_${Math.random().toString(36).substring(2, 15)}`;
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto py-12 px-4">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-cyan-400 animate-pulse">
+            Loading environment...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <PageContainer
         spaceId={spaceId}
-        spaceName="Acme Corporation"
+        spaceName={spaceName}
         currentTab="environments"
         subPage={{ name: envName, path: `/spaces/${spaceId}/environments` }}
       >
@@ -91,7 +115,8 @@ export default function EnvironmentDetailView({
         <div className="mb-12 mt-12">
           <div className="flex flex-col mb-6">
             <p className="text-slate-400">
-              {envDescription || "Configure and manage this environment's settings, API keys, and deployments."}
+              {envDescription ||
+                "Configure and manage this environment's settings, API keys, and deployments."}
             </p>
           </div>
         </div>

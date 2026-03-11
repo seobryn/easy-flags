@@ -1,7 +1,7 @@
 ---
 import "@/styles/globals.css";
-import Header from "@/components/Header";
-import Modals from "@/components/Modals";
+import Header from "@/components/astro/Header.astro";
+import Modals from "@/components/react/Modals";
 
 interface Props {
   title?: string;
@@ -32,7 +32,7 @@ const {
   </head>
   <body class="h-screen">
     <div class="root h-full">
-      {includeHeader && <Header client:load />}
+      {includeHeader && <Header />}
       <div class="container mx-auto mt-12 px-4">
         <div class="flex flex-col flex-1">
           <slot />

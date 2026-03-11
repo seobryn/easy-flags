@@ -5,13 +5,9 @@ import {
   unauthorizedResponse,
   badRequestResponse,
 } from "@/utils/api";
+import { SpaceService } from "@application/services";
 
 export const prerender = false;
-
-// This is a placeholder - in production, you would:
-// 1. Import the SpaceRepository and SpaceService from the Express app
-// 2. Use the database connection to fetch/create spaces
-// For now, we're returning mock data
 
 export const GET: APIRoute = async (context) => {
   const user = getUserFromContext(context);
@@ -22,32 +18,19 @@ export const GET: APIRoute = async (context) => {
     });
   }
 
-  // TODO: Use SpaceRepository to fetch user's spaces
-  // For demo, returning mock data with correct hierarchy:
-  // Spaces = Organizations/Projects (e.g., "Acme Corp", "Mobile App")
-  // Environments = Deployment stages (Production, Staging, Development)
-  const mockSpaces = [
-    {
-      id: 1,
-      name: "Acme Corporation",
-      description: "Feature flags for the main Acme product",
-      owner_id: user.id,
-      members_count: 5,
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      name: "Mobile App",
-      description: "Feature management for iOS and Android apps",
-      owner_id: user.id,
-      members_count: 3,
-      created_at: new Date().toISOString(),
-    },
-  ];
-
-  return new Response(JSON.stringify(successResponse(mockSpaces)), {
-    status: 200,
-  });
+  try {
+    const spaceService = new SpaceService();
+    const spaces = await spaceService.getUserSpaces(user.id);
+    return new Response(JSON.stringify(successResponse(spaces)), {
+      status: 200,
+    });
+  } catch (error) {
+    console.error("Error fetching spaces:", error);
+    return new Response(
+      JSON.stringify(badRequestResponse("Failed to fetch spaces")),
+      { status: 400 },
+    );
+  }
 };
 
 export const POST: APIRoute = async (context) => {
@@ -70,16 +53,11 @@ export const POST: APIRoute = async (context) => {
       );
     }
 
-    // TODO: Use SpaceService to create new space
-    // For demo, creating mock space
-    const newSpace = {
-      id: Math.floor(Math.random() * 1000),
+    const spaceService = new SpaceService();
+    const newSpace = await spaceService.createSpace(user.id, {
       name,
       description: description || "",
-      owner_id: user.id,
-      members_count: 1,
-      created_at: new Date().toISOString(),
-    };
+    });
 
     return new Response(JSON.stringify(successResponse(newSpace)), {
       status: 201,

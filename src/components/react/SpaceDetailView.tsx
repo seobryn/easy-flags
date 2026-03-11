@@ -18,16 +18,26 @@ export default function SpaceDetailView({ spaceId }: SpaceDetailViewProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch space details from API
-    // For now, use mock data
-    setSpace({
-      id: parseInt(spaceId || "1"),
-      name: "Acme Corporation",
-      description: "Feature flags for the main Acme product",
-      owner_id: 1,
-      created_at: new Date().toISOString(),
-    });
-    setIsLoading(false);
+    const fetchSpace = async () => {
+      try {
+        const response = await fetch(`/api/spaces/${spaceId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setSpace(data);
+        } else {
+          setSpace(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch space:", error);
+        setSpace(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (spaceId) {
+      fetchSpace();
+    }
   }, [spaceId]);
 
   if (isLoading) {

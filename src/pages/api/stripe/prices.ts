@@ -1,41 +1,16 @@
 import type { APIRoute } from "astro";
-import { stripeClient } from "@/lib/stripeClient";
+import { StripeService } from "@/application/services/StripeService";
 
 export const prerender = false;
 
 export const GET: APIRoute = async (context) => {
   try {
-    console.log("Fetching Stripe prices...");
-
-    const prices = await stripeClient.prices.list({
-      active: true,
-      expand: ["data.product"],
-      limit: 100,
-    });
-
-    console.log(`Found ${prices.data.length} active prices`);
-
-    const mapped = prices.data.map((p: any) => ({
-      id: p.id,
-      unit_amount: p.unit_amount,
-      currency: p.currency,
-      interval: p.recurring?.interval || null,
-      product:
-        p.product && typeof p.product === "object"
-          ? {
-              id: p.product.id,
-              name: p.product.name,
-              description: p.product.description,
-            }
-          : null,
-    }));
-
-    console.log("Mapped prices:", mapped);
+    const prices = await StripeService.getPrices();
 
     return new Response(
       JSON.stringify({
         success: true,
-        data: mapped,
+        data: prices,
       }),
       {
         status: 200,

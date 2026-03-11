@@ -1,12 +1,19 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import BillingPanel from "@/components/BillingPanel";
+import BillingPlans from "@/components/astro/BillingPlans.astro";
+import { getUserFromContext } from "@/utils/auth";
+
+// Redirect logged-in users to dashboard
+const user = getUserFromContext(Astro);
+if (user) {
+  return Astro.redirect("/spaces");
+}
 ---
 
 <BaseLayout title="Billing" includeHeader={true}>
   <article class="max-w-4xl mx-auto py-12">
     <h1 class="text-4xl font-bold text-gradient mb-6">Billing & Plans</h1>
 
-    <BillingPanel client:load />
+    <BillingPlans />
   </article>
 </BaseLayout>

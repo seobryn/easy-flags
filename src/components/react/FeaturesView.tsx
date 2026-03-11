@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SpaceNavigation from "./SpaceNavigation";
 
 interface FeatureEnvironmentConfig {
@@ -48,48 +48,8 @@ const getEnvironmentGradient = (color: string) => {
 };
 
 export default function FeaturesView({ spaceId }: FeaturesViewProps) {
-  const [features, setFeatures] = useState<Feature[]>([
-    {
-      id: 1,
-      key: "new_dashboard",
-      name: "New Dashboard",
-      description: "Improved dashboard UI with analytics",
-      type: "boolean",
-      environments: [
-        { environmentId: 1, environmentName: "Production", enabled: false },
-        { environmentId: 2, environmentName: "Staging", enabled: true },
-        { environmentId: 3, environmentName: "Development", enabled: true },
-      ],
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      key: "dark_mode",
-      name: "Dark Mode",
-      description: "Dark theme for the application",
-      type: "boolean",
-      environments: [
-        { environmentId: 1, environmentName: "Production", enabled: true },
-        { environmentId: 2, environmentName: "Staging", enabled: true },
-        { environmentId: 3, environmentName: "Development", enabled: true },
-      ],
-      created_at: new Date().toISOString(),
-    },
-    {
-      id: 3,
-      key: "beta_analytics",
-      name: "Beta Analytics",
-      description: "Advanced analytics features",
-      type: "string",
-      environments: [
-        { environmentId: 1, environmentName: "Production", enabled: false },
-        { environmentId: 2, environmentName: "Staging", enabled: true },
-        { environmentId: 3, environmentName: "Development", enabled: true },
-      ],
-      created_at: new Date().toISOString(),
-    },
-  ]);
-
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingFeature, setEditingFeature] = useState<Feature | null>(null);
@@ -100,56 +60,101 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
     "boolean" | "string" | "json"
   >("boolean");
 
-  const handleCreateFeature = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newFeatureKey.trim() || !newFeatureName.trim()) return;
+  useEffect(() => {
+    fetchFeatures();
+  }, [spaceId]);
 
-    const newFeature: Feature = {
-      id: Math.max(...features.map((f) => f.id), 0) + 1,
-      key: newFeatureKey,
-      name: newFeatureName,
-      description: newFeatureDescription,
-      type: newFeatureType,
-      environments: ENVIRONMENTS.map((env) => ({
-        environmentId: env.id,
-        environmentName: env.name,
-        enabled: false,
-      })),
-      created_at: new Date().toISOString(),
-    };
+  const fetchFeatures = async () => {
+    if (!spaceId) return;
 
-    setFeatures([...features, newFeature]);
-    setNewFeatureKey("");
-    setNewFeatureName("");
-    setNewFeatureDescription("");
-    setNewFeatureType("boolean");
-    setShowCreateModal(false);
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/spaces/${spaceId}/features`);
+      if (response.ok) {
+        const data = await response.json();
+        // Transform the features to include environment configurations
+        const transformedFeatures = data.map((feature: any) => ({
+          ...feature,
+          environments: ENVIRONMENTS.map((env) => ({
+            environmentId: env.id,
+            environmentName: env.name,
+            enabled: false, // This would need to be fetched from FeatureFlags
+          })),
+        }));
+        setFeatures(transformedFeatures);
+      } else {
+        setFeatures([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch features:", error);
+      setFeatures([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditFeature = (e: React.FormEvent) => {
+  const handleCreateFeature = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFeatureKey.trim() || !newFeatureName.trim() || !spaceId) return;
+
+    try {
+      const response = await fetch(`/api/spaces/${spaceId}/features`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: newFeatureKey,
+          name: newFeatureName,
+          description: newFeatureDescription,
+          type: newFeatureType,
+          default_value: newFeatureType === "boolean" ? "false" : "",
+        }),
+      });
+
+      if (response.ok) {
+        setNewFeatureKey("");
+        setNewFeatureName("");
+        setNewFeatureDescription("");
+        setNewFeatureType("boolean");
+        setShowCreateModal(false);
+        await fetchFeatures();
+      }
+    } catch (error) {
+      console.error("Failed to create feature:", error);
+    }
+  };
+
+  const handleEditFeature = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingFeature || !newFeatureKey.trim() || !newFeatureName.trim())
       return;
 
-    setFeatures(
-      features.map((f) =>
-        f.id === editingFeature.id
-          ? {
-              ...f,
-              key: newFeatureKey,
-              name: newFeatureName,
-              description: newFeatureDescription,
-              type: newFeatureType,
-            }
-          : f
-      )
-    );
-    setEditingFeature(null);
-    setNewFeatureKey("");
-    setNewFeatureName("");
-    setNewFeatureDescription("");
-    setNewFeatureType("boolean");
-    setShowEditModal(false);
+    try {
+      const response = await fetch(
+        `/api/spaces/${spaceId}/features/${editingFeature.id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            key: newFeatureKey,
+            name: newFeatureName,
+            description: newFeatureDescription,
+            type: newFeatureType,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        setEditingFeature(null);
+        setNewFeatureKey("");
+        setNewFeatureName("");
+        setNewFeatureDescription("");
+        setNewFeatureType("boolean");
+        setShowEditModal(false);
+        await fetchFeatures();
+      }
+    } catch (error) {
+      console.error("Failed to edit feature:", error);
+    }
   };
 
   const startEditingFeature = (feature: Feature) => {
@@ -161,13 +166,28 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
     setShowEditModal(true);
   };
 
-  const deleteFeature = (id: number) => {
-    if (confirm("Are you sure you want to delete this feature flag?")) {
-      setFeatures(features.filter((f) => f.id !== id));
+  const deleteFeature = async (id: number) => {
+    if (
+      !confirm("Are you sure you want to delete this feature flag?") ||
+      !spaceId
+    )
+      return;
+
+    try {
+      const response = await fetch(`/api/spaces/${spaceId}/features/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await fetchFeatures();
+      }
+    } catch (error) {
+      console.error("Failed to delete feature:", error);
     }
   };
 
   const toggleEnvironmentFlag = (featureId: number, environmentId: number) => {
+    // TODO: Implement API call to update FeatureFlag state
     setFeatures(
       features.map((f) =>
         f.id === featureId
@@ -176,11 +196,11 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
               environments: f.environments.map((env) =>
                 env.environmentId === environmentId
                   ? { ...env, enabled: !env.enabled }
-                  : env
+                  : env,
               ),
             }
-          : f
-      )
+          : f,
+      ),
     );
   };
 
@@ -197,9 +217,13 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
         <div className="mb-12">
           <div className="flex justify-between items-start mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-white mb-2">Feature Flags</h2>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Feature Flags
+              </h2>
               <p className="text-slate-400">
-                Create feature flags once, and configure them differently for each environment. All flags are automatically available across all environments.
+                Create feature flags once, and configure them differently for
+                each environment. All flags are automatically available across
+                all environments.
               </p>
             </div>
             <button
@@ -241,7 +265,10 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
           {/* Info Box */}
           <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 mb-8">
             <p className="text-sm text-cyan-300">
-              💡 <span className="font-semibold">How it works:</span> When you create a feature flag, it's automatically available in all environments. Use the toggles below to enable/disable each flag per environment.
+              💡 <span className="font-semibold">How it works:</span> When you
+              create a feature flag, it's automatically available in all
+              environments. Use the toggles below to enable/disable each flag
+              per environment.
             </p>
           </div>
         </div>
@@ -250,7 +277,9 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
         <div className="space-y-6">
           {features.length === 0 ? (
             <div className="text-center py-12 card">
-              <p className="text-slate-400 mb-4 text-lg">No feature flags yet</p>
+              <p className="text-slate-400 mb-4 text-lg">
+                No feature flags yet
+              </p>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="text-cyan-400 hover:text-cyan-300 font-semibold"
@@ -312,7 +341,7 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {feature.environments.map((envConfig) => {
                       const env = ENVIRONMENTS.find(
-                        (e) => e.id === envConfig.environmentId
+                        (e) => e.id === envConfig.environmentId,
                       );
                       if (!env) return null;
 
@@ -333,7 +362,10 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
                           </div>
                           <button
                             onClick={() =>
-                              toggleEnvironmentFlag(feature.id, envConfig.environmentId)
+                              toggleEnvironmentFlag(
+                                feature.id,
+                                envConfig.environmentId,
+                              )
                             }
                             className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
                               envConfig.enabled
@@ -389,7 +421,9 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
             </p>
 
             <form
-              onSubmit={editingFeature ? handleEditFeature : handleCreateFeature}
+              onSubmit={
+                editingFeature ? handleEditFeature : handleCreateFeature
+              }
               className="space-y-6"
             >
               <div>
@@ -446,7 +480,7 @@ export default function FeaturesView({ spaceId }: FeaturesViewProps) {
                   value={newFeatureType}
                   onChange={(e) =>
                     setNewFeatureType(
-                      e.target.value as "boolean" | "string" | "json"
+                      e.target.value as "boolean" | "string" | "json",
                     )
                   }
                   className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"

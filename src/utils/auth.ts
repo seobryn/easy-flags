@@ -51,5 +51,11 @@ export function setAuthCookie(
 }
 
 export function clearAuthCookie(context: APIContext): void {
-  context.cookies.delete("ff_token");
+  context.cookies.set("ff_token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 }
