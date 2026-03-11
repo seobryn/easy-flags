@@ -50,7 +50,19 @@ export default function DocsTableOfContents() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      const article = document.querySelector("article");
+      if (article) {
+        const elementRect = element.getBoundingClientRect();
+        const articleRect = article.getBoundingClientRect();
+        const scrollOffset = elementRect.top - articleRect.top + article.scrollTop;
+        
+        // Scroll margin of 112px (scroll-mt-28 = 7rem)
+        const marginOffset = 112;
+        article.scrollTo({
+          top: scrollOffset - marginOffset,
+          behavior: "smooth",
+        });
+      }
       setIsOpen(false);
     }
   };
