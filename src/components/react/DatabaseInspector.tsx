@@ -154,19 +154,9 @@ export default function DatabaseInspector() {
                 {tableInspection.viewTab === "records" && (
                   <div className="bg-slate-800/80 rounded-xl shadow-lg p-6 border border-cyan-700/30">
                     <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 className="text-lg font-semibold text-cyan-300">
-                          Data
-                        </h2>
-                        {tableInspection.data.length > 0 && (
-                          <p className="text-xs text-slate-400 mt-1">
-                            📄 Page {dataManipulation.currentPage} of{" "}
-                            {dataManipulation.getTotalPages()} •{" "}
-                            {dataManipulation.getPaginatedData().length} of{" "}
-                            {dataManipulation.getFilteredData().length} records
-                          </p>
-                        )}
-                      </div>
+                      <h2 className="text-lg font-semibold text-cyan-300">
+                        Data
+                      </h2>
                       <div className="flex gap-2 items-center flex-wrap">
                         <label className="text-sm text-slate-300 font-medium">
                           Per Page:
@@ -245,11 +235,19 @@ export default function DatabaseInspector() {
                           }}
                         />
 
-                        <PaginationControls
-                          currentPage={dataManipulation.currentPage}
-                          totalPages={dataManipulation.getTotalPages()}
-                          onPageChange={dataManipulation.setCurrentPage}
-                        />
+                        <div className="space-y-3">
+                          <p className="text-xs text-slate-400">
+                            📄 Page {dataManipulation.currentPage} of{" "}
+                            {dataManipulation.getTotalPages()} •{" "}
+                            {dataManipulation.getPaginatedData().length} of{" "}
+                            {dataManipulation.getFilteredData().length} records
+                          </p>
+                          <PaginationControls
+                            currentPage={dataManipulation.currentPage}
+                            totalPages={dataManipulation.getTotalPages()}
+                            onPageChange={dataManipulation.setCurrentPage}
+                          />
+                        </div>
                       </div>
                     ) : (
                       <p className="text-center text-slate-400 py-8">
