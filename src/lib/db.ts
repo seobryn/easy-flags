@@ -68,11 +68,13 @@ export async function initializeDatabase(): Promise<void> {
     CREATE TABLE IF NOT EXISTS spaces (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      slug TEXT NOT NULL,
       description TEXT,
       owner_id INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (owner_id) REFERENCES users(id)
+      FOREIGN KEY (owner_id) REFERENCES users(id),
+      UNIQUE(slug)
     );
 
     CREATE TABLE IF NOT EXISTS space_members (

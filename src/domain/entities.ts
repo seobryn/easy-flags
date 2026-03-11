@@ -30,6 +30,7 @@ export interface User {
 export interface Space {
   id: number;
   name: string;
+  slug: string;
   description?: string;
   owner_id: number;
   created_at: string;

@@ -24,6 +24,33 @@ const __dirname = path.dirname(__filename);
 const dbUrl = process.env.DATABASE_URL || "file:./data.db";
 const dbAuthToken = process.env.DATABASE_AUTH_TOKEN;
 
+/**
+ * Generate URL-friendly slug from text
+ * Converts to lowercase and replaces spaces with dashes
+ */
+function generateSlug(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Make slug unique in a collection by appending numbers if needed
+ */
+function makeSlugUnique(baseSlug, existingSlugs) {
+  let slug = baseSlug;
+  let counter = 1;
+  while (existingSlugs.includes(slug)) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+  return slug;
+}
+
 async function main() {
   try {
     console.log("🚀 Initializing Easy Flags database...");
@@ -86,11 +113,13 @@ async function initializeSchema(client) {
     CREATE TABLE IF NOT EXISTS spaces (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
+      slug TEXT NOT NULL,
       description TEXT,
       owner_id INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (owner_id) REFERENCES users(id)
+      FOREIGN KEY (owner_id) REFERENCES users(id),
+      UNIQUE(slug)
     );
 
     CREATE TABLE IF NOT EXISTS space_members (

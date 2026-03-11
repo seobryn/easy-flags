@@ -183,6 +183,15 @@ export class LibSqlSpaceRepository implements SpaceRepository {
     return (result.rows[0] as never as Space) || null;
   }
 
+  async findBySlug(slug: string): Promise<Space | null> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM spaces WHERE slug = ?",
+      args: [slug],
+    });
+    return (result.rows[0] as never as Space) || null;
+  }
+
   async findByOwnerId(ownerId: number): Promise<Space[]> {
     const db = await this.getDb();
     const result = await db.execute({
@@ -200,9 +209,16 @@ export class LibSqlSpaceRepository implements SpaceRepository {
 
   async create(dto: CreateSpaceDTO, ownerId: number): Promise<Space> {
     const db = await this.getDb();
+
+    // Generate unique slug
+    const baseSlug = generateSlug(dto.name);
+    const allSpaces = await this.findAll();
+    const existingSlugs = allSpaces.map((s) => s.slug);
+    const slug = makeSlugUnique(baseSlug, existingSlugs);
+
     const result = await db.execute({
-      sql: `INSERT INTO spaces (name, description, owner_id) VALUES (?, ?, ?)`,
-      args: [dto.name, dto.description || null, ownerId],
+      sql: `INSERT INTO spaces (name, slug, description, owner_id) VALUES (?, ?, ?, ?)`,
+      args: [dto.name, slug, dto.description || null, ownerId],
     });
     const created = await this.findById(Number(result.lastInsertRowid));
     if (!created) throw new Error("Failed to create space");
@@ -217,6 +233,16 @@ export class LibSqlSpaceRepository implements SpaceRepository {
     if (dto.name) {
       updates.push("name = ?");
       args.push(dto.name);
+
+      // Regenerate slug if name changes
+      const baseSlug = generateSlug(dto.name);
+      const allSpaces = await this.findAll();
+      const existingSlugs = allSpaces
+        .filter((s) => s.id !== id)
+        .map((s) => s.slug);
+      const slug = makeSlugUnique(baseSlug, existingSlugs);
+      updates.push("slug = ?");
+      args.push(slug);
     }
     if (dto.description !== undefined) {
       updates.push("description = ?");

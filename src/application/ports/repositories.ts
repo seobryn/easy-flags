@@ -54,6 +54,7 @@ export interface RoleRepository {
 
 export interface SpaceRepository {
   findById(id: number): Promise<Space | null>;
+  findBySlug(slug: string): Promise<Space | null>;
   findByOwnerId(ownerId: number): Promise<Space[]>;
   findAll(): Promise<Space[]>;
   create(dto: CreateSpaceDTO, ownerId: number): Promise<Space>;

@@ -37,6 +37,10 @@ export class SpaceService {
     return this.registry.getSpaceRepository().findById(id);
   }
 
+  async getSpaceBySlug(slug: string): Promise<Space | null> {
+    return this.registry.getSpaceRepository().findBySlug(slug);
+  }
+
   async getUserSpaces(userId: number): Promise<Space[]> {
     return this.registry.getSpaceRepository().findByOwnerId(userId);
   }
