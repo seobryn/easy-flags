@@ -270,56 +270,60 @@ export async function seedDatabase(): Promise<void> {
     });
 
     // Seed feature permissions
-    const FEATURES = {
-      FEATURE_FLAGS: "feature_flags",
-      SPACES: "spaces",
-      ENVIRONMENTS: "environments",
-      BILLING: "billing",
-      SETTINGS: "settings",
-      DATABASE_INSPECTOR: "database_inspector",
-      API_REFERENCE: "api_reference",
-    };
-
-    // Super user permissions (all features)
-    const superUserFeatures = Object.values(FEATURES);
+    // Seed feature permissions using defined defaults
+    // SUPER_USER (role_id: 1) - all features
+    const superUserFeatures = [
+      "feature_flags",
+      "spaces",
+      "environments",
+      "billing",
+      "settings",
+      "database_inspector",
+      "api_reference",
+    ];
     for (const feature of superUserFeatures) {
-      await database.execute({
-        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
-        args: [0, feature],
-      });
-    }
-
-    // Admin permissions (all except database_inspector)
-    const adminFeatures = Object.values(FEATURES).filter(
-      (f) => f !== FEATURES.DATABASE_INSPECTOR,
-    );
-    for (const feature of adminFeatures) {
       await database.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
         args: [1, feature],
       });
     }
 
-    // Editor permissions
-    const editorFeatures = [
-      FEATURES.FEATURE_FLAGS,
-      FEATURES.SPACES,
-      FEATURES.ENVIRONMENTS,
-      FEATURES.API_REFERENCE,
+    // ADMIN (role_id: 2) - all except database_inspector
+    const adminFeatures = [
+      "feature_flags",
+      "spaces",
+      "environments",
+      "billing",
+      "settings",
+      "api_reference",
     ];
-    for (const feature of editorFeatures) {
+    for (const feature of adminFeatures) {
       await database.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
         args: [2, feature],
       });
     }
 
-    // Viewer permissions
-    const viewerFeatures = [FEATURES.FEATURE_FLAGS, FEATURES.API_REFERENCE];
-    for (const feature of viewerFeatures) {
+    // EDITOR (role_id: 3) - feature flags, spaces, environments, api_reference
+    const editorFeatures = [
+      "feature_flags",
+      "spaces",
+      "environments",
+      "api_reference",
+    ];
+    for (const feature of editorFeatures) {
       await database.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
         args: [3, feature],
+      });
+    }
+
+    // VIEWER (role_id: 4) - feature flags, api_reference (read-only access)
+    const viewerFeatures = ["feature_flags", "api_reference"];
+    for (const feature of viewerFeatures) {
+      await database.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [4, feature],
       });
     }
 
