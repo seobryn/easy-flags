@@ -220,6 +220,9 @@ export default function DatabaseInspector() {
                                 Type
                               </th>
                               <th className="text-left px-4 py-2 font-semibold text-cyan-300">
+                                Default
+                              </th>
+                              <th className="text-left px-4 py-2 font-semibold text-cyan-300">
                                 Constraints
                               </th>
                             </tr>
@@ -235,6 +238,17 @@ export default function DatabaseInspector() {
                                 </td>
                                 <td className="px-4 py-2 text-slate-400">
                                   {col.type}
+                                </td>
+                                <td className="px-4 py-2 text-slate-400 font-mono text-xs">
+                                  {col.dflt_value ? (
+                                    <span className="text-slate-300">
+                                      {col.dflt_value}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-500 italic">
+                                      -
+                                    </span>
+                                  )}
                                 </td>
                                 <td className="px-4 py-2 text-slate-400">
                                   <div className="flex gap-1 flex-wrap">
