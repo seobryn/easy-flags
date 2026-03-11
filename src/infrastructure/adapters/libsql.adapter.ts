@@ -4,6 +4,7 @@
  */
 
 import { getDatabase } from "@lib/db";
+import { generateSlug, makeSlugUnique } from "@lib/utils";
 import type { Client, InArgs } from "@libsql/client";
 import type {
   User,
@@ -370,6 +371,15 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
     return (result.rows[0] as never as Environment) || null;
   }
 
+  async findBySlug(spaceId: number, slug: string): Promise<Environment | null> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM environments WHERE space_id = ? AND slug = ?",
+      args: [spaceId, slug],
+    });
+    return (result.rows[0] as never as Environment) || null;
+  }
+
   async findBySpaceId(spaceId: number): Promise<Environment[]> {
     const db = await this.getDb();
     const result = await db.execute({
@@ -384,9 +394,22 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
     dto: CreateEnvironmentDTO,
   ): Promise<Environment> {
     const db = await this.getDb();
+
+    // Generate unique slug
+    const baseSlug = generateSlug(dto.name);
+    const existingEnvs = await this.findBySpaceId(spaceId);
+    const existingSlugs = existingEnvs.map((e) => e.slug);
+    const slug = makeSlugUnique(baseSlug, existingSlugs);
+
     const result = await db.execute({
-      sql: `INSERT INTO environments (space_id, name, description, type) VALUES (?, ?, ?, ?)`,
-      args: [spaceId, dto.name, dto.description || null, dto.type || "other"],
+      sql: `INSERT INTO environments (space_id, name, slug, description, type) VALUES (?, ?, ?, ?, ?)`,
+      args: [
+        spaceId,
+        dto.name,
+        slug,
+        dto.description || null,
+        dto.type || "other",
+      ],
     });
     const created = await this.findById(Number(result.lastInsertRowid));
     if (!created) throw new Error("Failed to create environment");
@@ -404,6 +427,19 @@ export class LibSqlEnvironmentRepository implements EnvironmentRepository {
     if (dto.name) {
       updates.push("name = ?");
       args.push(dto.name);
+
+      // Regenerate slug if name changes
+      const env = await this.findById(id);
+      if (env) {
+        const baseSlug = generateSlug(dto.name);
+        const existingEnvs = await this.findBySpaceId(env.space_id);
+        const existingSlugs = existingEnvs
+          .filter((e) => e.id !== id)
+          .map((e) => e.slug);
+        const slug = makeSlugUnique(baseSlug, existingSlugs);
+        updates.push("slug = ?");
+        args.push(slug);
+      }
     }
     if (dto.description !== undefined) {
       updates.push("description = ?");

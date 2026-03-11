@@ -85,6 +85,7 @@ export interface SpaceMemberRepository {
 
 export interface EnvironmentRepository {
   findById(id: number): Promise<Environment | null>;
+  findBySlug(spaceId: number, slug: string): Promise<Environment | null>;
   findBySpaceId(spaceId: number): Promise<Environment[]>;
   create(spaceId: number, dto: CreateEnvironmentDTO): Promise<Environment>;
   update(id: number, dto: Partial<CreateEnvironmentDTO>): Promise<Environment>;

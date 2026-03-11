@@ -91,12 +91,14 @@ export async function initializeDatabase(): Promise<void> {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       space_id INTEGER NOT NULL,
       name TEXT NOT NULL,
+      slug TEXT NOT NULL,
       description TEXT,
       type TEXT DEFAULT 'other',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (space_id) REFERENCES spaces(id),
-      UNIQUE(space_id, name)
+      UNIQUE(space_id, name),
+      UNIQUE(space_id, slug)
     );
 
     CREATE TABLE IF NOT EXISTS features (

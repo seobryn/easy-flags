@@ -60,6 +60,7 @@ export interface Environment {
   id: number;
   space_id: number;
   name: string;
+  slug: string;
   description?: string;
   type: EnvironmentType;
   created_at: string;

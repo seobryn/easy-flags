@@ -114,6 +114,13 @@ export class EnvironmentService {
     return this.registry.getEnvironmentRepository().findById(id);
   }
 
+  async getEnvironmentBySlug(
+    spaceId: number,
+    slug: string,
+  ): Promise<Environment | null> {
+    return this.registry.getEnvironmentRepository().findBySlug(spaceId, slug);
+  }
+
   async getSpaceEnvironments(spaceId: number): Promise<Environment[]> {
     return this.registry.getEnvironmentRepository().findBySpaceId(spaceId);
   }
@@ -137,7 +144,10 @@ export class EnvironmentService {
 export class FeatureService {
   private registry = getRepositoryRegistry();
 
-  async createFeature(spaceId: number, dto: CreateFeatureDTO): Promise<Feature> {
+  async createFeature(
+    spaceId: number,
+    dto: CreateFeatureDTO,
+  ): Promise<Feature> {
     return this.registry.getFeatureRepository().create(spaceId, dto);
   }
 
@@ -340,7 +350,9 @@ export class ApiKeyService {
   }
 
   async getEnvironmentApiKeys(environmentId: number) {
-    return this.registry.getApiKeyRepository().findByEnvironmentId(environmentId);
+    return this.registry
+      .getApiKeyRepository()
+      .findByEnvironmentId(environmentId);
   }
 
   async deleteApiKey(id: number) {

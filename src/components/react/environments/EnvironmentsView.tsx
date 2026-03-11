@@ -6,6 +6,7 @@ type EnvironmentType = "production" | "staging" | "development" | "other";
 interface Environment {
   id: number;
   name: string;
+  slug: string;
   description?: string;
   type: EnvironmentType;
   created_at: string;
@@ -342,7 +343,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                       Created {new Date(env.created_at).toLocaleDateString()}
                     </span>
                     <a
-                      href={`/spaces/${spaceId}/environments/${env.id}`}
+                      href={`/spaces/${spaceId}/environments/${env.slug}`}
                       className={`text-sm font-semibold ${colors.accent} hover:brightness-110 transition`}
                     >
                       View →

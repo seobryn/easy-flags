@@ -17,7 +17,7 @@ if (!requireAuth(Astro)) {
 
 const { spaceId, envId } = Astro.params;
 const spaceIdNum = parseInt(spaceId as string);
-const envIdNum = parseInt(envId as string);
+const envSlug = envId as string;
 
 // Verify space exists first
 const spaceService = new SpaceService();
@@ -26,12 +26,13 @@ if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
-// Verify environment exists and belongs to the space
+// Verify environment exists and belongs to the space (lookup by slug)
 const environmentService = new EnvironmentService();
-const env = (await environmentService.getEnvironment(envIdNum))!;
-if (
-  !validateNestedResource(env, "space_id", spaceIdNum, Astro, "Environment")
-) {
+const env = (await environmentService.getEnvironmentBySlug(
+  spaceIdNum,
+  envSlug,
+))!;
+if (!env) {
   return Astro.redirect("/404");
 }
 
@@ -42,7 +43,7 @@ const title = `${env.name} - Configuration`;
   <EnvironmentDetailView
     client:load
     spaceId={spaceId}
-    envId={envId}
+    envId={env.id.toString()}
     envName={env.name}
     envDescription={env.description}
     createdAt={env.created_at}
