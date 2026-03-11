@@ -1,0 +1,57 @@
+---
+// src/pages/dev/db-inspector.astro
+// Development-only database inspection page
+import DatabaseInspector from "../../components/react/DatabaseInspector";
+
+// Only allow access in development environment
+const isDevelopment = !import.meta.env.PROD;
+if (!isDevelopment) {
+  return Astro.redirect("/");
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Database Inspector - Development</title>
+    <meta name="description" content="Development database inspection tool" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+  </head>
+  <body>
+    <div class="min-h-screen bg-slate-900">
+      <DatabaseInspector client:load />
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+    @apply antialiased bg-slate-900;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+</style>
