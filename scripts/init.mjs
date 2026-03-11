@@ -154,6 +154,15 @@ async function initializeSchema(client) {
       FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id)
     );
 
+    CREATE TABLE IF NOT EXISTS feature_permissions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      role_id INTEGER NOT NULL,
+      feature_name TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (role_id) REFERENCES roles(id),
+      UNIQUE(role_id, feature_name)
+    );
+
     CREATE TABLE IF NOT EXISTS migrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT UNIQUE NOT NULL,
@@ -196,20 +205,82 @@ async function seedDefaultData(client) {
       return;
     }
 
-    // Insert default roles
-    const roles = [
-      { name: "admin", description: "Administrator with full access" },
-      {
-        name: "editor",
-        description: "Editor can modify features and settings",
-      },
-      { name: "viewer", description: "Viewer can only read features" },
-    ];
+    // Insert default roles with specific IDs
+    await client.execute({
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [
+        0,
+        "super_user",
+        "Super User with access to system administration tools",
+      ],
+    });
 
-    for (const role of roles) {
+    await client.execute({
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [1, "admin", "Administrator with full access"],
+    });
+
+    await client.execute({
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [2, "editor", "Editor can modify features and settings"],
+    });
+
+    await client.execute({
+      sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
+      args: [3, "viewer", "Viewer can only read features"],
+    });
+
+    // Seed feature permissions
+    const FEATURES = {
+      FEATURE_FLAGS: "feature_flags",
+      SPACES: "spaces",
+      ENVIRONMENTS: "environments",
+      BILLING: "billing",
+      SETTINGS: "settings",
+      DATABASE_INSPECTOR: "database_inspector",
+      API_REFERENCE: "api_reference",
+    };
+
+    // Super user permissions (all features)
+    const superUserFeatures = Object.values(FEATURES);
+    for (const feature of superUserFeatures) {
       await client.execute({
-        sql: "INSERT INTO roles (name, description) VALUES (?, ?)",
-        args: [role.name, role.description],
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [0, feature],
+      });
+    }
+
+    // Admin permissions (all except database_inspector)
+    const adminFeatures = Object.values(FEATURES).filter(
+      (f) => f !== FEATURES.DATABASE_INSPECTOR,
+    );
+    for (const feature of adminFeatures) {
+      await client.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [1, feature],
+      });
+    }
+
+    // Editor permissions
+    const editorFeatures = [
+      FEATURES.FEATURE_FLAGS,
+      FEATURES.SPACES,
+      FEATURES.ENVIRONMENTS,
+      FEATURES.API_REFERENCE,
+    ];
+    for (const feature of editorFeatures) {
+      await client.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [2, feature],
+      });
+    }
+
+    // Viewer permissions
+    const viewerFeatures = [FEATURES.FEATURE_FLAGS, FEATURES.API_REFERENCE];
+    for (const feature of viewerFeatures) {
+      await client.execute({
+        sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
+        args: [3, feature],
       });
     }
 
@@ -222,12 +293,12 @@ async function seedDefaultData(client) {
       );
     }
 
-    // Insert default admin user
+    // Insert default super user (role_id: 0)
     const adminUser = {
       username: username,
       passwordPlain: password,
       email: "admin@example.com",
-      role_id: 1,
+      role_id: 0,
     };
 
     // Hash the password
@@ -244,8 +315,9 @@ async function seedDefaultData(client) {
     });
 
     console.log(`✅ Default data seeded`);
-    console.log(`   - 3 roles created (admin, editor, viewer)`);
-    console.log(`   - Admin user created: ${adminUser.username}`);
+    console.log(`   - 4 roles created (super_user, admin, editor, viewer)`);
+    console.log(`   - Feature permissions configured for all roles`);
+    console.log(`   - Super user created: ${adminUser.username}`);
   } catch (error) {
     console.error("Error seeding data:", error);
     throw error;
