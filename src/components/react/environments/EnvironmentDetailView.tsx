@@ -301,10 +301,10 @@ export default function EnvironmentDetailView({
                 </div>
                 <button
                   onClick={handleCopyApiKey}
-                  className="absolute top-2 right-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-xs text-slate-300 hover:text-white rounded transition flex items-center gap-1"
+                  className="absolute top-1/2 -translate-y-1/2 right-2 p-2 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded transition"
                   title="Copy to clipboard"
                 >
-                  {isCopied ? "✓ Copied" : "Copy"}
+                  {isCopied ? "✓" : "📋"}
                 </button>
               </div>
 
