@@ -1,10 +1,21 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { requireAuth } from "@/utils/auth-redirect";
+import { checkResourceExists } from "@/utils/resource-validation";
 import FeaturesView from "@/components/react/FeaturesView";
+import { SpaceService } from "@application/services";
 
 export const prerender = false;
 
+// Require authentication (includes redirect parameter)
+requireAuth(Astro);
+
 const { spaceId } = Astro.params;
+
+// Verify space exists
+const spaceService = new SpaceService();
+const space = await spaceService.getSpace(parseInt(spaceId as string));
+checkResourceExists(space, Astro, "Space");
 ---
 
 <BaseLayout title="Features" includeHeader={true}>

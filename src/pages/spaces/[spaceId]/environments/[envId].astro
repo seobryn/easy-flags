@@ -1,62 +1,47 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { requireAuth } from "@/utils/auth-redirect";
+import {
+  validateNestedResource,
+  checkResourceExists,
+} from "@/utils/resource-validation";
 import EnvironmentDetailView from "@/components/react/EnvironmentDetailView";
-import { EnvironmentService } from "@application/services";
+import { SpaceService, EnvironmentService } from "@application/services";
 
 export const prerender = false;
 
+// Require authentication (includes redirect parameter)
+requireAuth(Astro);
+
 const { spaceId, envId } = Astro.params;
+const spaceIdNum = parseInt(spaceId as string);
+const envIdNum = parseInt(envId as string);
 
-let environment = null;
-let errorMessage = "";
+// Verify space exists first
+const spaceService = new SpaceService();
+const space = await spaceService.getSpace(spaceIdNum);
+checkResourceExists(space, Astro, "Space");
 
-try {
-  if (envId) {
-    const environmentService = new EnvironmentService();
-    environment = await environmentService.getEnvironment(parseInt(envId));
+// Verify environment exists and belongs to the space
+const environmentService = new EnvironmentService();
+const environment = await environmentService.getEnvironment(envIdNum);
+validateNestedResource(
+  environment,
+  "space_id",
+  spaceIdNum,
+  Astro,
+  "Environment",
+);
 
-    if (!environment) {
-      errorMessage = "Environment not found";
-    }
-  }
-} catch (error) {
-  errorMessage = "Failed to load environment";
-  console.error("Error fetching environment:", error);
-}
-
-const title = environment
-  ? `${environment.name} - Configuration`
-  : "Environment - Configuration";
+const title = `${environment.name} - Configuration`;
 ---
 
 <BaseLayout title={title} includeHeader={true}>
-  {
-    errorMessage ? (
-      <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="card text-center py-12">
-          <p class="text-red-400 mb-4">{errorMessage}</p>
-          <a
-            href={`/spaces/${spaceId}/environments`}
-            class="text-cyan-400 hover:text-cyan-300"
-          >
-            Back to Environments
-          </a>
-        </div>
-      </div>
-    ) : environment ? (
-      <EnvironmentDetailView
-        client:load
-        spaceId={spaceId}
-        envId={envId}
-        envName={environment.name}
-        envDescription={environment.description}
-      />
-    ) : (
-      <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="card text-center py-12">
-          <p class="text-slate-400 mb-4">Loading environment...</p>
-        </div>
-      </div>
-    )
-  }
+  <EnvironmentDetailView
+    client:load
+    spaceId={spaceId}
+    envId={envId}
+    envName={environment.name}
+    envDescription={environment.description}
+  />
 </BaseLayout>

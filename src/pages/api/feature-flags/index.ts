@@ -3,11 +3,21 @@
  */
 
 import type { APIRoute } from "astro";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse, badRequestResponse } from "@/utils/api";
 import { FeatureFlagService } from "@application/services";
 export const prerender = false;
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const flagService = new FeatureFlagService();
+    const { params } = context;
     const { environmentId, featureId } = params;
 
     if (environmentId) {
@@ -37,10 +47,17 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, params }) => {
+export const POST: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const flagService = new FeatureFlagService();
-    const body = await request.json();
+    const body = await context.request.json();
     const flag = await flagService.createFeatureFlag(
       body.feature_id,
       body.environment_id,

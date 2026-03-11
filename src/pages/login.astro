@@ -1,6 +1,15 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { redirectIfAuthenticated } from "@/utils/auth-redirect";
 import LoginForm from "@/components/react/LoginForm";
+
+export const prerender = false;
+
+// Redirect authenticated users to spaces
+redirectIfAuthenticated(Astro);
+
+// Get redirect URL from query params (where user was trying to go)
+const redirectUrl = Astro.url.searchParams.get("redirect") || "/spaces";
 ---
 
 <BaseLayout title="Login - Feature Flags" includeHeader={false}>
@@ -10,7 +19,7 @@ import LoginForm from "@/components/react/LoginForm";
         <h1 class="text-4xl font-bold text-gradient mb-2">Easy Flags</h1>
         <p class="text-slate-400">Sign in to your account</p>
       </div>
-      <LoginForm client:load />
+      <LoginForm client:load redirectUrl={redirectUrl} />
     </div>
   </div>
 </BaseLayout>

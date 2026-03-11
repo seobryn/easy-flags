@@ -3,26 +3,37 @@
  */
 
 import type { APIRoute } from "astro";
-import {
-  EnvironmentConfigService,
-  ApiKeyService,
-} from "@application/services";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse } from "@/utils/api";
+import { EnvironmentConfigService, ApiKeyService } from "@application/services";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const envConfigService = new EnvironmentConfigService();
+    const { params } = context;
     const environmentId = parseInt(params.environmentId as string);
 
     // Check if requesting configs or API keys
     const url = new URL(params.toString());
-    if (url.searchParams.has("type") && url.searchParams.get("type") === "api-keys") {
+    if (
+      url.searchParams.has("type") &&
+      url.searchParams.get("type") === "api-keys"
+    ) {
       const apiKeyService = new ApiKeyService();
       const keys = await apiKeyService.getEnvironmentApiKeys(environmentId);
       return new Response(JSON.stringify(keys), { status: 200 });
     } else {
-      const configs = await envConfigService.getEnvironmentConfigs(environmentId);
+      const configs =
+        await envConfigService.getEnvironmentConfigs(environmentId);
       return new Response(JSON.stringify(configs), { status: 200 });
     }
   } catch (error) {
@@ -35,9 +46,17 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, params }) => {
+export const POST: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
-    const body = await request.json();
+    const body = await context.request.json();
+    const { params } = context;
     const environmentId = parseInt(params.environmentId as string);
 
     if (body.type === "api-key") {

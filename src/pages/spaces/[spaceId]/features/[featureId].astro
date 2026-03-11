@@ -1,63 +1,42 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { requireAuth } from "@/utils/auth-redirect";
+import {
+  validateNestedResource,
+  checkResourceExists,
+} from "@/utils/resource-validation";
 import AdvancedConfigurationView from "@/components/react/AdvancedConfigurationView";
-import { FeatureService } from "@application/services";
+import { SpaceService, FeatureService } from "@application/services";
 
 export const prerender = false;
 
+// Require authentication (includes redirect parameter)
+requireAuth(Astro);
+
 const { spaceId, featureId } = Astro.params;
+const spaceIdNum = parseInt(spaceId as string);
+const featureIdNum = parseInt(featureId as string);
 
-let feature = null;
-let errorMessage = "";
+// Verify space exists first
+const spaceService = new SpaceService();
+const space = await spaceService.getSpace(spaceIdNum);
+checkResourceExists(space, Astro, "Space");
 
-try {
-  if (featureId) {
-    const featureService = new FeatureService();
-    feature = await featureService.getFeature(parseInt(featureId));
+// Verify feature exists and belongs to the space
+const featureService = new FeatureService();
+const feature = await featureService.getFeature(featureIdNum);
+validateNestedResource(feature, "space_id", spaceIdNum, Astro, "Feature");
 
-    if (!feature) {
-      errorMessage = "Feature not found";
-    }
-  }
-} catch (error) {
-  errorMessage = "Failed to load feature";
-  console.error("Error fetching feature:", error);
-}
-
-const title = feature
-  ? `${feature.name} - Advanced Configuration`
-  : "Feature - Advanced Configuration";
+const title = `${feature.name} - Advanced Configuration`;
 ---
 
 <BaseLayout title={title} includeHeader={true}>
-  {
-    errorMessage ? (
-      <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="card text-center py-12">
-          <p class="text-red-400 mb-4">{errorMessage}</p>
-          <a
-            href={`/spaces/${spaceId}/features`}
-            class="text-cyan-400 hover:text-cyan-300"
-          >
-            Back to Features
-          </a>
-        </div>
-      </div>
-    ) : feature ? (
-      <AdvancedConfigurationView
-        client:load
-        spaceId={spaceId}
-        featureId={featureId}
-        featureName={feature.name}
-        featureKey={feature.key}
-        featureType={feature.type}
-      />
-    ) : (
-      <div class="max-w-4xl mx-auto py-12 px-4">
-        <div class="card text-center py-12">
-          <p class="text-slate-400 mb-4">Loading feature...</p>
-        </div>
-      </div>
-    )
-  }
+  <AdvancedConfigurationView
+    client:load
+    spaceId={spaceId}
+    featureId={featureId}
+    featureName={feature.name}
+    featureKey={feature.key}
+    featureType={feature.type}
+  />
 </BaseLayout>

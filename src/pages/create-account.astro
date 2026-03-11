@@ -1,6 +1,12 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { redirectIfAuthenticated } from "@/utils/auth-redirect";
 import RegisterForm from "@/components/react/RegisterForm";
+
+export const prerender = false;
+
+// Redirect authenticated users to spaces
+redirectIfAuthenticated(Astro);
 ---
 
 <BaseLayout title="Create Account - Feature Flags" includeHeader={false}>

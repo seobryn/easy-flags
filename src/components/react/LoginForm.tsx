@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 
-export default function LoginForm() {
+interface LoginFormProps {
+  redirectUrl?: string;
+}
+
+export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -9,7 +13,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    
+
     // Client-side validation
     if (!username.trim() || !password.trim()) {
       setError("Please enter both username and password");
@@ -20,10 +24,10 @@ export default function LoginForm() {
 
     try {
       console.log("Attempting login with username:", username);
-      const payload = { username, password };
+      const payload = { username, password, redirectUrl };
       console.log("📤 Sending payload:", payload);
       console.log("📤 Payload JSON stringified:", JSON.stringify(payload));
-      
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,7 +38,7 @@ export default function LoginForm() {
       console.log("Login response status:", response.status);
       const text = await response.text();
       console.log("📥 Response text:", text);
-      
+
       let data;
       try {
         data = JSON.parse(text);
@@ -43,7 +47,7 @@ export default function LoginForm() {
         setError("Invalid response from server");
         return;
       }
-      
+
       console.log("Login response data:", data);
 
       if (!response.ok) {
@@ -53,11 +57,17 @@ export default function LoginForm() {
         return;
       }
 
-      console.log("Login successful, redirecting to spaces...");
-      // Redirect to dashboard
-      window.location.href = "/spaces";
+      // Get redirect URL from response or use the provided one
+      const finalRedirectUrl = data.data?.redirectUrl || redirectUrl;
+      console.log("Login successful, redirecting to:", finalRedirectUrl);
+
+      // Redirect to the original requested page or default
+      window.location.href = finalRedirectUrl;
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "An error occurred. Please try again.";
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "An error occurred. Please try again.";
       console.error("Login exception:", err);
       setError(errorMsg);
     } finally {

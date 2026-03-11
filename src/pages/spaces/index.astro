@@ -2,7 +2,11 @@
 export const prerender = false;
 
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import { requireAuth } from "@/utils/auth-redirect";
 import SpacesDashboard from "@/components/react/SpacesDashboard";
+
+// Require authentication (includes redirect parameter)
+requireAuth(Astro);
 ---
 
 <BaseLayout title="Spaces - Feature Flags" includeHeader={true}>

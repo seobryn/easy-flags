@@ -3,14 +3,34 @@
  */
 
 import type { APIRoute } from "astro";
-import { FeatureService } from "@application/services";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse } from "@/utils/api";
+import { FeatureService, SpaceService } from "@application/services";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
-    const featureService = new FeatureService();
+    const { params } = context;
     const spaceId = parseInt(params.spaceId as string);
+
+    // Verify space exists
+    const spaceService = new SpaceService();
+    const space = await spaceService.getSpace(spaceId);
+    if (!space) {
+      return new Response(JSON.stringify({ error: "Space not found" }), {
+        status: 404,
+      });
+    }
+
+    const featureService = new FeatureService();
     const features = await featureService.getSpaceFeatures(spaceId);
     return new Response(JSON.stringify(features), { status: 200 });
   } catch (error) {
@@ -23,11 +43,29 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, params }) => {
+export const POST: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
-    const featureService = new FeatureService();
-    const body = await request.json();
+    const { params } = context;
     const spaceId = parseInt(params.spaceId as string);
+
+    // Verify space exists
+    const spaceService = new SpaceService();
+    const space = await spaceService.getSpace(spaceId);
+    if (!space) {
+      return new Response(JSON.stringify({ error: "Space not found" }), {
+        status: 404,
+      });
+    }
+
+    const featureService = new FeatureService();
+    const body = await context.request.json();
     const feature = await featureService.createFeature(spaceId, {
       key: body.key,
       name: body.name,

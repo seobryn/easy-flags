@@ -1,8 +1,10 @@
 import type { APIRoute } from "astro";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse } from "@/utils/api";
 import { getDatabase } from "../../../lib/db";
 import type { InArgs } from "@libsql/client";
 
-// Only allow in development
+// Only allow in development for authenticated users
 export const prerender = false;
 
 interface InspectorRequest {
@@ -20,7 +22,15 @@ interface InspectorRequest {
   primaryKey?: string;
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (context) => {
+  // Check authentication first
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   // Only allow in development environment
   const isDevelopment = !import.meta.env.PROD;
   if (!isDevelopment) {
@@ -38,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const db = await getDatabase();
-    const body = (await request.json()) as InspectorRequest;
+    const body = (await context.request.json()) as InspectorRequest;
 
     if (body.action === "getTables") {
       // Get all tables
@@ -195,7 +205,9 @@ export const POST: APIRoute = async ({ request }) => {
 
       if (!primaryKeyColumn) {
         return new Response(
-          JSON.stringify({ error: "Could not determine primary key for table" }),
+          JSON.stringify({
+            error: "Could not determine primary key for table",
+          }),
           {
             status: 400,
             headers: { "Content-Type": "application/json" },

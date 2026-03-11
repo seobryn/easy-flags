@@ -3,13 +3,23 @@
  */
 
 import type { APIRoute } from "astro";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse } from "@/utils/api";
 import { FeatureService } from "@application/services";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const featureService = new FeatureService();
+    const { params } = context;
     const featureId = parseInt(params.featureId as string);
     const feature = await featureService.getFeature(featureId);
     if (!feature) {
@@ -28,10 +38,18 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request, params }) => {
+export const PUT: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const featureService = new FeatureService();
-    const body = await request.json();
+    const { params } = context;
+    const body = await context.request.json();
     const featureId = parseInt(params.featureId as string);
     const feature = await featureService.updateFeature(featureId, {
       name: body.name,
@@ -49,9 +67,17 @@ export const PUT: APIRoute = async ({ request, params }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const featureService = new FeatureService();
+    const { params } = context;
     const featureId = parseInt(params.featureId as string);
     await featureService.deleteFeature(featureId);
     return new Response(JSON.stringify({ success: true }), { status: 200 });

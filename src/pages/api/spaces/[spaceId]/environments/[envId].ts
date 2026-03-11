@@ -3,14 +3,23 @@
  */
 
 import type { APIRoute } from "astro";
+import { getUserFromContext } from "@/utils/auth";
+import { unauthorizedResponse } from "@/utils/api";
 import { EnvironmentService } from "@application/services";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const environmentService = new EnvironmentService();
-    const envId = parseInt(params.envId as string);
+    const envId = parseInt(context.params.envId as string);
     const environment = await environmentService.getEnvironment(envId);
     if (!environment) {
       return new Response(JSON.stringify({ error: "Environment not found" }), {
@@ -28,11 +37,18 @@ export const GET: APIRoute = async ({ params }) => {
   }
 };
 
-export const PUT: APIRoute = async ({ request, params }) => {
+export const PUT: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const environmentService = new EnvironmentService();
-    const body = await request.json();
-    const envId = parseInt(params.envId as string);
+    const body = await context.request.json();
+    const envId = parseInt(context.params.envId as string);
     const environment = await environmentService.updateEnvironment(envId, {
       name: body.name,
       description: body.description,
@@ -48,11 +64,18 @@ export const PUT: APIRoute = async ({ request, params }) => {
   }
 };
 
-export const PATCH: APIRoute = async ({ request, params }) => {
+export const PATCH: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const environmentService = new EnvironmentService();
-    const body = await request.json();
-    const envId = parseInt(params.envId as string);
+    const body = await context.request.json();
+    const envId = parseInt(context.params.envId as string);
     const environment = await environmentService.updateEnvironment(envId, {
       name: body.name,
       description: body.description,
@@ -68,10 +91,17 @@ export const PATCH: APIRoute = async ({ request, params }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const DELETE: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
+  if (!user) {
+    return new Response(JSON.stringify(unauthorizedResponse()), {
+      status: 401,
+    });
+  }
+
   try {
     const environmentService = new EnvironmentService();
-    const envId = parseInt(params.envId as string);
+    const envId = parseInt(context.params.envId as string);
     await environmentService.deleteEnvironment(envId);
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
