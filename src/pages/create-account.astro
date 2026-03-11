@@ -6,7 +6,9 @@ import RegisterForm from "@/components/react/RegisterForm";
 export const prerender = false;
 
 // Redirect authenticated users to spaces
-redirectIfAuthenticated(Astro);
+if (redirectIfAuthenticated(Astro)) {
+  return Astro.redirect("/spaces");
+}
 ---
 
 <BaseLayout title="Create Account - Feature Flags" includeHeader={false}>

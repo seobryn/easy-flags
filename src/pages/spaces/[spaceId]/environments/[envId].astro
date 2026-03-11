@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { requireAuth } from "@/utils/auth-redirect";
+import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 import {
   validateNestedResource,
   checkResourceExists,
@@ -11,7 +11,9 @@ import { SpaceService, EnvironmentService } from "@application/services";
 export const prerender = false;
 
 // Require authentication (includes redirect parameter)
-requireAuth(Astro);
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
 
 const { spaceId, envId } = Astro.params;
 const spaceIdNum = parseInt(spaceId as string);
@@ -19,14 +21,14 @@ const envIdNum = parseInt(envId as string);
 
 // Verify space exists first
 const spaceService = new SpaceService();
-const space = await spaceService.getSpace(spaceIdNum);
+const space = (await spaceService.getSpace(spaceIdNum))!;
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
 
 // Verify environment exists and belongs to the space
 const environmentService = new EnvironmentService();
-const env = await environmentService.getEnvironment(envIdNum);
+const env = (await environmentService.getEnvironment(envIdNum))!;
 if (
   !validateNestedResource(env, "space_id", spaceIdNum, Astro, "Environment")
 ) {

@@ -2,7 +2,7 @@
 // src/pages/dev/db-inspector.astro
 // Development-only database inspection page
 import DatabaseInspector from "../../components/react/DatabaseInspector";
-import { requireAuth } from "@/utils/auth-redirect";
+import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 
 // Only allow access in development environment
 const isDevelopment = !import.meta.env.PROD;
@@ -11,7 +11,9 @@ if (!isDevelopment) {
 }
 
 // Require authentication even in development (includes redirect parameter)
-requireAuth(Astro);
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
 ---
 
 <!doctype html>

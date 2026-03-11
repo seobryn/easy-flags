@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { requireAuth } from "@/utils/auth-redirect";
+import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 import {
   validateNestedResource,
   checkResourceExists,
@@ -11,7 +11,9 @@ import { SpaceService, FeatureService } from "@application/services";
 export const prerender = false;
 
 // Require authentication (includes redirect parameter)
-requireAuth(Astro);
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
 
 const { spaceId, featureId } = Astro.params;
 const spaceIdNum = parseInt(spaceId as string);

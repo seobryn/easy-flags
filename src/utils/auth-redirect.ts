@@ -8,19 +8,27 @@ import { getUserFromContext } from "./auth";
  * ```astro
  * ---
  * import { requireAuth } from "@/utils/auth-redirect";
- * requireAuth(Astro);
+ * if (!requireAuth(Astro)) {
+ *   return Astro.redirect(getLoginUrl(Astro));
+ * }
  * ---
  * ```
  */
-export function requireAuth(astroContext: AstroGlobal): void {
+export function requireAuth(astroContext: AstroGlobal): boolean {
   const user = getUserFromContext(astroContext);
 
   if (!user) {
-    // Redirect to login with current URL as redirect parameter
-    const currentUrl = astroContext.url.pathname + astroContext.url.search;
-    const loginUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
-    astroContext.redirect(loginUrl);
+    return false;
   }
+  return true;
+}
+
+/**
+ * Get login URL with redirect parameter
+ */
+export function getLoginUrl(astroContext: AstroGlobal): string {
+  const currentUrl = astroContext.url.pathname + astroContext.url.search;
+  return `/login?redirect=${encodeURIComponent(currentUrl)}`;
 }
 
 /**
@@ -30,17 +38,20 @@ export function requireAuth(astroContext: AstroGlobal): void {
  * ```astro
  * ---
  * import { redirectIfAuthenticated } from "@/utils/auth-redirect";
- * redirectIfAuthenticated(Astro);
+ * if (redirectIfAuthenticated(Astro)) {
+ *   return Astro.redirect("/spaces");
+ * }
  * ---
  * ```
  */
 export function redirectIfAuthenticated(
   astroContext: AstroGlobal,
   redirectTo: string = "/spaces",
-): void {
+): boolean {
   const user = getUserFromContext(astroContext);
 
   if (user) {
-    astroContext.redirect(redirectTo);
+    return true;
   }
+  return false;
 }

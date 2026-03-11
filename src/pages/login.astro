@@ -6,7 +6,9 @@ import LoginForm from "@/components/react/LoginForm";
 export const prerender = false;
 
 // Redirect authenticated users to spaces
-redirectIfAuthenticated(Astro);
+if (redirectIfAuthenticated(Astro)) {
+  return Astro.redirect("/spaces");
+}
 
 // Get redirect URL from query params (where user was trying to go)
 const redirectUrl = Astro.url.searchParams.get("redirect") || "/spaces";
