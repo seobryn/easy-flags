@@ -323,12 +323,12 @@ export async function seedDatabase(): Promise<void> {
       });
     }
 
-    // Insert default admin user (role_id should now be 1 for admin)
+    // Insert default super user (role_id: 0)
     const adminUser = {
       username: process.env.ADMIN_USER || "admin",
       email: "admin@example.com",
       password_hash: process.env.ADMIN_PASS || "password",
-      role_id: 1,
+      role_id: 0,
     };
 
     const result = await database.execute({

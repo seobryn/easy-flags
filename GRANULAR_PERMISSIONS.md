@@ -7,16 +7,18 @@ The application now supports granular, role-based feature permissions. This allo
 ## Roles
 
 ### 1. **Super User** (Role ID: 0)
+
 - Has access to ALL features including system administration tools
 - Can access the Database Inspector (`/dev/db-inspector`)
 - Should be granted sparingly - only to system administrators
 - **Features**: All features
 
 ### 2. **Admin** (Role ID: 1)
+
 - Administrator with full access to user management and configuration
 - Cannot access Database Inspector (restricted to Super User)
 - Can manage all spaces, environments, and feature flags
-- **Features**: 
+- **Features**:
   - Feature Flags
   - Spaces
   - Environments
@@ -25,6 +27,7 @@ The application now supports granular, role-based feature permissions. This allo
   - API Reference
 
 ### 3. **Editor** (Role ID: 2)
+
 - Can modify features, spaces, and environments
 - Cannot access billing or settings
 - Limited to specific spaces where they have editor role
@@ -35,6 +38,7 @@ The application now supports granular, role-based feature permissions. This allo
   - API Reference
 
 ### 4. **Viewer** (Role ID: 3)
+
 - Read-only access to feature flags
 - Cannot make any modifications
 - **Features**:
@@ -47,14 +51,14 @@ The following features are controlled by permissions:
 
 ```typescript
 FEATURES = {
-  FEATURE_FLAGS: "feature_flags",        // Create, read, update, delete feature flags
-  SPACES: "spaces",                      // Manage spaces
-  ENVIRONMENTS: "environments",          // Manage environments
-  BILLING: "billing",                    // Access billing information
-  SETTINGS: "settings",                  // Access system settings
+  FEATURE_FLAGS: "feature_flags", // Create, read, update, delete feature flags
+  SPACES: "spaces", // Manage spaces
+  ENVIRONMENTS: "environments", // Manage environments
+  BILLING: "billing", // Access billing information
+  SETTINGS: "settings", // Access system settings
   DATABASE_INSPECTOR: "database_inspector", // Access database inspection tool (Super User only)
-  API_REFERENCE: "api_reference",        // Access API documentation
-}
+  API_REFERENCE: "api_reference", // Access API documentation
+};
 ```
 
 ## Database Schema
@@ -99,15 +103,18 @@ if (!hasFeatureAccess(user, FEATURES.DATABASE_INSPECTOR)) {
 import { checkFeatureAuth, FEATURES } from "@/utils/permissions";
 
 export const POST: APIRoute = async (context) => {
-  const { isAuthorized, user } = await checkFeatureAuth(context, FEATURES.FEATURE_FLAGS);
-  
+  const { isAuthorized, user } = await checkFeatureAuth(
+    context,
+    FEATURES.FEATURE_FLAGS,
+  );
+
   if (!isAuthorized) {
-    return new Response(
-      JSON.stringify({ error: "Access denied" }),
-      { status: 403, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: "Access denied" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  
+
   // Process request
 };
 ```
@@ -136,8 +143,23 @@ Returns the current user's allowed features and roles.
   "userId": 1,
   "roleId": 1,
   "isSuperUser": false,
-  "allowedFeatures": ["feature_flags", "spaces", "environments", "billing", "settings", "api_reference"],
-  "allFeatures": ["feature_flags", "spaces", "environments", "billing", "settings", "database_inspector", "api_reference"]
+  "allowedFeatures": [
+    "feature_flags",
+    "spaces",
+    "environments",
+    "billing",
+    "settings",
+    "api_reference"
+  ],
+  "allFeatures": [
+    "feature_flags",
+    "spaces",
+    "environments",
+    "billing",
+    "settings",
+    "database_inspector",
+    "api_reference"
+  ]
 }
 ```
 
@@ -153,6 +175,7 @@ Returns the current user's allowed features and roles.
 ```
 
 Response:
+
 ```json
 {
   "feature": "database_inspector",
@@ -172,16 +195,32 @@ Response:
 ```
 
 Response:
+
 ```json
 {
   "permissions": [
     {
       "roleId": 0,
-      "features": ["feature_flags", "spaces", "environments", "billing", "settings", "database_inspector", "api_reference"]
+      "features": [
+        "feature_flags",
+        "spaces",
+        "environments",
+        "billing",
+        "settings",
+        "database_inspector",
+        "api_reference"
+      ]
     },
     {
       "roleId": 1,
-      "features": ["feature_flags", "spaces", "environments", "billing", "settings", "api_reference"]
+      "features": [
+        "feature_flags",
+        "spaces",
+        "environments",
+        "billing",
+        "settings",
+        "api_reference"
+      ]
     }
   ]
 }
@@ -192,11 +231,13 @@ Response:
 The Database Inspector (`/dev/db-inspector`) is now **restricted to Super Users only**.
 
 ### Current Protection
+
 - ✅ User must be authenticated
 - ✅ User must have `role_id = 0` (Super User)
 - ✅ Redirects to `/forbidden` if user doesn't have access
 
 ### Example
+
 ```typescript
 // In /src/pages/dev/db-inspector.astro
 if (!user || !isSuperUser(user)) {
@@ -219,9 +260,14 @@ if (!hasFeatureAccess(user, FEATURES.YOUR_NEW_FEATURE)) {
 }
 
 // In API route
-const { isAuthorized } = await checkFeatureAuth(context, FEATURES.YOUR_NEW_FEATURE);
+const { isAuthorized } = await checkFeatureAuth(
+  context,
+  FEATURES.YOUR_NEW_FEATURE,
+);
 if (!isAuthorized) {
-  return new Response(JSON.stringify({ error: "Access denied" }), { status: 403 });
+  return new Response(JSON.stringify({ error: "Access denied" }), {
+    status: 403,
+  });
 }
 ```
 
@@ -246,9 +292,9 @@ If you have an existing database:
 
 ## Permission Matrix
 
-| Role | Feature Flags | Spaces | Environments | Billing | Settings | DB Inspector | API Ref |
-|------|---------------|--------|--------------|---------|----------|---|---------|
-| Super User | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Admin | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
-| Editor | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
-| Viewer | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Role       | Feature Flags | Spaces | Environments | Billing | Settings | DB Inspector | API Ref |
+| ---------- | ------------- | ------ | ------------ | ------- | -------- | ------------ | ------- |
+| Super User | ✅            | ✅     | ✅           | ✅      | ✅       | ✅           | ✅      |
+| Admin      | ✅            | ✅     | ✅           | ✅      | ✅       | ❌           | ✅      |
+| Editor     | ✅            | ✅     | ✅           | ❌      | ❌       | ❌           | ✅      |
+| Viewer     | ✅            | ❌     | ❌           | ❌      | ❌       | ❌           | ✅      |
