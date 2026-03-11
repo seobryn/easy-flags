@@ -52,7 +52,19 @@ export function useAddRowHandler({
 
       try {
         const convertedData = convertFormDataToTypes(formData);
-        await api.addRow(selectedTable, convertedData);
+
+        // Identify password fields that need hashing
+        const passwordFields = Object.keys(convertedData).filter((key) =>
+          key.toLowerCase().includes("password"),
+        );
+
+        // Include metadata for password fields
+        const payload = {
+          ...convertedData,
+          ...(passwordFields.length > 0 && { _passwordFields: passwordFields }),
+        };
+
+        await api.addRow(selectedTable, payload);
         onSuccess();
       } catch (err) {
         const message =

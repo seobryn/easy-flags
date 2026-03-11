@@ -3,6 +3,7 @@ import { getUserFromContext } from "@/utils/auth";
 import { unauthorizedResponse } from "@/utils/api";
 import { getDatabase } from "../../../lib/db";
 import type { InArgs } from "@libsql/client";
+import bcrypt from "bcryptjs";
 
 // Only allow in development for authenticated users
 export const prerender = false;
@@ -131,8 +132,28 @@ export const POST: APIRoute = async (context) => {
         );
       }
 
-      const columns = Object.keys(body.rowData);
-      const values = Object.values(body.rowData);
+      // Extract password fields metadata and prepare data for insertion
+      const passwordFields =
+        (body.rowData._passwordFields as string[] | undefined) || [];
+      const insertData: Record<string, unknown> = {};
+
+      // Filter out the _passwordFields metadata and process password fields
+      for (const [key, value] of Object.entries(body.rowData)) {
+        if (key === "_passwordFields") {
+          continue; // Skip metadata
+        }
+
+        if (passwordFields.includes(key) && typeof value === "string") {
+          // Hash the password field
+          const hashedPassword = await bcrypt.hash(value, 10);
+          insertData[key] = hashedPassword;
+        } else {
+          insertData[key] = value;
+        }
+      }
+
+      const columns = Object.keys(insertData);
+      const values = Object.values(insertData);
       const placeholders = columns.map(() => "?").join(",");
 
       const query = `INSERT INTO ${body.table} (${columns.join(",")}) VALUES (${placeholders})`;
@@ -215,8 +236,28 @@ export const POST: APIRoute = async (context) => {
         );
       }
 
-      const columns = Object.keys(body.rowData);
-      const values = Object.values(body.rowData);
+      // Extract password fields metadata and prepare data for update
+      const passwordFields =
+        (body.rowData._passwordFields as string[] | undefined) || [];
+      const updateData: Record<string, unknown> = {};
+
+      // Filter out the _passwordFields metadata and process password fields
+      for (const [key, value] of Object.entries(body.rowData)) {
+        if (key === "_passwordFields") {
+          continue; // Skip metadata
+        }
+
+        if (passwordFields.includes(key) && typeof value === "string") {
+          // Hash the password field
+          const hashedPassword = await bcrypt.hash(value, 10);
+          updateData[key] = hashedPassword;
+        } else {
+          updateData[key] = value;
+        }
+      }
+
+      const columns = Object.keys(updateData);
+      const values = Object.values(updateData);
       const setClause = columns.map((col) => `${col} = ?`).join(", ");
 
       // Add rowId as the last argument for the WHERE clause

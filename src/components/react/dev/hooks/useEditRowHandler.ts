@@ -41,7 +41,7 @@ export function useEditRowHandler({
 
       return convertedData;
     },
-    [schema]
+    [schema],
   );
 
   const editRow = useCallback(
@@ -52,7 +52,19 @@ export function useEditRowHandler({
 
       try {
         const convertedData = convertFormDataToTypes(formData);
-        await api.updateRow(selectedTable, rowId, convertedData);
+
+        // Identify password fields that need hashing
+        const passwordFields = Object.keys(convertedData).filter((key) =>
+          key.toLowerCase().includes("password"),
+        );
+
+        // Include metadata for password fields
+        const payload = {
+          ...convertedData,
+          ...(passwordFields.length > 0 && { _passwordFields: passwordFields }),
+        };
+
+        await api.updateRow(selectedTable, rowId, payload);
         onSuccess();
       } catch (err) {
         const message =
@@ -62,7 +74,14 @@ export function useEditRowHandler({
         onLoadingChange?.(false);
       }
     },
-    [selectedTable, api, convertFormDataToTypes, onSuccess, onError, onLoadingChange]
+    [
+      selectedTable,
+      api,
+      convertFormDataToTypes,
+      onSuccess,
+      onError,
+      onLoadingChange,
+    ],
   );
 
   return { editRow, convertFormDataToTypes };
