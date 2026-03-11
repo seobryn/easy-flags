@@ -69,9 +69,10 @@ Exports role-based access control functions:
 
 ```typescript
 // Role constants
-ROLES.ADMIN; // ID: 1
-ROLES.EDITOR; // ID: 2
-ROLES.VIEWER; // ID: 3
+ROLES.SUPER_USER; // ID: 1
+ROLES.ADMIN; // ID: 2
+ROLES.EDITOR; // ID: 3
+ROLES.VIEWER; // ID: 4
 
 // Utility functions
 isGlobalAdmin(user); // Check if user is global admin

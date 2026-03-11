@@ -6,10 +6,10 @@ import { getDatabase } from "@/lib/db";
  * Role IDs
  */
 export const ROLES = {
-  SUPER_USER: 0,
-  ADMIN: 1,
-  EDITOR: 2,
-  VIEWER: 3,
+  SUPER_USER: 1,
+  ADMIN: 2,
+  EDITOR: 3,
+  VIEWER: 4,
 } as const;
 
 /**
@@ -136,7 +136,7 @@ export async function hasFeatureAccessFromDB(
 
     const roleId = userResult.rows[0]?.role_id as number;
 
-    // Check if super user (role_id = 0)
+    // Check if super user (role_id = 1)
     if (roleId === ROLES.SUPER_USER) {
       return true;
     }

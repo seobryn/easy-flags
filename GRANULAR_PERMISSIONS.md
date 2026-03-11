@@ -233,7 +233,7 @@ The Database Inspector (`/dev/db-inspector`) is now **restricted to Super Users 
 ### Current Protection
 
 - ✅ User must be authenticated
-- ✅ User must have `role_id = 0` (Super User)
+- ✅ User must have `role_id = 1` (Super User)
 - ✅ Redirects to `/forbidden` if user doesn't have access
 
 ### Example
@@ -287,7 +287,7 @@ If you have an existing database:
 
 1. No migration needed - new tables are created automatically
 2. Existing users will keep their current role_id
-3. New roles (SUPER_USER with id 0) will be created
+3. New roles (SUPER_USER with id 1) will be created
 4. Feature permissions will be seeded automatically
 
 ## Permission Matrix

@@ -93,7 +93,7 @@ export const POST: APIRoute = async (context) => {
     const member = await teamMemberService.addTeamMember(
       spaceId,
       user.id,
-      body.role_id || 3,
+      body.role_id || 4,
     );
     return new Response(JSON.stringify(member), { status: 201 });
   } catch (error) {

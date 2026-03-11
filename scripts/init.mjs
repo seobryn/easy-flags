@@ -223,7 +223,7 @@ async function seedDefaultData(client) {
     await client.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
       args: [
-        0,
+        1,
         "super_user",
         "Super User with access to system administration tools",
       ],
@@ -231,21 +231,21 @@ async function seedDefaultData(client) {
 
     await client.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [1, "admin", "Administrator with full access"],
+      args: [2, "admin", "Administrator with full access"],
     });
 
     await client.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [2, "editor", "Editor can modify features and settings"],
+      args: [3, "editor", "Editor can modify features and settings"],
     });
 
     await client.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [3, "viewer", "Viewer can only read features"],
+      args: [4, "viewer", "Viewer can only read features"],
     });
 
     // Seed feature permissions using defined defaults
-    // SUPER_USER (role_id: 0) - all features
+    // SUPER_USER (role_id: 1) - all features
     const superUserFeatures = [
       "feature_flags",
       "spaces",
@@ -258,11 +258,11 @@ async function seedDefaultData(client) {
     for (const feature of superUserFeatures) {
       await client.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
-        args: [0, feature],
+        args: [1, feature],
       });
     }
 
-    // ADMIN (role_id: 1) - all except database_inspector
+    // ADMIN (role_id: 2) - all except database_inspector
     const adminFeatures = [
       "feature_flags",
       "spaces",
@@ -274,11 +274,11 @@ async function seedDefaultData(client) {
     for (const feature of adminFeatures) {
       await client.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
-        args: [1, feature],
+        args: [2, feature],
       });
     }
 
-    // EDITOR (role_id: 2) - feature flags, spaces, environments, api_reference
+    // EDITOR (role_id: 3) - feature flags, spaces, environments, api_reference
     const editorFeatures = [
       "feature_flags",
       "spaces",
@@ -288,16 +288,16 @@ async function seedDefaultData(client) {
     for (const feature of editorFeatures) {
       await client.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
-        args: [2, feature],
+        args: [3, feature],
       });
     }
 
-    // VIEWER (role_id: 3) - feature flags, api_reference (read-only access)
+    // VIEWER (role_id: 4) - feature flags, api_reference (read-only access)
     const viewerFeatures = ["feature_flags", "api_reference"];
     for (const feature of viewerFeatures) {
       await client.execute({
         sql: "INSERT INTO feature_permissions (role_id, feature_name) VALUES (?, ?)",
-        args: [3, feature],
+        args: [4, feature],
       });
     }
 
@@ -310,12 +310,12 @@ async function seedDefaultData(client) {
       );
     }
 
-    // Insert default super user (role_id: 0)
+    // Insert default super user (role_id: 1)
     const adminUser = {
       username: username,
       passwordPlain: password,
       email: "admin@example.com",
-      role_id: 0,
+      role_id: 1,
     };
 
     // Hash the password

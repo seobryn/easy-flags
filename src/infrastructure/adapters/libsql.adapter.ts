@@ -69,7 +69,7 @@ export class LibSqlUserRepository implements UserRepository {
     const result = await db.execute({
       sql: `INSERT INTO users (username, email, password_hash, role_id, is_active) 
             VALUES (?, ?, ?, ?, ?)`,
-      args: [user.username!, user.email!, "", user.role_id || 1, 1],
+      args: [user.username!, user.email!, "", user.role_id || 2, 1],
     });
     const newUser = await this.findById(Number(result.lastInsertRowid));
     if (!newUser) throw new Error("Failed to create user");

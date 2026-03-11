@@ -248,7 +248,7 @@ export async function seedDatabase(): Promise<void> {
     await database.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
       args: [
-        0,
+        1,
         "super_user",
         "Super User with access to system administration tools",
       ],
@@ -256,17 +256,17 @@ export async function seedDatabase(): Promise<void> {
 
     await database.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [1, "admin", "Administrator with full access"],
+      args: [2, "admin", "Administrator with full access"],
     });
 
     await database.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [2, "editor", "Editor can modify features and settings"],
+      args: [3, "editor", "Editor can modify features and settings"],
     });
 
     await database.execute({
       sql: "INSERT INTO roles (id, name, description) VALUES (?, ?, ?)",
-      args: [3, "viewer", "Viewer can only read features"],
+      args: [4, "viewer", "Viewer can only read features"],
     });
 
     // Seed feature permissions
@@ -323,12 +323,12 @@ export async function seedDatabase(): Promise<void> {
       });
     }
 
-    // Insert default super user (role_id: 0)
+    // Insert default super user (role_id: 1)
     const adminUser = {
       username: process.env.ADMIN_USER || "admin",
       email: "admin@example.com",
       password_hash: process.env.ADMIN_PASS || "password",
-      role_id: 0,
+      role_id: 1,
     };
 
     const result = await database.execute({
