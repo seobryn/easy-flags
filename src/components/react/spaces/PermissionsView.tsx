@@ -1,5 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
+
+// Role ID mapping
+const ROLE_ID_MAP: Record<number, "admin" | "editor" | "viewer"> = {
+  2: "admin",
+  3: "editor",
+  4: "viewer",
+};
+
+const ROLE_NAME_TO_ID: Record<"admin" | "editor" | "viewer", number> = {
+  admin: 2,
+  editor: 3,
+  viewer: 4,
+};
 
 interface TeamMember {
   id: number;
@@ -9,34 +22,29 @@ interface TeamMember {
   joinedAt: string;
 }
 
+interface SpaceMemberAPI {
+  id: number;
+  space_id: number;
+  user_id: number;
+  role_id: number;
+  created_at: string;
+  user?: {
+    id: number;
+    username: string;
+    email: string;
+  };
+}
+
 interface PermissionsViewProps {
   spaceId: string | undefined;
 }
 
 export default function PermissionsView({ spaceId }: PermissionsViewProps) {
-  const [members, setMembers] = useState<TeamMember[]>([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "admin",
-      joinedAt: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "editor",
-      joinedAt: new Date().toISOString(),
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      role: "viewer",
-      joinedAt: new Date().toISOString(),
-    },
-  ]);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isInviting, setIsInviting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -50,22 +58,88 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
   );
   const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
 
-  const handleInviteMember = (e: React.FormEvent) => {
+  // Fetch team members on mount
+  useEffect(() => {
+    if (spaceId) {
+      fetchTeamMembers();
+    }
+  }, [spaceId]);
+
+  const fetchTeamMembers = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await fetch(`/api/spaces/${spaceId}/team-members`, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch team members");
+      }
+
+      const data = await response.json();
+      const spaceMembers: SpaceMemberAPI[] = Array.isArray(data)
+        ? data
+        : data.data || [];
+
+      // Convert SpaceMember to TeamMember
+      const teamMembers: TeamMember[] = spaceMembers
+        .map((member) => ({
+          id: member.id,
+          name: member.user?.username || `User ${member.user_id}`,
+          email: member.user?.email || "",
+          role: ROLE_ID_MAP[member.role_id] || "viewer",
+          joinedAt: member.created_at,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      setMembers(teamMembers);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load team members";
+      setError(message);
+      console.error("Error fetching team members:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteEmail.trim()) return;
+    if (!inviteEmail.trim() || !spaceId) return;
 
-    const newMember: TeamMember = {
-      id: Math.max(...members.map((m) => m.id), 0) + 1,
-      name: inviteEmail.split("@")[0],
-      email: inviteEmail,
-      role: inviteRole,
-      joinedAt: new Date().toISOString(),
-    };
+    try {
+      setIsInviting(true);
+      setError(null);
 
-    setMembers([...members, newMember]);
-    setInviteEmail("");
-    setInviteRole("editor");
-    setShowInviteModal(false);
+      const response = await fetch(`/api/spaces/${spaceId}/team-members`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: inviteEmail,
+          role_id: ROLE_NAME_TO_ID[inviteRole],
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to invite member");
+      }
+
+      // Refresh team members list
+      await fetchTeamMembers();
+      setInviteEmail("");
+      setInviteRole("editor");
+      setShowInviteModal(false);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to invite member";
+      setError(message);
+      console.error("Error inviting member:", err);
+    } finally {
+      setIsInviting(false);
+    }
   };
 
   const handleEditMember = (member: TeamMember) => {
@@ -73,21 +147,75 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
     setEditingRole(member.role);
   };
 
-  const handleSavePermissions = () => {
-    if (!selectedMemberForEdit) return;
+  const handleSavePermissions = async () => {
+    if (!selectedMemberForEdit || !spaceId) return;
 
-    setMembers(
-      members.map((m) =>
-        m.id === selectedMemberForEdit.id ? { ...m, role: editingRole } : m,
-      ),
-    );
-    setSelectedMemberForEdit(null);
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      const response = await fetch(
+        `/api/spaces/${spaceId}/team-members/${selectedMemberForEdit.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role_id: ROLE_NAME_TO_ID[editingRole],
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to update member role");
+      }
+
+      // Refresh team members list
+      await fetchTeamMembers();
+      setSelectedMemberForEdit(null);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save permissions";
+      setError(message);
+      console.error("Error saving permissions:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleRemoveMember = (memberId: number) => {
-    setMembers(members.filter((m) => m.id !== memberId));
-    setSelectedMemberForEdit(null);
-    setMemberToRemove(null);
+  const handleRemoveMember = async (memberId: number) => {
+    if (!spaceId) return;
+
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      const response = await fetch(
+        `/api/spaces/${spaceId}/team-members/${memberId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Failed to remove member");
+      }
+
+      // Refresh team members list
+      await fetchTeamMembers();
+      setSelectedMemberForEdit(null);
+      setMemberToRemove(null);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to remove member";
+      setError(message);
+      console.error("Error removing member:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const roleDescriptions: Record<string, string> = {
@@ -123,6 +251,9 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
     },
   };
 
+  // Roles available for space membership (excludes Super User)
+  const availableSpaceRoles = ["admin", "editor", "viewer"] as const;
+
   return (
     <>
       <PageContainer
@@ -140,6 +271,13 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
           </p>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-300 rounded">
+            {error}
+          </div>
+        )}
+
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Team Members Section */}
@@ -154,109 +292,136 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                       Team Members
                     </h2>
                     <p className="text-xs text-slate-400">
-                      {members.length} in this space
+                      {isLoading
+                        ? "Loading..."
+                        : `${members.length} in this space`}
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowInviteModal(true)}
-                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded text-sm font-semibold transition"
                 >
                   + Invite
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {members.map((member) => (
-                  <div
-                    key={member.id}
-                    className="flex items-center justify-between p-4 bg-slate-900/50 border border-slate-700 rounded hover:border-slate-600 transition"
-                  >
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">{member.name}</p>
-                      <p className="text-xs text-slate-400">{member.email}</p>
+              {isLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-slate-400">Loading team members...</p>
+                </div>
+              ) : members.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-slate-400">No team members yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-4 bg-slate-900/50 border border-slate-700 rounded hover:border-slate-600 transition"
+                    >
+                      <div className="flex-1">
+                        <p className="font-semibold text-white">
+                          {member.name}
+                        </p>
+                        <p className="text-xs text-slate-400">{member.email}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`flex items-center justify-center gap-1 w-24 px-3 py-1 rounded text-xs font-semibold border ${roleColors[member.role].bg} ${roleColors[member.role].text} ${roleColors[member.role].border}`}
+                        >
+                          <span>{roleIcons[member.role]}</span>
+                          {member.role.charAt(0).toUpperCase() +
+                            member.role.slice(1)}
+                        </span>
+                        <button
+                          onClick={() => handleEditMember(member)}
+                          disabled={isSaving}
+                          className="text-slate-500 hover:text-slate-300 p-2 hover:bg-slate-800 rounded transition disabled:opacity-50"
+                          title="Edit permissions"
+                        >
+                          ⋮
+                        </button>
+                        <button
+                          onClick={() => setMemberToRemove(member)}
+                          disabled={isSaving}
+                          className="text-slate-500 hover:text-red-400 p-2 hover:bg-red-500/10 rounded transition disabled:opacity-50"
+                          title="Remove user"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`flex items-center justify-center gap-1 w-24 px-3 py-1 rounded text-xs font-semibold border ${roleColors[member.role].bg} ${roleColors[member.role].text} ${roleColors[member.role].border}`}
-                      >
-                        <span>{roleIcons[member.role]}</span>
-                        {member.role.charAt(0).toUpperCase() +
-                          member.role.slice(1)}
-                      </span>
-                      <button
-                        onClick={() => handleEditMember(member)}
-                        className="text-slate-500 hover:text-slate-300 p-2 hover:bg-slate-800 rounded transition"
-                        title="Edit permissions"
-                      >
-                        ⋮
-                      </button>
-                      <button
-                        onClick={() => setMemberToRemove(member)}
-                        className="text-slate-500 hover:text-red-400 p-2 hover:bg-red-500/10 rounded transition"
-                        title="Remove user"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  ))}
+                </div>
+              )}
 
-            {/* Pending Invitations */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">📬</span>
-                <h2 className="text-xl font-bold text-white">
-                  Pending Invitations
-                </h2>
-              </div>
-              <p className="text-slate-500 text-center py-8 text-sm">
-                No pending invitations
-              </p>
-            </div>
-          </div>
-
-          {/* Sidebar - Roles Reference */}
-          <div className="space-y-6">
-            {/* Role Permissions Card */}
-            <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl">🔐</span>
-                <h2 className="text-xl font-bold text-white">Roles</h2>
-              </div>
-
-              <div className="space-y-3">
-                {(
-                  [
-                    { role: "admin", desc: roleDescriptions.admin },
-                    { role: "editor", desc: roleDescriptions.editor },
-                    { role: "viewer", desc: roleDescriptions.viewer },
-                  ] as const
-                ).map(({ role, desc }) => (
-                  <div
-                    key={role}
-                    className={`p-3 border rounded-lg ${roleColors[role].bg} ${roleColors[role].border}`}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">{roleIcons[role]}</span>
-                      <p
-                        className={`text-sm font-semibold ${roleColors[role].text}`}
-                      >
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </p>
-                    </div>
-                    <p className="text-xs text-slate-400">{desc}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-slate-700">
-                <p className="text-xs text-slate-500">
-                  <span className="text-cyan-300 font-semibold">💡 Tip:</span> A
-                  space must have at least one admin.
+              {/* Pending Invitations */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">📬</span>
+                  <h2 className="text-xl font-bold text-white">
+                    Pending Invitations
+                  </h2>
+                </div>
+                <p className="text-slate-500 text-center py-8 text-sm">
+                  No pending invitations
                 </p>
+              </div>
+            </div>
+
+            {/* Sidebar - Roles Reference */}
+            <div className="space-y-6">
+              {/* Role Permissions Card */}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl">🔐</span>
+                  <h2 className="text-xl font-bold text-white">Roles</h2>
+                </div>
+
+                <div className="space-y-3">
+                  {" "}
+                  {(
+                    [
+                      { role: "admin", desc: roleDescriptions.admin },
+                      { role: "editor", desc: roleDescriptions.editor },
+                      { role: "viewer", desc: roleDescriptions.viewer },
+                    ] as const
+                  ).map(({ role, desc }) => (
+                    <div
+                      key={role}
+                      className={`p-3 border rounded-lg ${roleColors[role].bg} ${roleColors[role].border}`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-lg">{roleIcons[role]}</span>
+                        <p
+                          className={`text-sm font-semibold ${roleColors[role].text}`}
+                        >
+                          {role.charAt(0).toUpperCase() + role.slice(1)}
+                        </p>
+                      </div>
+                      <p className="text-xs text-slate-400">{desc}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">
+                  <p className="text-xs text-slate-500">
+                    <span className="text-cyan-300 font-semibold">💡 Tip:</span>{" "}
+                    A space must have at least one admin.
+                  </p>
+                  <div className="bg-slate-900/50 border border-slate-600/50 rounded p-2">
+                    <p className="text-xs text-slate-400">
+                      <span className="text-yellow-300 font-semibold">
+                        ⓘ Note:
+                      </span>{" "}
+                      Super Admin roles are managed by system administrators
+                      only. Contact support to manage Super Admin permissions.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -284,7 +449,8 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="john@example.com"
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
+                  disabled={isInviting}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition disabled:opacity-50"
                   required
                 />
               </div>
@@ -300,7 +466,8 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                       e.target.value as "admin" | "editor" | "viewer",
                     )
                   }
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition"
+                  disabled={isInviting}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition disabled:opacity-50"
                 >
                   <option value="viewer">👁️ Viewer (Read-only)</option>
                   <option value="editor">✏️ Editor (Modify features)</option>
@@ -309,21 +476,26 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                 <p className="text-xs text-slate-500 mt-2">
                   {roleDescriptions[inviteRole]}
                 </p>
+                <p className="text-xs text-slate-600 mt-1">
+                  ⓘ System roles are managed by Super Admins
+                </p>
               </div>
 
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowInviteModal(false)}
-                  className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
+                  disabled={isInviting}
+                  className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                  disabled={isInviting}
+                  className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
-                  Send Invite
+                  {isInviting ? "Sending..." : "Send Invite"}
                 </button>
               </div>
             </form>
@@ -464,21 +636,24 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setSelectedMemberForEdit(null)}
-                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => handleRemoveMember(selectedMemberForEdit.id)}
-                  className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded text-sm font-semibold transition"
+                  onClick={() => handleRemoveMember(selectedMemberForEdit!.id)}
+                  disabled={isSaving}
+                  className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded text-sm font-semibold transition disabled:opacity-50"
                 >
-                  Remove
+                  {isSaving ? "..." : "Remove"}
                 </button>
                 <button
                   onClick={handleSavePermissions}
-                  className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition"
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
-                  Save Changes
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
             </div>
@@ -499,13 +674,12 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
                 <h2 className="text-xl font-bold text-white">Remove User</h2>
               </div>
             </div>
-
             {/* Content */}
             <div className="p-6 space-y-4">
               <p className="text-slate-300">
                 Are you sure you want to remove{" "}
                 <span className="font-semibold text-white">
-                  {memberToRemove.name}
+                  {memberToRemove?.name}
                 </span>{" "}
                 from this space?
               </p>
@@ -518,15 +692,17 @@ export default function PermissionsView({ spaceId }: PermissionsViewProps) {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setMemberToRemove(null)}
-                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition"
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={() => handleRemoveMember(memberToRemove.id)}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded text-sm font-semibold transition"
+                  onClick={() => handleRemoveMember(memberToRemove?.id || 0)}
+                  disabled={isSaving}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded text-sm font-semibold transition disabled:opacity-50"
                 >
-                  Remove User
+                  {isSaving ? "Removing..." : "Remove User"}
                 </button>
               </div>
             </div>

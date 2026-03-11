@@ -2,7 +2,9 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 import { checkResourceExists } from "@/utils/resource-validation";
-import PermissionsView from "@/components/react/spaces/PermissionsView";
+import { getUserFromContext } from "@/utils/auth";
+import { isSuperUser } from "@/utils/permissions";
+import PermissionsManagementView from "@/components/react/spaces/PermissionsManagementView";
 import { SpaceService } from "@application/services";
 
 export const prerender = false;
@@ -20,8 +22,16 @@ const space = await spaceService.getSpace(parseInt(spaceId as string));
 if (!checkResourceExists(space, Astro, "Space")) {
   return Astro.redirect("/404");
 }
+
+// Check if user is super user
+const user = getUserFromContext(Astro);
+const canManageFeaturePermissions = isSuperUser(user);
 ---
 
 <BaseLayout title="Permissions & Team" includeHeader={true}>
-  <PermissionsView client:load spaceId={spaceId} />
+  <PermissionsManagementView
+    client:load
+    spaceId={spaceId}
+    canManageFeaturePermissions={canManageFeaturePermissions}
+  />
 </BaseLayout>
