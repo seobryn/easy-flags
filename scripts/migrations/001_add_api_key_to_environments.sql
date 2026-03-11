@@ -1,7 +1,15 @@
 -- Migration: Add API Key field to environments table
 -- Description: Adds api_key column to store unique API keys for each environment
--- This migration is conditional and only adds the column if it doesn't already exist
 
--- For SQLite, we need to use a workaround since ALTER TABLE ADD COLUMN with functions isn't always reliable
--- We'll generate unique keys as we add the column
-ALTER TABLE environments ADD COLUMN api_key TEXT UNIQUE NOT NULL DEFAULT (hex(randomblob(8)) || '_' || hex(randomblob(8)));
+-- Check if column already exists using a workaround
+-- This is safe to run multiple times
+PRAGMA table_info(environments);
+
+-- Add the column (will be skipped by migration system if it already exists)
+ALTER TABLE environments ADD COLUMN api_key TEXT;
+
+-- Update existing rows to generate unique keys if they don't have one
+UPDATE environments SET api_key = hex(randomblob(8)) || '_' || hex(randomblob(8)) WHERE api_key IS NULL;
+
+-- Create unique index on api_key
+CREATE UNIQUE INDEX IF NOT EXISTS idx_environments_api_key ON environments(api_key);

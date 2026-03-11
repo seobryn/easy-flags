@@ -20,7 +20,7 @@ export const POST: APIRoute = async (context) => {
   try {
     const spaceService = new SpaceService();
     const environmentService = new EnvironmentService();
-    
+
     const spaceSlug = context.params.spaceId as string;
     const envId = parseInt(context.params.envId as string);
 
