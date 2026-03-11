@@ -23,6 +23,7 @@ export default function EnvironmentDetailView({
   const [spaceName, setSpaceName] = useState("Space");
   const [currentApiKey, setCurrentApiKey] = useState(apiKey);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     fetchEnvironmentData();
@@ -107,6 +108,13 @@ export default function EnvironmentDetailView({
     } finally {
       setIsRegenerating(false);
     }
+  };
+
+  const handleCopyApiKey = () => {
+    navigator.clipboard.writeText(currentApiKey).then(() => {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    });
   };
 
   if (isLoading) {
@@ -287,8 +295,17 @@ export default function EnvironmentDetailView({
 
             {/* Content */}
             <div className="p-6 space-y-4">
-              <div className="p-4 bg-slate-900 border border-slate-700 rounded font-mono text-sm break-all">
-                <p className="text-cyan-400">{currentApiKey}</p>
+              <div className="relative">
+                <div className="p-4 bg-slate-900 border border-slate-700 rounded font-mono text-sm break-all pr-12">
+                  <p className="text-cyan-400">{currentApiKey}</p>
+                </div>
+                <button
+                  onClick={handleCopyApiKey}
+                  className="absolute top-2 right-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-xs text-slate-300 hover:text-white rounded transition flex items-center gap-1"
+                  title="Copy to clipboard"
+                >
+                  {isCopied ? "✓ Copied" : "Copy"}
+                </button>
               </div>
 
               <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-sm text-yellow-300">
