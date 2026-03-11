@@ -12,28 +12,36 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
       <section>
         <h2 class="text-2xl font-bold text-cyan-300 mb-3">Authentication</h2>
         <p class="text-slate-400 mb-4">
-          All API requests require a valid JWT token in the Authorization header.
+          All API requests require a valid JWT token in the Authorization
+          header.
         </p>
-        <pre class="bg-slate-900 p-4 rounded-lg overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
+        <pre
+          class="bg-slate-900 p-4 rounded-lg overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
       </section>
 
       <section>
         <h3 class="text-xl font-bold text-cyan-300 mb-3">
           POST /api/auth/login
         </h3>
-        <p class="text-slate-400 mb-4">Authenticate a user and get a JWT token.</p>
+        <p class="text-slate-400 mb-4">
+          Authenticate a user and get a JWT token.
+        </p>
       </section>
 
       <section>
         <h3 class="text-xl font-bold text-cyan-300 mb-3">GET /api/spaces</h3>
-        <p class="text-slate-400 mb-4">List all spaces for the authenticated user.</p>
+        <p class="text-slate-400 mb-4">
+          List all spaces for the authenticated user.
+        </p>
       </section>
 
       <section>
         <h3 class="text-xl font-bold text-cyan-300 mb-3">
           POST /api/spaces/:spaceId/features
         </h3>
-        <p class="text-slate-400 mb-4">Create a new feature in the specified space.</p>
+        <p class="text-slate-400 mb-4">
+          Create a new feature in the specified space.
+        </p>
       </section>
 
       <section>
