@@ -32,7 +32,7 @@ const {
       rel="stylesheet"
     />
   </head>
-  <body class="h-screen overflow-hidden">
+  <body class={`h-screen ${fullWidth ? "overflow-hidden" : ""}`}>
     <div class="root h-full">
       {includeHeader && <Header />}
       {
