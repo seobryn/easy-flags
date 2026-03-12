@@ -26,6 +26,7 @@ const ROLE_NAME_TO_ID: Record<"admin" | "editor" | "viewer", number> = {
 
 interface TeamMember {
   id: number;
+  user_id: number;
   name: string;
   email: string;
   role: "admin" | "editor" | "viewer";
@@ -107,6 +108,7 @@ export default function PermissionsView({
       // Convert SpaceMember to TeamMember
       let teamMembers: TeamMember[] = spaceMembers.map((member) => ({
         id: member.id,
+        user_id: member.user_id,
         name: member.user?.username || `User ${member.user_id}`,
         email: member.user?.email || "",
         role: ROLE_ID_MAP[member.role_id] || "viewer",
@@ -409,15 +411,17 @@ export default function PermissionsView({
                           {member.role.charAt(0).toUpperCase() +
                             member.role.slice(1)}
                         </span>
-                        <button
-                          onClick={() => handleEditMember(member)}
-                          disabled={isSaving}
-                          className="text-slate-500 hover:text-slate-300 p-2 hover:bg-slate-800 rounded transition disabled:opacity-50"
-                          title="Edit permissions"
-                        >
-                          ⋮
-                        </button>
-                        {space && member.id !== space.owner_id && (
+                        {space && member.user_id !== space.owner_id && (
+                          <button
+                            onClick={() => handleEditMember(member)}
+                            disabled={isSaving}
+                            className="text-slate-500 hover:text-slate-300 p-2 hover:bg-slate-800 rounded transition disabled:opacity-50"
+                            title="Edit permissions"
+                          >
+                            ⋮
+                          </button>
+                        )}
+                        {space && member.user_id !== space.owner_id && (
                           <button
                             onClick={() => setMemberToRemove(member)}
                             disabled={isSaving}
