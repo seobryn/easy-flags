@@ -147,7 +147,7 @@ export default function AnalyticsManager({
             <div className="flex gap-4 items-center">
               {/* Quick date presets */}
               <div className="flex gap-2 items-center">
-                <Calendar className="w-4 h-4 text-slate-400" />
+                <span className="text-slate-400">📅</span>
                 <span className="text-sm text-slate-300 font-medium">
                   {dateRangeDisplay}
                 </span>
@@ -160,7 +160,7 @@ export default function AnalyticsManager({
                   disabled={exporting}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  <Download className="w-4 h-4" />
+                  <span>⬇️</span>
                   {exporting ? "Exporting..." : "Export"}
                 </button>
 
@@ -197,7 +197,7 @@ export default function AnalyticsManager({
                     : "bg-slate-700 text-slate-300 hover:bg-slate-600"
                 }`}
               >
-                <Filter className="w-4 h-4" />
+                <span>🔍</span>
                 Filters
               </button>
             </div>
@@ -243,32 +243,32 @@ export default function AnalyticsManager({
           <TabButton
             active={activeTab === "flags"}
             onClick={() => setActiveTab("flags")}
-            icon={<BarChart3 className="w-4 h-4" />}
+            icon="📊"
             label="Flag Metrics"
           />
           <TabButton
             active={activeTab === "audit"}
             onClick={() => setActiveTab("audit")}
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon="📈"
             label="Audit Logs"
           />
           <TabButton
             active={activeTab === "performance"}
             onClick={() => setActiveTab("performance")}
-            icon={<BarChart3 className="w-4 h-4" />}
+            icon="📊"
             label="Performance"
           />
           <TabButton
             active={activeTab === "compliance"}
             onClick={() => setActiveTab("compliance")}
-            icon={<TrendingUp className="w-4 h-4" />}
+            icon="📈"
             label="Compliance"
           />
           {isAdmin && (
             <TabButton
               active={activeTab === "comparison"}
               onClick={() => setActiveTab("comparison")}
-              icon={<BarChart3 className="w-4 h-4" />}
+              icon="📊"
               label="Comparison"
             />
           )}

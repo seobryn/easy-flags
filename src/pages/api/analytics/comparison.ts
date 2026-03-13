@@ -53,8 +53,8 @@ export const GET: APIRoute = async (context) => {
     }
 
     const comparisonType = context.url.searchParams.get("comparisonType") || "month";
-    const dateFrom = context.url.searchParams.get("dateFrom");
-    const dateTo = context.url.searchParams.get("dateTo");
+    const dateFrom = context.url.searchParams.get("dateFrom")!;
+    const dateTo = context.url.searchParams.get("dateTo")!;
 
     // Get metrics for current period
     const metrics = await analyticsService.getUsageMetrics({

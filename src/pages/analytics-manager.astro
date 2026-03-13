@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import AnalyticsManager from "@/components/react/analytics/AnalyticsManager";
+import AnalyticsManagerComponent from "@/components/react/analytics/AnalyticsManager";
+
 import {
     requireAuth,
     getUserFromAstroContext,
@@ -29,7 +30,7 @@ const isAdmin = user && isGlobalAdmin(user);
     <div
         class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
     >
-        <AnalyticsManager
+        <AnalyticsManagerComponent
             client:load
             userId={String(user.id)}
             isAdmin={isAdmin}
