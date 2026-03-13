@@ -73,7 +73,7 @@ export const DEFAULT_FEATURE_PERMISSIONS: Record<
  */
 export function isGlobalAdmin(user: UserPayload | null): boolean {
   if (!user) return false;
-  return user.role_id === ROLES.ADMIN;
+  return user.role_id === ROLES.SUPER_USER;
 }
 
 /**
