@@ -9,7 +9,6 @@ interface Space {
   created_at: string;
   updated_at: string;
 }
-import PageContainer from "@/components/react/shared/PageContainer";
 
 // Role ID mapping
 const ROLE_ID_MAP: Record<number, "admin" | "editor" | "viewer"> = {
@@ -331,13 +330,7 @@ export default function PermissionsView({
 
   return (
     <>
-      <PageContainer
-        spaceId={spaceId}
-        spaceName="Acme Corporation"
-        currentTab="permissions"
-      >
-        {/* Header */}
-        <div className="mb-12 mt-12">
+      <div className="mt-12">
           <h1 className="text-4xl font-bold text-white mb-2">
             Team & Permissions
           </h1>
@@ -504,7 +497,7 @@ export default function PermissionsView({
             </div>
           </div>
         </div>
-      </PageContainer>
+      </div>
 
       {/* Invite Modal */}
       {showInviteModal && (

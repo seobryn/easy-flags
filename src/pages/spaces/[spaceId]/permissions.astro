@@ -33,6 +33,7 @@ const canManageFeaturePermissions = isSuperUser(user);
   <PermissionsManagementView
     client:load
     spaceId={spaceId}
+    spaceName={space?.name}
     canManageFeaturePermissions={canManageFeaturePermissions}
   />
 </BaseLayout>
