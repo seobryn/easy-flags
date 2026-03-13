@@ -22,11 +22,7 @@ export const GET: APIRoute = async (context) => {
     const preferences = await getUserPreferences(user.id);
 
     return new Response(
-      JSON.stringify(
-        successResponse({
-          data: preferences,
-        }),
-      ),
+      JSON.stringify(successResponse(preferences)),
       { status: 200 },
     );
   } catch (error) {
@@ -78,12 +74,7 @@ export const POST: APIRoute = async (context) => {
     });
 
     return new Response(
-      JSON.stringify(
-        successResponse({
-          data: preferences,
-          message: "Preferences updated successfully",
-        }),
-      ),
+      JSON.stringify(successResponse(preferences)),
       { status: 200 },
     );
   } catch (error) {

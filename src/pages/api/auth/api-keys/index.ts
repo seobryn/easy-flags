@@ -18,11 +18,7 @@ export const GET: APIRoute = async (context) => {
     const apiKeys = await getUserApiKeys(user.id);
 
     return new Response(
-      JSON.stringify(
-        successResponse({
-          data: apiKeys,
-        }),
-      ),
+      JSON.stringify(successResponse(apiKeys)),
       { status: 200 },
     );
   } catch (error) {
@@ -52,12 +48,7 @@ export const POST: APIRoute = async (context) => {
     const apiKey = await createUserApiKey(user.id);
 
     return new Response(
-      JSON.stringify(
-        successResponse({
-          data: apiKey,
-          message: "API key created successfully",
-        }),
-      ),
+      JSON.stringify(successResponse(apiKey)),
       { status: 201 },
     );
   } catch (error) {
