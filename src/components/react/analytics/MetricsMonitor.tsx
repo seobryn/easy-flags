@@ -24,6 +24,29 @@ interface MetricsMonitorProps {
   userId: string | number;
 }
 
+// Helper function to get date range based on time range selection
+function getDateRange(timeRange: "24h" | "7d" | "30d"): { from: string; to: string } {
+  const to = new Date();
+  const from = new Date();
+  
+  switch (timeRange) {
+    case "24h":
+      from.setDate(from.getDate() - 1);
+      break;
+    case "7d":
+      from.setDate(from.getDate() - 7);
+      break;
+    case "30d":
+      from.setDate(from.getDate() - 30);
+      break;
+  }
+  
+  return {
+    from: from.toISOString().split("T")[0],
+    to: to.toISOString().split("T")[0],
+  };
+}
+
 export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
   const [metrics, setMetrics] = useState<MetricsData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,14 +58,50 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
     const fetchMetrics = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `/api/analytics/metrics?userId=${userId}&timeRange=${timeRange}`
-        );
+        // Get the current space ID from URL or pass it as a prop
+        const spaceId = new URL(window.location.href).searchParams.get("spaceId") || "1";
+        
+        const params = new URLSearchParams({
+          space_id: spaceId,
+          metric_type: "usage",
+          date_from: getDateRange(timeRange).from,
+          date_to: getDateRange(timeRange).to,
+        });
+
+        const response = await fetch(`/api/analytics/metrics?${params}`);
         if (!response.ok) {
           throw new Error("Failed to fetch metrics");
         }
-        const data = await response.json();
-        setMetrics(data.metrics || []);
+        const rawData = await response.json();
+        
+        // Transform flat metrics array into the expected structure
+        const metricsArray = Array.isArray(rawData) ? rawData : [];
+        const spacesMap = new Map<string, MetricsData>();
+        
+        metricsArray.forEach((metric: any) => {
+          const spaceId = metric.space_id || "default";
+          if (!spacesMap.has(spaceId)) {
+            spacesMap.set(spaceId, {
+              spaceId,
+              spaceName: `Space ${spaceId}`,
+              flagCount: 0,
+              totalEvaluations: 0,
+              uniqueUsers: 0,
+              averageEvaluationTime: 0,
+              errorRate: 0,
+              topFlags: [],
+              recentTrend: [],
+            });
+          }
+          
+          const space = spacesMap.get(spaceId)!;
+          space.totalEvaluations += metric.total_evaluations || 0;
+          space.flagCount += 1;
+          space.averageEvaluationTime = metric.avg_evaluation_time_ms || 0;
+          space.errorRate = metric.error_count > 0 ? ((metric.error_count / metric.total_evaluations) * 100) : 0;
+        });
+        
+        setMetrics(Array.from(spacesMap.values()));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {

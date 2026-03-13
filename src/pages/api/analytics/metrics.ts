@@ -17,11 +17,11 @@ const analyticsService = new AnalyticsService();
  * Query analytics metrics for a space
  *
  * Query params:
- * - spaceId: number (required)
- * - environmentId?: number
- * - featureId?: number
- * - dateFrom?: string (ISO date)
- * - dateTo?: string (ISO date)
+ * - space_id or spaceId: number (required)
+ * - environment_id or environmentId?: number
+ * - feature_id or featureId?: number
+ * - date_from or dateFrom?: string (ISO date)
+ * - date_to or dateTo?: string (ISO date)
  * - metric_type?: "evaluations" | "usage" | "performance" (default: "usage")
  */
 export const GET: APIRoute = async (context) => {
@@ -34,7 +34,10 @@ export const GET: APIRoute = async (context) => {
       );
     }
 
-    const spaceId = context.url.searchParams.get("spaceId");
+    // Support both snake_case and camelCase parameters
+    const spaceId =
+      context.url.searchParams.get("spaceId") ||
+      context.url.searchParams.get("space_id");
     if (!spaceId) {
       return new Response(
         JSON.stringify({ error: "spaceId is required" }),
@@ -54,10 +57,18 @@ export const GET: APIRoute = async (context) => {
       );
     }
 
-    const environmentId = context.url.searchParams.get("environmentId");
-    const featureId = context.url.searchParams.get("featureId");
-    const dateFrom = context.url.searchParams.get("dateFrom");
-    const dateTo = context.url.searchParams.get("dateTo");
+    const environmentId =
+      context.url.searchParams.get("environmentId") ||
+      context.url.searchParams.get("environment_id");
+    const featureId =
+      context.url.searchParams.get("featureId") ||
+      context.url.searchParams.get("feature_id");
+    const dateFrom =
+      context.url.searchParams.get("dateFrom") ||
+      context.url.searchParams.get("date_from");
+    const dateTo =
+      context.url.searchParams.get("dateTo") ||
+      context.url.searchParams.get("date_to");
     const metricType = context.url.searchParams.get("metric_type") || "usage";
 
     const filters = {
@@ -87,16 +98,25 @@ export const GET: APIRoute = async (context) => {
         break;
     }
 
+    // Ensure we always return an array or object
+    if (!data) {
+      data = [];
+    }
+
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error querying analytics metrics:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Stack:", error instanceof Error ? error.stack : "N/A");
+
     return new Response(
       JSON.stringify({
         error: "Failed to query metrics",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: errorMessage,
       }),
       { status: 500, headers: { "Content-Type": "application/json" } },
     );
