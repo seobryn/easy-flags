@@ -16,31 +16,30 @@
         "test:watch": "jest --watch"
     },
     "dependencies": {
-        "@astrojs/node": "^7.0.0",
-        "@astrojs/react": "^3.0.0",
-        "@astrojs/tailwind": "^5.0.0",
+        "@astrojs/node": "^10.0.3",
+        "@astrojs/react": "^5.0.1",
+        "@astrojs/tailwind": "^6.0.2",
         "@astrojs/vercel": "^10.0.2",
-        "@libsql/client": "^0.5.0",
+        "@libsql/client": "^0.5.6",
         "@types/jsonwebtoken": "^9.0.10",
-        "astro": "^4.9.0",
+        "astro": "^6.0.7",
         "bcryptjs": "^2.4.3",
         "cookie": "^0.5.0",
         "jsonwebtoken": "^9.0.3",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "tailwindcss": "^3.4.0",
-        "vercel": "^50.34.1"
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
+        "tailwindcss": "^3.4.19"
     },
     "devDependencies": {
-        "@types/bcryptjs": "^2.4.2",
-        "@types/cookie": "^0.5.2",
-        "@types/node": "^20.0.0",
-        "@types/react": "^18.2.0",
-        "@types/react-dom": "^18.2.0",
-        "autoprefixer": "^10.4.0",
-        "dotenv": "^16.3.1",
-        "postcss": "^8.4.0",
-        "typescript": "^5.1.6"
+        "@types/bcryptjs": "^2.4.6",
+        "@types/cookie": "^0.5.4",
+        "@types/node": "^20.19.37",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "autoprefixer": "^10.4.27",
+        "dotenv": "^16.6.1",
+        "postcss": "^8.5.8",
+        "typescript": "^5.9.3"
     },
     "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748"
 }

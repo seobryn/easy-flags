@@ -1,7 +1,0 @@
-{
-    "buildCommand": "pnpm build",
-    "devCommand": "pnpm dev",
-    "env": {
-        "NODE_ENV": "production"
-    }
-}
