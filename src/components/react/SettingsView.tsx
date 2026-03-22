@@ -625,7 +625,7 @@ export default function SettingsView() {
                     </div>
                     <button
                       onClick={() => handleDeleteApiKey(key.id)}
-                      className="ml-4 px-3 py-1 bg-red-900/30 hover:bg-red-900/50 border border-red-500/30 text-red-400 rounded transition text-sm font-medium flex-shrink-0"
+                      className="ml-4 px-3 py-1 bg-red-900/30 hover:bg-red-900/50 border border-red-500/30 text-red-400 rounded transition text-sm font-medium shrink-0"
                     >
                       Delete
                     </button>
@@ -664,7 +664,7 @@ export default function SettingsView() {
                         and feature flag changes
                       </p>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
+                    <div className="ml-4 shrink-0">
                       <Toggle
                         checked={preferences.email_notifications}
                         onChange={(value) =>
@@ -686,7 +686,7 @@ export default function SettingsView() {
                         attempts
                       </p>
                     </div>
-                    <div className="ml-4 flex-shrink-0">
+                    <div className="ml-4 shrink-0">
                       <Toggle
                         checked={preferences.security_alerts}
                         onChange={(value) =>

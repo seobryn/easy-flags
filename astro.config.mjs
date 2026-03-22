@@ -17,7 +17,6 @@ export default defineConfig({
     ssr: {
       external: ["bcryptjs", "jsonwebtoken"],
     },
-
     plugins: [tailwindcss()],
   },
   integrations: [react()],

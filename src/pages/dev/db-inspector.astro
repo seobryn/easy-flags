@@ -1,75 +1,29 @@
 ---
-// src/pages/dev/db-inspector.astro
-// Development-only database inspection page
-export const prerender = false;
-
+import BaseLayout from "@/layouts/BaseLayout.astro";
 import DatabaseInspector from "@/components/react/DatabaseInspector";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
-import { isSuperUser, FEATURES } from "@/utils/permissions";
+import { isSuperUser } from "@/utils/permissions";
 import { getUserFromContext } from "@/utils/auth";
 
+export const prerender = false;
+
 // Require authentication
-console.log("[db-inspector] Checking auth...");
 if (!requireAuth(Astro)) {
-  console.log("[db-inspector] User not authenticated, redirecting to login");
   return Astro.redirect(getLoginUrl(Astro));
 }
 
 // Check if user is a super user
 const user = getUserFromContext(Astro);
-console.log("[db-inspector] User object:", user);
-console.log("[db-inspector] User role_id:", user?.role_id);
-console.log("[db-inspector] Is super user?", isSuperUser(user));
 
 if (!user || !isSuperUser(user)) {
-  console.log(
-    "[db-inspector] User is not a super user. Redirecting to forbidden.",
-  );
   return Astro.redirect("/forbidden");
 }
-
-console.log("[db-inspector] Access granted to super user:", user.username);
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Database Inspector - Development</title>
-    <meta name="description" content="Development database inspection tool" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <meta name="robots" content="noindex, nofollow" />
-  </head>
-  <body>
-    <div class="min-h-screen bg-slate-900">
-      <DatabaseInspector client:load />
-    </div>
-  </body>
-</html>
-
-<style is:global>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html {
-    color-scheme: dark;
-  }
-
-  body {
-    font-family: "Inter", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    background-color: #0f172a;
-    font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
-  }
-</style>
+<BaseLayout
+  title="Database Inspector - Development"
+  description="Development database inspection tool"
+  includeHeader={true}
+>
+  <DatabaseInspector client:load />
+</BaseLayout>
