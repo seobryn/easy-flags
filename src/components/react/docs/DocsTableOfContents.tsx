@@ -86,10 +86,10 @@ export default function DocsTableOfContents() {
         }`}
       >
         <div className="hidden md:block mb-4">
-          <h2 className="text-xl font-bold text-gradient bg-gradient-to-r from-cyan-300 via-blue-300 to-cyan-200 bg-clip-text text-transparent mb-2">
+          <h2 className="text-xl font-bold text-gradient bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-400 bg-clip-text text-transparent mb-2">
             Documentation
           </h2>
-          <div className="h-1 w-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full mt-3"></div>
+          <div className="h-1 w-12 bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full mt-3"></div>
         </div>
 
         <ul className="space-y-1">
