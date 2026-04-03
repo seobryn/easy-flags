@@ -1,51 +1,68 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Section {
   id: string;
   title: string;
+  icon: React.ReactNode;
   subsections?: { id: string; title: string }[];
 }
+
+const Icons = {
+  Rocket: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3"/><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5"/></svg>,
+  Box: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>,
+  Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
+  Globe: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
+  Target: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
+  Zap: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899 15.223 3 13.825 10.101H20l-11.223 11.899L10.175 14.899H4z"/></svg>,
+  Users: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  Help: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+};
 
 const sections: Section[] = [
   {
     id: "getting-started",
     title: "Getting Started",
+    icon: <Icons.Rocket />,
     subsections: [
-      { id: "understanding-hierarchy", title: "Understanding the Hierarchy" },
+      { id: "understanding-hierarchy", title: "Understanding Hierarchy" },
     ],
   },
-  {
-    id: "creating-spaces",
-    title: "Creating and Managing Spaces",
-  },
-  {
-    id: "creating-features",
-    title: "Creating and Managing Features",
-  },
-  {
-    id: "environments",
-    title: "Working with Environments",
-  },
-  {
-    id: "targeting-rollout",
-    title: "User Targeting & Rollout Strategies",
-  },
-  {
-    id: "api-integration",
-    title: "API Integration",
-  },
-  {
-    id: "team-management",
-    title: "Team Management & Roles",
-  },
-  {
-    id: "troubleshooting",
-    title: "Troubleshooting & FAQ",
-  },
+  { id: "creating-spaces", title: "Managing Spaces", icon: <Icons.Box /> },
+  { id: "creating-features", title: "Managing Features", icon: <Icons.Settings /> },
+  { id: "environments", title: "Environments", icon: <Icons.Globe /> },
+  { id: "targeting-rollout", title: "Targeting & Rollout", icon: <Icons.Target /> },
+  { id: "api-integration", title: "API Integration", icon: <Icons.Zap /> },
+  { id: "team-management", title: "Team & Roles", icon: <Icons.Users /> },
+  { id: "troubleshooting", title: "FAQ", icon: <Icons.Help /> },
 ];
 
 export default function DocsTableOfContents() {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeId, setActiveId] = useState("");
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-100px 0% -80% 0%" }
+    );
+
+    sections.forEach((section) => {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+      section.subsections?.forEach((sub) => {
+        const subEl = document.getElementById(sub.id);
+        if (subEl) observer.observe(subEl);
+      });
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -54,11 +71,9 @@ export default function DocsTableOfContents() {
       if (article) {
         const elementRect = element.getBoundingClientRect();
         const articleRect = article.getBoundingClientRect();
-        const scrollOffset =
-          elementRect.top - articleRect.top + article.scrollTop;
-
-        // Scroll margin of 112px (scroll-mt-28 = 7rem)
-        const marginOffset = 112;
+        const scrollOffset = elementRect.top - articleRect.top + article.scrollTop;
+        const marginOffset = 100;
+        
         article.scrollTo({
           top: scrollOffset - marginOffset,
           behavior: "smooth",
@@ -70,92 +85,91 @@ export default function DocsTableOfContents() {
 
   return (
     <>
-      {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 md:hidden z-40 bg-cyan-500 hover:bg-cyan-400 text-white p-3 rounded-full shadow-lg transition text-xl font-bold"
-        aria-label="Toggle table of contents"
+        className="fixed bottom-8 right-8 md:hidden z-[100] w-14 h-14 bg-cyan-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-all active:scale-95 shadow-cyan-500/20"
       >
-        {isOpen ? "✕" : "☰"}
+        {isOpen ? (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        ) : (
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        )}
       </button>
 
-      {/* Table of Contents */}
       <nav
-        className={`fixed left-0 top-0 h-screen w-72 bg-gradient-to-b from-slate-800/98 to-slate-900/95 border-r border-cyan-700/40 p-8 pt-28 pb-32 overflow-y-auto transition-transform duration-300 z-30 md:relative md:w-80 md:pt-8 md:pb-32 md:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed left-0 top-0 h-screen w-80 bg-[#06080f]/80 backdrop-blur-2xl border-r border-white/5 p-8 pt-24 pb-32 overflow-y-auto transition-all duration-500 ease-in-out z-[90] md:relative md:pt-10 md:pb-32 lg:w-80 md:translate-x-0 ${
+          isOpen ? "translate-x-0 opacity-100" : "-translate-x-full md:opacity-100"
         }`}
       >
-        <div className="hidden md:block mb-4">
-          <h2 className="text-xl font-bold text-gradient bg-gradient-to-r from-cyan-400 via-cyan-300 to-cyan-400 bg-clip-text text-transparent mb-2">
+        <div className="mb-8 px-2">
+          <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500 mb-6 px-1">
             Documentation
           </h2>
-          <div className="h-1 w-12 bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-full mt-3"></div>
+          
+          <ul className="space-y-1">
+            {sections.map((section) => {
+              const isActive = activeId === section.id || section.subsections?.some(s => s.id === activeId);
+              
+              return (
+                <li key={section.id} className="group">
+                  <button
+                    onClick={() => scrollToSection(section.id)}
+                    className={`w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 border ${
+                      isActive 
+                        ? "bg-cyan-500/10 border-cyan-500/20 text-white font-bold" 
+                        : "bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <span className={`transition-colors ${isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-cyan-300"}`}>
+                      {section.icon}
+                    </span>
+                    <span className="text-sm">{section.title}</span>
+                  </button>
+                  
+                  {section.subsections && (
+                    <ul className="ml-10 mt-1 space-y-1 overflow-hidden transition-all">
+                      {section.subsections.map((sub) => (
+                        <li key={sub.id}>
+                          <button
+                            onClick={() => scrollToSection(sub.id)}
+                            className={`w-full text-left px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 border ${
+                              activeId === sub.id
+                                ? "text-cyan-400 border-transparent font-bold"
+                                : "text-slate-500 border-transparent hover:text-slate-300"
+                            }`}
+                          >
+                            {sub.title}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
-        <ul className="space-y-1">
-          {sections.map((section, index) => (
-            <li key={section.id} className="mb-3 last:mb-0">
-              <button
-                onClick={() => scrollToSection(section.id)}
-                className="w-full text-left px-4 py-3.5 rounded-lg text-slate-200 hover:bg-cyan-500/20 hover:text-cyan-100 hover:translate-x-1 transition-all duration-200 text-sm font-semibold block group"
-              >
-                <span
-                  className={`inline-block mr-2 ${index === 0 ? "" : "opacity-60 group-hover:opacity-100 transition-opacity"}`}
-                >
-                  {index === 0
-                    ? "🚀"
-                    : index === 1
-                      ? "📦"
-                      : index === 2
-                        ? "⚙️"
-                        : index === 3
-                          ? "🌍"
-                          : index === 4
-                            ? "🎯"
-                            : index === 5
-                              ? "🔌"
-                              : index === 6
-                                ? "👥"
-                                : "🔍"}
-                </span>
-                {section.title}
-              </button>
-              {section.subsections && (
-                <ul className="ml-6 mt-3.5 space-y-2.5">
-                  {section.subsections.map((subsection) => (
-                    <li key={subsection.id}>
-                      <button
-                        onClick={() => scrollToSection(subsection.id)}
-                        className="w-full text-left px-3.5 py-2.5 rounded-lg text-slate-400 hover:bg-cyan-500/15 hover:text-cyan-300 hover:translate-x-1 transition-all duration-200 text-xs font-medium block group"
-                      >
-                        <span className="inline-block opacity-0 group-hover:opacity-100 transition-opacity mr-2">
-                          ▸
-                        </span>
-                        {subsection.title}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ul>
-
-        <div className="hidden md:flex flex-col gap-3 mt-6 pt-4 border-t border-slate-700/50">
-          <p className="text-slate-500 text-xs">Need help? Visit our</p>
+        <div className="mt-auto px-4 py-6 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-white/5">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+            <p className="text-white text-xs font-bold">Pro Support</p>
+          </div>
+          <p className="text-slate-400 text-[10px] leading-relaxed mb-4">
+            Need custom architecture help? Contact our flags experts.
+          </p>
           <a
             href="/contact"
-            className="w-full text-center px-4 py-2.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 hover:text-cyan-200 transition-all duration-200 text-xs font-semibold"
+            className="block w-full text-center py-2 rounded-lg bg-cyan-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20"
           >
-            Contact Support
+            Get Help
           </a>
         </div>
       </nav>
 
-      {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 md:hidden z-20"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm md:hidden z-[80] animate-in fade-in duration-300"
           onClick={() => setIsOpen(false)}
         />
       )}

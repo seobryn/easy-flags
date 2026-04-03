@@ -24,6 +24,25 @@ interface MetricsMonitorProps {
   userId: string | number;
 }
 
+// Custom Icons
+const Icons = {
+  Chart: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+  ),
+  Layers: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+  ),
+  Alert: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+  ),
+  Clock: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+  ),
+  ChevronDown: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  )
+};
+
 // Helper function to get date range based on time range selection
 function getDateRange(timeRange: "24h" | "7d" | "30d"): { from: string; to: string } {
   const to = new Date();
@@ -126,76 +145,85 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
       : 0;
 
   return (
-    <div className="p-8 w-full max-w-7xl mx-auto">
+    <div className="px-4 py-8 md:p-8 w-full max-w-7xl mx-auto animate-in fade-in duration-700">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Metrics Dashboard</h1>
-        <p className="text-slate-400">Monitor your feature flags performance across all spaces</p>
+      <div className="mb-10 text-center md:text-left relative">
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-cyan-500/10 blur-[100px] rounded-full"></div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+          Metrics <span className="text-gradient">Dashboard</span>
+        </h1>
+        <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto md:mx-0">
+          Real-time insights into your feature flag performance and system health across all monitored spaces.
+        </p>
       </div>
 
       {/* Time Range Selector */}
-      <div className="flex gap-2 mb-8">
+      <div className="flex items-center gap-2 sm:gap-3 mb-10 pb-2 overflow-x-auto no-scrollbar">
         {(["24h", "7d", "30d"] as const).map((range) => (
           <button
             key={range}
             onClick={() => setTimeRange(range)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`flex-shrink-0 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:base font-semibold transition-all duration-300 border ${
               timeRange === range
-                ? "bg-blue-600 text-white"
-                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                ? "bg-cyan-500 border-cyan-400 text-white shadow-lg shadow-cyan-500/25"
+                : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
             }`}
           >
-            Last {range === "24h" ? "24 Hours" : range === "7d" ? "7 Days" : "30 Days"}
+            <span className="sm:hidden">{range.toUpperCase()}</span>
+            <span className="hidden sm:inline">Last {range === "24h" ? "24 Hours" : range === "7d" ? "7 Days" : "30 Days"}</span>
           </button>
         ))}
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
         <SummaryCard
           title="Total Evaluations"
           value={totalEvaluations.toLocaleString()}
-          icon="📊"
+          icon={<Icons.Chart />}
           trend={"+12%"}
-          color="blue"
+          color="cyan"
         />
         <SummaryCard
           title="Spaces Monitored"
           value={metrics.length.toString()}
-          icon="✅"
-          color="green"
+          icon={<Icons.Layers />}
+          color="blue"
         />
         <SummaryCard
           title="Error Rate"
           value={`${(totalErrors / Math.max(totalEvaluations, 1)).toFixed(2)}%`}
-          icon="⚠️"
+          icon={<Icons.Alert />}
           color={totalErrors > 0 ? "red" : "green"}
         />
         <SummaryCard
           title="Avg Response Time"
           value={`${avgResponseTime}ms`}
-          icon="⏱️"
+          icon={<Icons.Clock />}
           color="purple"
         />
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500 rounded-lg p-4 mb-8">
-          <p className="text-red-400">{error}</p>
+        <div className="bg-red-500/10 border border-red-500/20 backdrop-blur-md rounded-2xl p-6 mb-8 flex items-center gap-4 animate-in slide-in-from-top-4">
+          <div className="text-red-500"><Icons.Alert /></div>
+          <p className="text-red-400 font-medium">{error}</p>
         </div>
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="flex justify-center items-center py-12">
-          <div className="text-slate-400">Loading metrics...</div>
+        <div className="flex flex-col justify-center items-center py-24 gap-4">
+          <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin"></div>
+          <p className="text-slate-400 font-medium">Fetching real-time metrics...</p>
         </div>
       )}
 
       {/* Metrics by Space */}
       {!loading && metrics.length > 0 && (
         <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-white mb-6 px-1">Monitored Spaces</h2>
           {metrics.map((space) => (
             <SpaceMetricsCard
               key={space.spaceId}
@@ -213,11 +241,15 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
 
       {/* Empty State */}
       {!loading && metrics.length === 0 && !error && (
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 text-center">
-          <p className="text-slate-400">No metrics data available yet.</p>
-          <p className="text-slate-500 text-sm mt-2">
-            Start evaluating feature flags to see metrics here.
+        <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-12 text-center max-w-2xl mx-auto">
+          <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-500">
+             <Icons.Chart />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">No data yet</h3>
+          <p className="text-slate-400 mb-8">
+            Start evaluating feature flags in your application to see performance metrics here.
           </p>
+          <button className="btn-primary">Learn how to integrate</button>
         </div>
       )}
     </div>
@@ -227,27 +259,40 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
 interface SummaryCardProps {
   title: string;
   value: string;
-  icon: string;
+  icon: React.ReactNode;
   trend?: string;
-  color: "blue" | "green" | "red" | "purple";
+  color: "cyan" | "blue" | "green" | "red" | "purple";
 }
 
 function SummaryCard({ title, value, icon, trend, color }: SummaryCardProps) {
-  const colorClasses = {
-    blue: "bg-blue-500/10 border-blue-500",
-    green: "bg-green-500/10 border-green-500",
-    red: "bg-red-500/10 border-red-500",
-    purple: "bg-purple-500/10 border-purple-500",
+  const colorMap = {
+    cyan: "from-cyan-400 to-cyan-600 shadow-cyan-500/20",
+    blue: "from-blue-400 to-blue-600 shadow-blue-500/20",
+    green: "from-emerald-400 to-emerald-600 shadow-emerald-500/20",
+    red: "from-rose-400 to-rose-600 shadow-rose-500/20",
+    purple: "from-purple-400 to-purple-600 shadow-purple-500/20",
   };
 
   return (
-    <div className={`border rounded-lg p-6 ${colorClasses[color]}`}>
-      <div className="flex items-start justify-between mb-4">
-        <div className="text-2xl">{icon}</div>
-        {trend && <span className="text-green-400 text-sm font-medium">{trend}</span>}
+    <div className="card !p-6 group relative overflow-hidden">
+      <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${colorMap[color]} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rounded-full`}></div>
+      
+      <div className="flex items-start justify-between mb-6">
+        <div className={`p-3 rounded-xl bg-gradient-to-br ${colorMap[color]} shadow-lg text-white`}>
+          {icon}
+        </div>
+        {trend && (
+          <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-500/10">
+            <span>↑</span>
+            {trend}
+          </div>
+        )}
       </div>
-      <p className="text-slate-400 text-sm mb-2">{title}</p>
-      <p className="text-2xl font-bold text-white">{value}</p>
+      
+      <div>
+        <h3 className="text-slate-400 text-sm font-medium mb-1 uppercase tracking-wider">{title}</h3>
+        <p className="text-3xl font-bold text-white tracking-tight">{value}</p>
+      </div>
     </div>
   );
 }
@@ -260,88 +305,117 @@ interface SpaceMetricsCardProps {
 
 function SpaceMetricsCard({ space, isSelected, onSelect }: SpaceMetricsCardProps) {
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 cursor-pointer hover:bg-slate-700/50 transition-colors" onClick={onSelect}>
-      <div className="flex items-start justify-between mb-4">
+    <div 
+      className={`card !p-0 overflow-hidden transition-all duration-500 group ${
+        isSelected ? "ring-2 ring-cyan-500/50" : ""
+      }`}
+    >
+      <div 
+        className="p-6 md:p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6"
+        onClick={onSelect}
+      >
         <div>
-          <h3 className="text-xl font-bold text-white">{space.spaceName}</h3>
-          <p className="text-slate-400 text-sm">{space.flagCount} feature flags</p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <h3 className="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors">
+              {space.spaceName}
+            </h3>
+          </div>
+          <p className="text-slate-400 font-medium flex items-center gap-2">
+            <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+            {space.flagCount} active feature flags
+          </p>
         </div>
-        <div className={`text-xl transition-transform ${
-            isSelected ? "rotate-180" : ""
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:flex md:items-center gap-8 md:gap-12">
+          <MetricItem label="Evaluations" value={space.totalEvaluations.toLocaleString()} />
+          <MetricItem label="Users" value={space.uniqueUsers.toLocaleString()} />
+          <MetricItem label="Latency" value={`${space.averageEvaluationTime.toFixed(1)}ms`} />
+          <MetricItem 
+            label="Errors" 
+            value={`${space.errorRate.toFixed(2)}%`} 
+            highlight={space.errorRate > 0} 
+          />
+          
+          <div className={`hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white/5 text-slate-400 transition-all duration-300 ${
+            isSelected ? "rotate-180 bg-cyan-500/20 text-cyan-400" : "group-hover:bg-white/10 group-hover:text-white"
           }`}>
-          ↗️
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-        <div>
-          <p className="text-slate-400 text-sm">Total Evaluations</p>
-          <p className="text-lg font-semibold text-white">
-            {space.totalEvaluations.toLocaleString()}
-          </p>
-        </div>
-        <div>
-          <p className="text-slate-400 text-sm">Unique Users</p>
-          <p className="text-lg font-semibold text-white">
-            {space.uniqueUsers.toLocaleString()}
-          </p>
-        </div>
-        <div>
-          <p className="text-slate-400 text-sm">Avg Response Time</p>
-          <p className="text-lg font-semibold text-white">
-            {space.averageEvaluationTime.toFixed(2)}ms
-          </p>
-        </div>
-        <div>
-          <p className="text-slate-400 text-sm">Error Rate</p>
-          <p className={`text-lg font-semibold ${space.errorRate > 0 ? "text-red-400" : "text-green-400"}`}>
-            {space.errorRate.toFixed(2)}%
-          </p>
-        </div>
-      </div>
-
-      {/* Top Flags */}
-      {isSelected && space.topFlags.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-slate-700">
-          <h4 className="text-sm font-semibold text-white mb-4">Top Flags</h4>
-          <div className="space-y-3">
-            {space.topFlags.map((flag) => (
-              <div key={flag.key} className="bg-slate-700/50 rounded p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-mono text-blue-400">{flag.key}</p>
-                  <p className="text-xs text-slate-400">
-                    {flag.evaluations.toLocaleString()} evals
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <p className="text-xs text-slate-500">Enabled</p>
-                    <div className="w-full bg-slate-600 rounded h-2 mt-1">
-                      <div
-                        className="bg-green-500 h-2 rounded"
-                        style={{
-                          width: `${(flag.enabled / flag.evaluations) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-slate-500">Disabled</p>
-                    <div className="w-full bg-slate-600 rounded h-2 mt-1">
-                      <div
-                        className="bg-red-500 h-2 rounded"
-                        style={{
-                          width: `${(flag.disabled / flag.evaluations) * 100}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <Icons.ChevronDown />
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Expanded Content: Top Flags */}
+      <div className={`transition-all duration-500 ease-in-out border-t border-white/5 bg-black/20 ${
+        isSelected ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+      }`}>
+        <div className="p-6 md:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h4 className="text-lg font-bold text-white">Top Performing Flags</h4>
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Usage Distribution</span>
+          </div>
+
+          {space.topFlags.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {space.topFlags.map((flag) => (
+                <div key={flag.key} className="bg-white/5 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm font-mono text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded ring-1 ring-cyan-500/20">{flag.key}</p>
+                    <p className="text-xs font-bold text-slate-500">
+                      {flag.evaluations.toLocaleString()} evals
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <ProgressItem 
+                      label="Enabled" 
+                      percentage={(flag.enabled / flag.evaluations) * 100} 
+                      color="bg-emerald-500" 
+                    />
+                    <ProgressItem 
+                      label="Disabled" 
+                      percentage={(flag.disabled / flag.evaluations) * 100} 
+                      color="bg-slate-500" 
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center border-2 border-dashed border-white/5 rounded-3xl">
+              <p className="text-slate-500">Detailed flag data not available for this period.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricItem({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div>
+      <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">{label}</p>
+      <p className={`text-lg font-bold tracking-tight ${highlight ? "text-rose-400" : "text-white"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ProgressItem({ label, percentage, color }: { label: string; percentage: number; color: string }) {
+  return (
+    <div>
+      <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">
+        <span>{label}</span>
+        <span>{percentage.toFixed(1)}%</span>
+      </div>
+      <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden" title={`${percentage.toFixed(1)}%`}>
+        <div
+          className={`h-full rounded-full transition-all duration-1000 ${color}`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
     </div>
   );
 }
