@@ -1,45 +1,49 @@
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+
 interface Feature {
   icon: string;
   title: string;
   description: string;
 }
 
-export default function WhyLoveSection() {
+interface WhyLoveSectionProps {
+  initialLocale?: AvailableLanguages;
+}
+
+export default function WhyLoveSection({ initialLocale }: WhyLoveSectionProps) {
+  const t = useTranslate(initialLocale);
+
   const features: Feature[] = [
     {
       icon: "🚀",
-      title: "Instant Rollback",
-      description:
-        "Roll back any feature instantly without redeploying your application.",
+      title: t('whyLove.instantRollback'),
+      description: t('whyLove.instantRollbackDesc'),
     },
     {
       icon: "👥",
-      title: "Targeted Rollout",
-      description:
-        "Release features to specific user segments and gradually increase visibility.",
+      title: t('whyLove.targetedRollout'),
+      description: t('whyLove.targetedRolloutDesc'),
     },
     {
       icon: "📊",
-      title: "Real-time Analytics",
-      description:
-        "Monitor feature adoption and user behavior in real-time dashboards.",
+      title: t('whyLove.realTimeAnalytics'),
+      description: t('whyLove.realTimeAnalyticsDesc'),
     },
     {
       icon: "🔐",
-      title: "Enterprise Security",
-      description:
-        "Role-based access control with granular permissions for your team.",
+      title: t('whyLove.enterpriseSecurity'),
+      description: t('whyLove.enterpriseSecurityDesc'),
     },
     {
       icon: "⚡",
-      title: "High Performance",
-      description: "Lightning-fast flag evaluations with edge caching support.",
+      title: t('whyLove.highPerformance'),
+      description: t('whyLove.highPerformanceDesc'),
     },
     {
       icon: "🔗",
-      title: "Easy Integration",
-      description:
-        "Simple API and SDK libraries for all major programming languages.",
+      title: t('whyLove.easyIntegration'),
+      description: t('whyLove.easyIntegrationDesc'),
     },
   ];
 
@@ -50,11 +54,10 @@ export default function WhyLoveSection() {
           id="features-heading"
           className="section-title text-4xl md:text-5xl"
         >
-          Why Choose <span className="text-gradient">Easy Flags?</span>
+          {t('whyLove.title')}
         </h2>
         <p className="text-xl text-slate-400 max-w-2xl leading-relaxed">
-          Engineered for performance, built for developers, and designed to give you
-          absolute control over your release cycle.
+          {t('whyLove.subtitle')}
         </p>
       </div>
 
@@ -67,7 +70,7 @@ export default function WhyLoveSection() {
             {/* Subtle glow on hover */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-500">
               {feature.icon}
             </div>
             

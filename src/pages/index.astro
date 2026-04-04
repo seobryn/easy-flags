@@ -1,14 +1,17 @@
 ---
 export const prerender = false;
 
+import { getLocale } from "@/infrastructure/i18n/astro";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import HeroSection from "@/components/react/HeroSection";
 import QuickStartSection from "@/components/react/QuickStartSection";
 import WhyLoveSection from "@/components/react/WhyLoveSection";
+
+const locale = getLocale(Astro.request);
 ---
 
 <BaseLayout title="Easy Flags UI" includeHeader={true} fullWidth={true}>
-  <HeroSection client:load />
-  <QuickStartSection client:load />
-  <WhyLoveSection client:load />
+  <HeroSection client:load initialLocale={locale} />
+  <QuickStartSection client:load initialLocale={locale} />
+  <WhyLoveSection client:load initialLocale={locale} />
 </BaseLayout>

@@ -1,21 +1,30 @@
-export default function QuickStartSection() {
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+
+interface QuickStartSectionProps {
+  initialLocale?: AvailableLanguages;
+}
+
+export default function QuickStartSection({ initialLocale }: QuickStartSectionProps) {
+  const t = useTranslate(initialLocale);
+
   const resources = [
     {
       icon: "📚",
-      title: "Documentation",
-      description: "Read our comprehensive guides to get started quickly.",
+      title: t('quickstart.documentation'),
+      description: t('quickstart.documentationDesc'),
       href: "/docs",
     },
     {
       icon: "🔌",
-      title: "API Reference",
-      description: "Integrate feature flags into your application.",
+      title: t('quickstart.apiReference'),
+      description: t('quickstart.apiReferenceDesc'),
       href: "/api-reference",
     },
     {
       icon: "💬",
-      title: "Support",
-      description: "Get help from our support team or community.",
+      title: t('quickstart.support'),
+      description: t('quickstart.supportDesc'),
       href: "/contact",
     },
   ];
@@ -27,11 +36,10 @@ export default function QuickStartSection() {
           id="quickstart-heading"
           className="section-title text-center"
         >
-          Quick Start Guide
+          {t('quickstart.title')}
         </h2>
         <p className="text-slate-400 max-w-2xl">
-          Everything you need to launch your first feature flag in minutes. 
-          Choose your path and start shipping with confidence.
+          {t('quickstart.description')}
         </p>
       </div>
 

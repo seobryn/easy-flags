@@ -1,4 +1,13 @@
-export default function HeroSection() {
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+
+interface HeroSectionProps {
+  initialLocale?: AvailableLanguages;
+}
+
+export default function HeroSection({ initialLocale }: HeroSectionProps) {
+  const t = useTranslate(initialLocale);
+
   return (
     <section className="mt-12 mb-20 relative px-4">
       {/* Decorative background glow */}
@@ -11,26 +20,25 @@ export default function HeroSection() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
             </span>
-            New: Edge Rollouts
+            {t('hero.badge')}
           </div>
 
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-[1.1] tracking-tight">
-            Launch ideas <br />
-            <span className="text-gradient">without the stress.</span>
+            {t('hero.title')} <br />
+            <span className="text-gradient">{t('hero.titleStress')}</span>
           </h1>
 
           <p className="text-xl text-slate-400 mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-            Take full control of your release cycle. Deploy when you're ready,
-            toggle features instantly, and sleep better at night.
+            {t('hero.description')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a
               href="/create-account"
               className="btn-primary group"
-              aria-label="Create account"
+              aria-label={t('hero.getStarted')}
             >
-              Get Started Free
+              {t('hero.getStarted')}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
@@ -46,20 +54,25 @@ export default function HeroSection() {
                 />
               </svg>
             </a>
-            <a href="/docs" className="btn-secondary" aria-label="docs">
-              Documentation
+            <a href="/docs" className="btn-secondary" aria-label={t('hero.documentation')}>
+              {t('hero.documentation')}
             </a>
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center relative z-10">
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+        <div className="flex-1 flex items-center justify-center relative z-10 w-full lg:w-auto">
+          <div className="relative group w-full flex justify-center">
+            {/* Extended glow effect */}
+            <div className="absolute -inset-4 bg-linear-to-r from-cyan-500/20 to-blue-600/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition duration-700 pointer-events-none" />
+            
+            <div className="absolute -inset-1 bg-linear-to-r from-cyan-500 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
             <img
-              className="relative rounded-2xl drop-shadow-2xl max-w-full md:max-w-lg lg:max-w-xl animate-fade-in"
+              className="relative rounded-3xl drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] w-full h-auto max-w-md md:max-w-xl lg:max-w-2xl xl:max-w-3xl transform hover:scale-[1.02] transition-transform duration-700"
               src="/illustrations/hero.svg"
-              alt="Feature rollout illustration"
-              style={{ animation: "float 6s ease-in-out infinite" }}
+              alt={t('hero.illustrationAlt')}
+              width="900"
+              height="450"
+              style={{ animation: "float 6s ease-in-out infinite, fadeIn 1.2s ease-out forwards" }}
             />
           </div>
         </div>

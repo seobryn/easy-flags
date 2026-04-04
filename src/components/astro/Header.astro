@@ -77,16 +77,11 @@ const getNavLinkClass = (href: string) => {
 <header id="main-header" class="sticky top-0 z-50 w-full border-b border-white/5 bg-[#06080f]/80 backdrop-blur-xl transition-all duration-300">
   <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <div class="w-10 h-10 rounded-xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-        </svg>
-      </div>
-      <a
-        href="/"
-        class="text-2xl font-bold tracking-tight bg-linear-to-r from-white via-white to-slate-400 bg-clip-text text-transparent font-display"
-      >
-        Easy Flags
+      <a href="/" class="flex items-center gap-3 group">
+        <img src="/logo.svg" alt="Easy Flags" class="w-10 h-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg shadow-cyan-500/10 rounded-xl" />
+        <span class="text-2xl font-bold tracking-tight bg-linear-to-r from-white via-white to-slate-400 bg-clip-text text-transparent font-display">
+          Easy Flags
+        </span>
       </a>
     </div>
 
