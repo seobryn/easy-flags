@@ -7,12 +7,6 @@ interface RolePermission {
   features: string[];
 }
 
-interface Role {
-  id: number;
-  name: string;
-  description: string;
-}
-
 interface FeaturesPermissionsViewProps {
   spaceId: string | undefined;
 }
@@ -226,7 +220,7 @@ export default function FeaturesPermissionsView({
     environments: "Manage deployment environments",
     billing: "Access billing and subscription settings",
     settings: "Access application settings",
-    database_inspector: "Access database inspector (dev only)",
+    database_inspector: "Access database inspector (super user only)",
     api_reference: "View API reference and documentation",
   };
 
@@ -245,104 +239,137 @@ export default function FeaturesPermissionsView({
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-slate-400">Loading feature permissions...</p>
+      <div className="py-20 flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-2 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+        <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-600">
+          Loading Permissions...
+        </p>
       </div>
     );
   }
 
   return (
-    <>
-      {/* Header */}
-      <div className="mb-12 mt-12">
-        <h1 className="text-4xl font-bold text-white mb-2">
-          Feature Permissions
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <header>
+        <h1 className="text-4xl font-bold text-white mb-3 tracking-tight">
+          Role <span className="text-gradient">Permissions</span>
         </h1>
-        <p className="text-slate-400">
-          Manage which features are accessible to each role
+        <p className="text-slate-400 max-w-2xl text-lg leading-relaxed">
+          Global configuration for what each system role can access. This
+          affects all spaces and environments.
         </p>
-      </div>
+      </header>
 
       {/* Message */}
       {message && (
         <div
-          className={`mb-6 p-4 rounded-lg border ${
+          className={`p-4 rounded-2xl border flex items-center gap-3 animate-in slide-in-from-top-2 duration-300 ${
             message.type === "success"
-              ? "bg-green-500/10 border-green-500/30 text-green-300"
-              : "bg-red-500/10 border-red-500/30 text-red-300"
+              ? "bg-green-500/10 border-green-500/20 text-green-400"
+              : "bg-red-500/10 border-red-500/20 text-red-400"
           }`}
         >
-          {message.text}
+          <span>{message.type === "success" ? "✅" : "⚠️"}</span>
+          <p className="text-sm font-medium">{message.text}</p>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Roles List - Left Sidebar */}
-        <div className="lg:col-span-1">
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4 space-y-2">
-            <h2 className="text-sm font-bold text-slate-300 mb-3 px-2">
-              ROLES
+        <div className="lg:col-span-3">
+          <div className="card !p-4 space-y-2 sticky top-8">
+            <h2 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-3">
+              System Roles
             </h2>
-            {permissions.map((perm) => (
-              <button
-                key={perm.roleId}
-                onClick={() => setSelectedRole(perm.roleId)}
-                className={`w-full text-left px-3 py-2 rounded transition ${
-                  selectedRole === perm.roleId
-                    ? "bg-cyan-600/30 border border-cyan-500 text-cyan-300"
-                    : "bg-slate-700/30 hover:bg-slate-700/50 text-slate-300"
-                }`}
-              >
-                <div className="font-semibold text-sm">{perm.roleName}</div>
-                <div className="text-xs text-slate-400">
-                  {perm.features.length} features
-                </div>
-              </button>
-            ))}
+            <div className="space-y-1.5">
+              {permissions.map((perm) => (
+                <button
+                  key={perm.roleId}
+                  onClick={() => setSelectedRole(perm.roleId)}
+                  className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-300 border ${
+                    selectedRole === perm.roleId
+                      ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+                      : "bg-transparent border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  }`}
+                >
+                  <div className="font-bold text-sm">{perm.roleName}</div>
+                  <div className="text-[10px] font-medium opacity-60">
+                    {perm.features.length} active features
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Features Matrix - Main Content */}
-        <div className="lg:col-span-3">
-          {selectedRoleData && (
+        <div className="lg:col-span-9">
+          {selectedRoleData ? (
             <div className="space-y-6">
               {/* Role Info */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {selectedRoleData.roleName}
-                </h2>
-                <p className="text-slate-400 text-sm mb-4">
-                  {selectedRoleData.roleDescription}
-                </p>
-                <div className="text-xs text-slate-500">
-                  {selectedFeatures.size} of {availableFeatures.length} features
-                  enabled
+              <div className="card">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white tracking-tight mb-2">
+                      {selectedRoleData.roleName}
+                    </h2>
+                    <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
+                      {selectedRoleData.roleDescription}
+                    </p>
+                  </div>
+                  <div className="px-4 py-2 bg-white/2 border border-white/5 rounded-2xl min-w-fit">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                      Status
+                    </p>
+                    <p className="text-sm font-bold text-cyan-400">
+                      {selectedFeatures.size} / {availableFeatures.length}{" "}
+                      Enabled
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Features Grid */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">
-                  Available Features
+              <div className="card">
+                <h3 className="text-lg font-bold text-white tracking-tight mb-6 flex items-center gap-2">
+                  <span className="text-cyan-400">✨</span> Available Features
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {availableFeatures.map((feature) => (
                     <label
                       key={feature}
-                      className="flex items-start gap-3 p-3 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/30 transition"
+                      className={`group flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+                        selectedFeatures.has(feature)
+                          ? "bg-cyan-500/5 border-cyan-500/20 shadow-[0_4px_20px_rgba(6,182,212,0.05)]"
+                          : "bg-white/2 border-white/5 hover:bg-white/[0.04] hover:border-white/10"
+                      }`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedFeatures.has(feature)}
-                        onChange={() => handleFeatureToggle(feature)}
-                        className="w-4 h-4 mt-1 cursor-pointer"
-                      />
+                      <div className="relative flex items-center mt-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedFeatures.has(feature)}
+                          onChange={() => handleFeatureToggle(feature)}
+                          className="peer w-5 h-5 appearance-none rounded-lg border border-white/10 bg-slate-900 checked:bg-cyan-500 checked:border-cyan-500 transition-all cursor-pointer"
+                        />
+                        <svg
+                          className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none left-1 top-1 transition-opacity"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg">
-                            {featureIcons[feature] || "✨"}
+                          <span className="text-lg group-hover:scale-110 transition-transform">
+                            {featureIcons[feature] || "💎"}
                           </span>
-                          <span className="font-semibold text-white text-sm">
+                          <span className="font-bold text-white text-sm tracking-tight">
                             {feature
                               .replace(/_/g, " ")
                               .split(" ")
@@ -352,8 +379,9 @@ export default function FeaturesPermissionsView({
                               .join(" ")}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400">
-                          {featureDescriptions[feature] || ""}
+                        <p className="text-[11px] font-medium text-slate-500 leading-relaxed">
+                          {featureDescriptions[feature] ||
+                            "Access to this system module."}
                         </p>
                       </div>
                     </label>
@@ -362,13 +390,20 @@ export default function FeaturesPermissionsView({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={handleSaveChanges}
                   disabled={!hasUnsavedChanges || isSaving}
-                  className="flex-1 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 disabled:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded font-semibold transition"
+                  className="btn-primary !flex-1 !py-3.5 shadow-lg shadow-cyan-500/20 disabled:grayscale disabled:opacity-50"
                 >
-                  {isSaving ? "Saving..." : "Save Changes"}
+                  {isSaving ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Saving Changes...
+                    </span>
+                  ) : (
+                    "Save Permissions"
+                  )}
                 </button>
                 <button
                   onClick={() => {
@@ -380,22 +415,29 @@ export default function FeaturesPermissionsView({
                     setChanges(newChanges);
                   }}
                   disabled={!hasUnsavedChanges}
-                  className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-slate-300 rounded font-semibold transition"
+                  className="btn-secondary !flex-1 !py-3.5"
                 >
-                  Cancel
+                  Discard Changes
                 </button>
               </div>
 
               {/* Unsaved Changes Indicator */}
               {hasUnsavedChanges && (
-                <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 p-3 rounded text-sm">
-                  💡 You have unsaved changes
+                <div className="bg-amber-500/5 border border-amber-500/10 text-amber-400 p-4 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center gap-3 animate-pulse">
+                  <span className="text-lg">💡</span>
+                  You have unsaved changes for this role
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="card text-center py-20">
+              <p className="text-slate-500">
+                Select a role on the left to manage permissions.
+              </p>
             </div>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

@@ -17,8 +17,8 @@ export default function PermissionsManagementView({
   const [activeTab, setActiveTab] = useState<"space" | "features">("space");
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <div className="max-w-6xl mx-auto py-12 px-4">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto pt-12 pb-24 px-6 animate-in fade-in duration-700">
         <SpaceNavigationWithTabs
           spaceId={spaceId}
           spaceName={spaceName}
@@ -28,17 +28,20 @@ export default function PermissionsManagementView({
           canManageFeaturePermissions={canManageFeaturePermissions}
         />
 
-        {/* Content based on active tab */}
-        {activeTab === "space" && (
-          <PermissionsView
-            spaceId={spaceId}
-            canManageFeaturePermissions={canManageFeaturePermissions}
-          />
-        )}
-        {activeTab === "features" && canManageFeaturePermissions && (
-          <FeaturesPermissionsView spaceId={spaceId} />
-        )}
+        <div className="relative z-10">
+          {/* Content based on active tab */}
+          {activeTab === "space" && (
+            <PermissionsView
+              spaceId={spaceId}
+              canManageFeaturePermissions={canManageFeaturePermissions}
+            />
+          )}
+          {activeTab === "features" && canManageFeaturePermissions && (
+            <FeaturesPermissionsView spaceId={spaceId} />
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
