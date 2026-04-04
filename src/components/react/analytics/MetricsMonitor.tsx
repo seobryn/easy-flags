@@ -163,7 +163,7 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
           <button
             key={range}
             onClick={() => setTimeRange(range)}
-            className={`flex-shrink-0 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:base font-semibold transition-all duration-300 border ${
+            className={`shrink-0 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full text-sm sm:base font-semibold transition-all duration-300 border ${
               timeRange === range
                 ? "bg-cyan-500 border-cyan-400 text-white shadow-lg shadow-cyan-500/25"
                 : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
@@ -181,7 +181,6 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
           title="Total Evaluations"
           value={totalEvaluations.toLocaleString()}
           icon={<Icons.Chart />}
-          trend={"+12%"}
           color="cyan"
         />
         <SummaryCard
@@ -249,7 +248,7 @@ export default function MetricsMonitor({ userId }: MetricsMonitorProps) {
           <p className="text-slate-400 mb-8">
             Start evaluating feature flags in your application to see performance metrics here.
           </p>
-          <button className="btn-primary">Learn how to integrate</button>
+          <a href="/docs" className="btn-primary">Learn how to integrate</a>
         </div>
       )}
     </div>
@@ -274,11 +273,11 @@ function SummaryCard({ title, value, icon, trend, color }: SummaryCardProps) {
   };
 
   return (
-    <div className="card !p-6 group relative overflow-hidden">
-      <div className={`absolute -right-4 -top-4 w-24 h-24 bg-gradient-to-br ${colorMap[color]} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rounded-full`}></div>
+    <div className="card p-6! group relative overflow-hidden">
+      <div className={`absolute -right-4 -top-4 w-24 h-24 bg-linear-to-br ${colorMap[color]} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rounded-full`}></div>
       
       <div className="flex items-start justify-between mb-6">
-        <div className={`p-3 rounded-xl bg-gradient-to-br ${colorMap[color]} shadow-lg text-white`}>
+        <div className={`p-3 rounded-xl bg-linear-to-br ${colorMap[color]} shadow-lg text-white`}>
           {icon}
         </div>
         {trend && (
@@ -306,7 +305,7 @@ interface SpaceMetricsCardProps {
 function SpaceMetricsCard({ space, isSelected, onSelect }: SpaceMetricsCardProps) {
   return (
     <div 
-      className={`card !p-0 overflow-hidden transition-all duration-500 group ${
+      className={`card p-0! overflow-hidden transition-all duration-500 group ${
         isSelected ? "ring-2 ring-cyan-500/50" : ""
       }`}
     >
