@@ -19,8 +19,8 @@ export default function PageContainer({
   subPage,
 }: PageContainerProps) {
   return (
-    <div className="min-h-screen bg-slate-900">
-      <div className="max-w-6xl mx-auto py-12 px-4">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto pt-12 pb-24 px-6 animate-in fade-in duration-700">
         <SpaceNavigation
           spaceId={spaceId}
           spaceName={spaceName}
