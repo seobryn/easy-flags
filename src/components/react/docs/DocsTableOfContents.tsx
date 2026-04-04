@@ -154,6 +154,20 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
                 </li>
               );
             })}
+            
+            {/* API Reference Link */}
+            <li className="group mt-4 pt-4 border-t border-white/5">
+              <a
+                href="/api-reference"
+                className="w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 border bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-white/5"
+              >
+                <span className="text-slate-500 group-hover:text-emerald-400 transition-colors">
+                  <Icons.Zap />
+                </span>
+                <span className="text-sm font-bold">{t('apiReference.title')}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              </a>
+            </li>
           </ul>
         </div>
 

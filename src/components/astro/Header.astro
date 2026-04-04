@@ -42,6 +42,11 @@ const navItems = {
     label: t('navigation.docs') || "Docs",
     showFor: true,
   },
+  apiReference: {
+    href: "/api-reference",
+    label: t('navigation.apiReference') || "API Reference",
+    showFor: true,
+  },
   login: {
     href: "/login",
     label: t('auth.login') || "Login",
@@ -124,6 +129,13 @@ const getNavLinkClass = (href: string) => {
           class="text-sm font-medium text-slate-400 hover:text-white transition-colors"
         >
           {navItems.docs.label}
+        </a>
+
+        <a
+          href={navItems.apiReference.href}
+          class="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+        >
+          {navItems.apiReference.label}
         </a>
       </div>
 
@@ -218,6 +230,12 @@ const getNavLinkClass = (href: string) => {
         class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
       >
         {navItems.docs.label}
+      </a>
+      <a 
+        href={navItems.apiReference.href} 
+        class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
+      >
+        {navItems.apiReference.label}
       </a>
     </div>
     

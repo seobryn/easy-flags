@@ -21,6 +21,7 @@ export const es = {
     metrics: 'Métricas',
     pricing: 'Precios',
     spaces: 'Espacios',
+    apiReference: 'Referencia API',
   },
   auth: {
     login: 'Iniciar sesión',
@@ -89,6 +90,7 @@ export const es = {
     getEnvsDesc: 'Obtenga todos los entornos en un espacio.',
     developerInterface: 'Interfaz para Desarrolladores',
     heroDesc: 'API REST potente para automatizar tus flujos de trabajo de banderas de función e integrarlos con tus tuberías de CI/CD existentes.',
+    shortDesc: 'Automatiza tus flujos de trabajo con nuestra API REST.',
     httpHeader: 'Encabezado HTTP',
     availableEndpoints: 'Puntos de Acceso Disponibles',
     customIntegrationTitle: '¿Necesitas una integración personalizada?',

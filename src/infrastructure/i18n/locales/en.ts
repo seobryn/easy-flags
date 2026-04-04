@@ -21,6 +21,7 @@ export const en = {
     metrics: 'Metrics',
     pricing: 'Pricing',
     spaces: 'Spaces',
+    apiReference: 'API Reference',
   },
   auth: {
     login: 'Login',
@@ -89,6 +90,7 @@ export const en = {
     getEnvsDesc: 'Get all environments in a space.',
     developerInterface: 'Developer Interface',
     heroDesc: 'Powerful REST API to automate your feature flag workflows and integrate with your existing CI/CD pipelines.',
+    shortDesc: 'Automate your workflows with our REST API.',
     httpHeader: 'HTTP Header',
     availableEndpoints: 'Available Endpoints',
     customIntegrationTitle: 'Need a custom integration?',

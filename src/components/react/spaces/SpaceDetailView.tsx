@@ -291,6 +291,12 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
                     description={t('spaces.sdkIntegrationDesc')}
                     icon="📚"
                 />
+                <ActionLink 
+                    href={`/api-reference`}
+                    title={t('apiReference.title')}
+                    description={t('apiReference.shortDesc')}
+                    icon="🔌"
+                />
               </div>
             </section>
 
