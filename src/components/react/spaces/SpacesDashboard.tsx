@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface Space {
   id: number;
@@ -12,26 +13,6 @@ interface Space {
   created_at: string;
 }
 
-const Icons = {
-  Search: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-  ),
-  Plus: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-  ),
-  Users: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  ),
-  Calendar: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-  ),
-  Folder: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-  ),
-  ChevronRight: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-  )
-};
 
 interface SpacesDashboardProps {
   initialLocale?: AvailableLanguages;
@@ -139,7 +120,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           <div className="relative w-full sm:w-80 group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
-              <Icons.Search />
+              <Icon name="Search" size={18} />
             </div>
             <input
               type="text"
@@ -153,7 +134,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
             onClick={() => setShowCreateModal(true)}
             className="w-full sm:w-auto btn-primary flex items-center justify-center gap-2 py-3.5! px-8! shadow-xl shadow-cyan-500/20"
           >
-            <Icons.Plus />
+            <Icon name="Plus" size={18} />
             {t('spaces.createButton')}
           </button>
         </div>
@@ -165,7 +146,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
         
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-8">
            <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
-              <Icons.Folder />
+              <Icon name="Folder" size={24} />
            </div>
            <div>
               <h3 className="text-xl font-bold text-white tracking-tight">{t('spaces.systemArch')}</h3>
@@ -174,17 +155,19 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-[11px] sm:text-xs">
-          <HierNode icon="📦" label={t('spaces.hierSpace')} value="Acme Corp" color="text-cyan-400" />
-          <HierNode icon="🌍" label={t('spaces.hierEnv')} value="Production" color="text-emerald-400" />
-          <HierNode icon="🌍" label={t('spaces.hierEnv')} value="Staging" color="text-blue-400" />
-          <HierNode icon="⚙️" label={t('spaces.hierFlags')} value="Ruleset" color="text-purple-400" />
+          <HierNode icon={<Icon name="Box" size={18} />} label={t('spaces.hierSpace')} value="Acme Corp" color="text-cyan-400" />
+          <HierNode icon={<Icon name="Globe" size={18} />} label={t('spaces.hierEnv')} value="Production" color="text-emerald-400" />
+          <HierNode icon={<Icon name="Globe" size={18} />} label={t('spaces.hierEnv')} value="Staging" color="text-blue-400" />
+          <HierNode icon={<Icon name="Settings" size={18} />} label={t('spaces.hierFlags')} value="Ruleset" color="text-purple-400" />
         </div>
       </div>
 
       {/* Spaces Grid */}
       {spaces.length === 0 ? (
         <div className="card text-center py-20 relative overflow-hidden flex flex-col items-center justify-center border-dashed border-2 border-white/10 bg-transparent">
-          <div className="text-7xl mb-8 opacity-50 group-hover:scale-110 transition-transform duration-500">🚀</div>
+          <div className="mb-8 opacity-50 group-hover:scale-110 transition-transform duration-500 text-cyan-500">
+            <Icon name="Rocket" size={64} />
+          </div>
           <h2 className="text-3xl font-bold text-white mb-4">{t('spaces.launchTitle')}</h2>
           <p className="text-slate-500 max-w-md mx-auto mb-10 leading-relaxed font-medium">
             {t('spaces.launchDesc')}
@@ -193,7 +176,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
             onClick={() => setShowCreateModal(true)}
             className="btn-primary flex items-center gap-2 px-10! py-4!"
           >
-            <Icons.Plus />
+            <Icon name="Plus" size={18} />
             {t('spaces.buildWorkspace')}
           </button>
         </div>
@@ -206,12 +189,12 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
               className="group relative bg-white/5 border border-white/5 rounded-4xl p-8 transition-all duration-500 hover:bg-white/8 hover:border-cyan-500/30 hover:-translate-y-2 hover:shadow-2xl hover:shadow-cyan-500/10 flex flex-col h-full"
             >
               <div className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 opacity-0 group-hover:opacity-100 transition-all rotate-45 group-hover:rotate-0">
-                 <Icons.ChevronRight />
+                 <Icon name="ChevronRight" size={16} />
               </div>
  
                <div className="mb-6">
                   <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400/20 to-blue-600/20 flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
-                     <Icons.Folder />
+                     <Icon name="Folder" size={24} />
                   </div>
                   <h3 className="text-2xl font-bold text-white group-hover:text-cyan-400 transition-colors mb-2 wrap-break-word tracking-tight">
                     {space.name}
@@ -227,12 +210,12 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
 
               <div className="mt-auto pt-6 border-t border-white/5 flex items-center gap-6">
                 <div className="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors">
-                  <Icons.Calendar />
+                  <Icon name="Calendar" size={14} />
                   <span className="text-[10px] font-bold uppercase tracking-widest">{new Date(space.created_at).toLocaleDateString()}</span>
                 </div>
                 {space.members_count !== undefined && (
                   <div className="flex items-center gap-2 text-slate-500 group-hover:text-slate-400 transition-colors">
-                    <Icons.Users />
+                    <Icon name="Users" size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest">{t('spaces.teamCount', { count: space.members_count })}</span>
                   </div>
                 )}
@@ -242,7 +225,9 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
 
           {filteredSpaces.length === 0 && (
             <div className="col-span-full py-24 text-center bg-white/5 rounded-4xl border border-dashed border-white/10">
-              <div className="text-5xl mb-6 grayscale opacity-50">🔍</div>
+              <div className="mb-6 grayscale opacity-50 text-cyan-500">
+                <Icon name="Search" size={48} className="mx-auto" />
+              </div>
               <p className="text-xl font-bold text-white mb-2">{t('spaces.noMatches')}</p>
               <p className="text-slate-500 text-sm mb-6">{t('spaces.noMatchesDesc', { query: searchQuery })}</p>
               <button
@@ -329,7 +314,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
   );
 }
 
-function HierNode({ icon, label, value, color }: { icon: string; label: string; value: string; color: string }) {
+function HierNode({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
   return (
     <div className="flex items-center gap-3 bg-white/2 border border-white/5 rounded-2xl p-4 transition-all hover:bg-white/5">
        <div className="text-xl">{icon}</div>

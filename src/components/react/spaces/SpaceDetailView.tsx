@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface Space {
   id: number;
@@ -28,35 +29,6 @@ interface SpaceDetailViewProps {
   initialLocale?: AvailableLanguages;
 }
 
-const Icons = {
-  Globe: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-  ),
-  Settings: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-  ),
-  Users: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-  ),
-  Activity: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-  ),
-  Info: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-  ),
-  Rocket: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-2.5 5-2.5"/><path d="M12 15v5s3.03-.55 4.5-2c1.63-1.62 2.5-5 2.5-5"/></svg>
-  ),
-  ExternalLink: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-  ),
-  Calendar: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-  ),
-  Hash: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>
-  )
-};
 
 export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailViewProps) {
   const t = useTranslate(initialLocale);
@@ -191,7 +163,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <div className="relative z-10">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-cyan-400/20 to-blue-600/20 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
-                <span className="text-2xl text-white">📦</span>
+                <Icon name="Box" size={24} />
               </div>
               <div>
                 <p className="text-[10px] font-bold text-cyan-500 uppercase tracking-[0.3em] mb-1">{t('spaces.overviewHeader')}</p>
@@ -209,13 +181,13 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
 
             <div className="flex flex-wrap items-center gap-6 pt-6 border-t border-white/5">
                 <div className="flex items-center gap-2 text-slate-500">
-                    <Icons.Calendar />
+                    <Icon name="Calendar" size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest">
                         {t('spaces.createdDate', { date: new Date(space.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) })}
                     </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-500">
-                    <Icons.Hash />
+                    <Icon name="Hash" size={14} />
                     <span className="text-[10px] font-bold uppercase tracking-widest">{t('spaces.idLabel', { id: space.id })}</span>
                 </div>
             </div>
@@ -227,7 +199,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <StatCard 
             title={t('navigation.environments')} 
             count={stats.environmentsCount} 
-            icon={<Icons.Globe />} 
+            icon={<Icon name="Globe" size={24} />} 
             color="cyan" 
             link={`/spaces/${spaceId}/environments`}
             label={t('spaces.infrastructure')}
@@ -236,7 +208,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <StatCard 
             title={t('navigation.flags')} 
             count={stats.featuresCount} 
-            icon={<Icons.Settings />} 
+            icon={<Icon name="Settings" size={24} />} 
             color="purple" 
             link={`/spaces/${spaceId}/features`}
             label={t('spaces.controls')}
@@ -245,7 +217,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <StatCard 
             title={t('navigation.members')} 
             count={stats.teamMembersCount} 
-            icon={<Icons.Users />} 
+            icon={<Icon name="Users" size={24} />} 
             color="emerald" 
             link={`/spaces/${spaceId}/permissions`}
             label={t('spaces.collaboration')}
@@ -271,31 +243,31 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
                     href={`/spaces/${spaceId}/environments`}
                     title={t('spaces.deployEnv')}
                     description={t('spaces.deployEnvDesc')}
-                    icon="🌍"
+                    icon={<Icon name="Globe" size={24} />}
                 />
                 <ActionLink 
                     href={`/spaces/${spaceId}/features`}
                     title={t('spaces.newFlag')}
                     description={t('spaces.newFlagDesc')}
-                    icon="⚙️"
+                    icon={<Icon name="Settings" size={24} />}
                 />
                 <ActionLink 
                     href={`/spaces/${spaceId}/permissions`}
                     title={t('spaces.inviteMembers')}
                     description={t('spaces.inviteMembersDesc')}
-                    icon="👥"
+                    icon={<Icon name="Users" size={24} />}
                 />
                 <ActionLink 
                     href={`/docs`}
                     title={t('spaces.sdkIntegration')}
                     description={t('spaces.sdkIntegrationDesc')}
-                    icon="📚"
+                    icon={<Icon name="FileText" size={24} />}
                 />
                 <ActionLink 
                     href={`/api-reference`}
                     title={t('apiReference.title')}
                     description={t('apiReference.shortDesc')}
-                    icon="🔌"
+                    icon={<Icon name="Zap" size={24} />}
                 />
               </div>
             </section>
@@ -304,7 +276,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
-                  <Icons.Activity />
+                  <Icon name="Activity" size={20} />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">{t('spaces.recentActivity')}</h3>
               </div>
@@ -335,7 +307,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <div className="space-y-8">
             <div className="bg-linear-to-br from-cyan-500/10 to-blue-600/5 border border-white/5 rounded-3xl p-8 sticky top-12">
                <div className="flex items-center gap-3 mb-8">
-                  <Icons.Info />
+                  <Icon name="Info" size={20} />
                   <h4 className="font-bold text-white tracking-tight">{t('spaces.deployGuide')}</h4>
                </div>
 
@@ -352,7 +324,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
                     className="flex items-center justify-between group p-4 bg-white/5 rounded-2xl hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/20 transition-all font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-cyan-400"
                   >
                     {t('spaces.viewSdkDocs')}
-                    <Icons.ExternalLink />
+                    <Icon name="ExternalLink" size={14} />
                   </a>
                </div>
             </div>
@@ -396,7 +368,7 @@ function StatCard({ title, count, icon, color, link, label, t }: {
   );
 }
 
-function ActionLink({ href, title, description, icon }: { href: string; title: string; description: string; icon: string }) {
+function ActionLink({ href, title, description, icon }: { href: string; title: string; description: string; icon: React.ReactNode }) {
   return (
     <a href={href} className="group flex items-center gap-5 p-5 bg-white/5 border border-white/5 rounded-2xl transition-all hover:bg-white/8 hover:border-white/10">
         <div className="w-12 h-12 rounded-xl bg-[#0b0e14] flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">

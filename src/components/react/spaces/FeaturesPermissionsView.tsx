@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon, type IconName } from "@/components/react/shared/Icon";
 
 interface RolePermission {
   roleId: number;
@@ -229,14 +230,14 @@ export default function FeaturesPermissionsView({
     api_reference: t('globalPermissions.apiReferenceDesc'),
   };
 
-  const featureIcons: Record<string, string> = {
-    feature_flags: "🚀",
-    spaces: "📦",
-    environments: "🌍",
-    billing: "💳",
-    settings: "⚙️",
-    database_inspector: "🗄️",
-    api_reference: "📚",
+  const featureIcons: Record<string, IconName> = {
+    feature_flags: "Rocket",
+    spaces: "Box",
+    environments: "Globe",
+    billing: "CreditCard",
+    settings: "Settings",
+    database_inspector: "Database",
+    api_reference: "Book",
   };
 
   const hasUnsavedChanges = changes.size > 0;
@@ -273,7 +274,7 @@ export default function FeaturesPermissionsView({
               : "bg-red-500/10 border-red-500/20 text-red-400"
           }`}
         >
-          <span>{message.type === "success" ? "✅" : "⚠️"}</span>
+          <Icon name={message.type === "success" ? "Check" : "AlertTriangle"} size={20} />
           <p className="text-sm font-medium">{message.text}</p>
         </div>
       )}
@@ -321,7 +322,7 @@ export default function FeaturesPermissionsView({
                       {selectedRoleData.roleDescription}
                     </p>
                   </div>
-                  <div className="px-4 py-2 bg-white/2 border border-white/5 rounded-2xl min-w-fit">
+                  <div className="px-4 py-2 bg-white/1! border border-white/5 rounded-2xl min-w-fit">
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
                       {t('globalPermissions.statusLabel')}
                     </p>
@@ -335,7 +336,7 @@ export default function FeaturesPermissionsView({
               {/* Features Grid */}
               <div className="card">
                 <h3 className="text-lg font-bold text-white tracking-tight mb-6 flex items-center gap-2">
-                  <span className="text-cyan-400">✨</span> {t('globalPermissions.availableFeatures')}
+                  <Icon name="Plus" size={18} className="text-cyan-400" /> {t('globalPermissions.availableFeatures')}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {availableFeatures.map((feature) => (
@@ -344,7 +345,7 @@ export default function FeaturesPermissionsView({
                       className={`group flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
                         selectedFeatures.has(feature)
                           ? "bg-cyan-500/5 border-cyan-500/20 shadow-[0_4px_20px_rgba(6,182,212,0.05)]"
-                          : "bg-white/2 border-white/5 hover:bg-white/4 hover:border-white/10"
+                          : "bg-white/1! border-white/5 hover:bg-white/4 hover:border-white/10"
                       }`}
                     >
                       <div className="relative flex items-center mt-1">
@@ -354,24 +355,20 @@ export default function FeaturesPermissionsView({
                           onChange={() => handleFeatureToggle(feature)}
                           className="peer w-5 h-5 appearance-none rounded-lg border border-white/10 bg-slate-900 checked:bg-cyan-500 checked:border-cyan-500 transition-all cursor-pointer"
                         />
-                        <svg
-                          className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none left-1 top-1 transition-opacity"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
+                        <Icon 
+                          name="Check" 
+                          size={12} 
+                          className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none left-1 top-1 transition-opacity" 
+                          strokeWidth={4} 
+                        />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg group-hover:scale-110 transition-transform">
-                            {featureIcons[feature] || "💎"}
-                          </span>
+                          <Icon 
+                            name={featureIcons[feature] || "Target"} 
+                            size={20} 
+                            className="group-hover:scale-110 transition-transform text-white" 
+                          />
                           <span className="font-bold text-white text-sm tracking-tight">
                             {feature
                               .replace(/_/g, " ")
@@ -427,7 +424,7 @@ export default function FeaturesPermissionsView({
               {/* Unsaved Changes Indicator */}
               {hasUnsavedChanges && (
                 <div className="bg-amber-500/5 border border-amber-500/10 text-amber-400 p-4 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center gap-3 animate-pulse">
-                  <span className="text-lg">💡</span>
+                  <Icon name="Lightbulb" size={20} />
                   {t('globalPermissions.unsavedChanges')}
                 </div>
               )}

@@ -27,24 +27,7 @@ interface MetricsMonitorProps {
   initialLocale?: AvailableLanguages;
 }
 
-// Custom Icons
-const Icons = {
-  Chart: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-  ),
-  Layers: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-  ),
-  Alert: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-  ),
-  Clock: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-  ),
-  ChevronDown: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-  )
-};
+import { Icon } from "@/components/react/shared/Icon";
 
 // Helper function to get date range based on time range selection
 function getDateRange(timeRange: "24h" | "7d" | "30d"): { from: string; to: string } {
@@ -190,25 +173,25 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
         <SummaryCard
           title={t('metrics.totalEvaluations')}
           value={totalEvaluations.toLocaleString(initialLocale || "en-US")}
-          icon={<Icons.Chart />}
+          icon={<Icon name="Activity" size={20} />}
           color="cyan"
         />
         <SummaryCard
           title={t('metrics.spacesMonitored')}
           value={metrics.length.toString()}
-          icon={<Icons.Layers />}
+          icon={<Icon name="Layers" size={20} />}
           color="blue"
         />
         <SummaryCard
           title={t('metrics.errorRate')}
           value={`${(totalErrors / Math.max(totalEvaluations, 1)).toFixed(2)}%`}
-          icon={<Icons.Alert />}
+          icon={<Icon name="AlertCircle" size={20} />}
           color={totalErrors > 0 ? "red" : "green"}
         />
         <SummaryCard
           title={t('metrics.avgResponseTime')}
           value={`${avgResponseTime}ms`}
-          icon={<Icons.Clock />}
+          icon={<Icon name="Clock" size={20} />}
           color="purple"
         />
       </div>
@@ -216,7 +199,7 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
       {/* Error State */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 backdrop-blur-md rounded-2xl p-6 mb-8 flex items-center gap-4 animate-in slide-in-from-top-4">
-          <div className="text-red-500"><Icons.Alert /></div>
+          <div className="text-red-500"><Icon name="AlertCircle" size={20} /></div>
           <p className="text-red-400 font-medium">{error}</p>
         </div>
       )}
@@ -253,7 +236,7 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
       {!loading && metrics.length === 0 && !error && (
         <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-12 text-center max-w-2xl mx-auto">
           <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-6 text-slate-500">
-             <Icons.Chart />
+             <Icon name="Activity" size={20} />
           </div>
           <h3 className="text-xl font-bold text-white mb-2">{t('metrics.noData')}</h3>
           <p className="text-slate-400 mb-8">
@@ -352,7 +335,7 @@ function SpaceMetricsCard({ space, isSelected, onSelect, initialLocale }: SpaceM
           <div className={`hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white/5 text-slate-400 transition-all duration-300 ${
             isSelected ? "rotate-180 bg-cyan-500/20 text-cyan-400" : "group-hover:bg-white/10 group-hover:text-white"
           }`}>
-            <Icons.ChevronDown />
+            <Icon name="ChevronDown" size={20} />
           </div>
         </div>
       </div>

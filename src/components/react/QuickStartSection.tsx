@@ -1,5 +1,6 @@
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface QuickStartSectionProps {
   initialLocale?: AvailableLanguages;
@@ -10,19 +11,19 @@ export default function QuickStartSection({ initialLocale }: QuickStartSectionPr
 
   const resources = [
     {
-      icon: "📚",
+      icon: <Icon name="FileText" size={24} />,
       title: t('quickstart.documentation'),
       description: t('quickstart.documentationDesc'),
       href: "/docs",
     },
     {
-      icon: "🔌",
+      icon: <Icon name="Zap" size={24} />,
       title: t('quickstart.apiReference'),
       description: t('quickstart.apiReferenceDesc'),
       href: "/api-reference",
     },
     {
-      icon: "💬",
+      icon: <Icon name="MessageSquare" size={24} />,
       title: t('quickstart.support'),
       description: t('quickstart.supportDesc'),
       href: "/contact",
@@ -60,7 +61,7 @@ export default function QuickStartSection({ initialLocale }: QuickStartSectionPr
               {resource.description}
             </p>
             <div className="mt-auto flex items-center text-cyan-500 font-semibold group-hover:translate-x-1 transition-transform">
-              Explore <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              Explore <Icon name="ChevronRight" size={16} className="ml-1" />
             </div>
           </a>
         ))}

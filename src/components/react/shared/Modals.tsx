@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "./Icon";
 
 interface ModalsProps {
   initialLocale?: AvailableLanguages;
@@ -141,7 +142,7 @@ export function Modal({
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 transition-all active:scale-90"
             aria-label={t('common.close')}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <Icon name="X" size={18} strokeWidth={3} />
           </button>
         </div>
         

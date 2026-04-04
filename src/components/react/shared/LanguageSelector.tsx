@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface LanguageSelectorProps {
   currentLang: AvailableLanguages;
@@ -24,19 +25,11 @@ export default function LanguageSelector({ currentLang, currentPath }: LanguageS
       >
         <span className="text-base leading-none">{currentLanguage.flag}</span>
         <span className="hidden sm:inline">{currentLanguage.name}</span>
-        <svg
-          className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
+        <Icon 
+          name="ChevronDown" 
+          size={14} 
+          className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} 
+        />
       </button>
 
       {isOpen && (

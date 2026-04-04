@@ -359,12 +359,8 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
   };
 
   const handleRevokeUserTokens = async (userId: number) => {
-    const username = revokeTargetUsername || `User ${userId}`;
-    if (
-      !confirm(
-        `Revoke all tokens for ${username}? This will log them out from all devices.`,
-      )
-    ) {
+    const username = revokeTargetUsername || `${t('settings.userId')} ${userId}`;
+    if (!confirm(t('settings.confirmRevokeUser', { username }))) {
       return;
     }
 
@@ -382,16 +378,16 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
 
       const data = await response.json();
       if (response.ok) {
-        setSuccess(`All tokens revoked for ${username}`);
+        setSuccess(t('settings.tokensRevoked', { username }));
         setRevokeTargetUserId("");
         setRevokeTargetUsername("");
         setTimeout(() => setSuccess(""), 3000);
       } else {
-        setError(data.message || "Failed to revoke user tokens");
+        setError(data.message || t('settings.failedRevokeTokens'));
       }
     } catch (error) {
       console.error("Error revoking user tokens:", error);
-      setError("Failed to revoke user tokens");
+      setError(t('settings.failedRevokeTokens'));
     } finally {
       setIsRevokingTokens(false);
     }
@@ -409,7 +405,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl">
-        <h1 className="text-4xl font-bold text-gradient mb-8">Settings</h1>
+        <h1 className="text-4xl font-bold text-gradient mb-8">{t('settings.title')}</h1>
 
         {/* Alert Messages */}
         {error && (
@@ -453,13 +449,13 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
           <div className="space-y-6">
             <div className="card">
               <h2 className="text-2xl font-bold text-cyan-300 mb-6">
-                Profile Information
+                {t('settings.profileInfo')}
               </h2>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                      Username
+                      {t('settings.username')}
                     </label>
                     <div className="text-slate-100 mt-2 font-medium">
                       {user?.username}
@@ -467,15 +463,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   </div>
                   <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                      User ID
-                    </label>
-                    <div className="text-slate-100 mt-2 font-medium">
-                      #{user?.id}
-                    </div>
-                  </div>
-                  <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
-                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                      Email Address
+                      {t('settings.emailAddress')}
                     </label>
                     <div className="text-slate-100 mt-2 font-medium">
                       {user?.email}
@@ -483,7 +471,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   </div>
                   <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
                     <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
-                      Member Since
+                      {t('settings.memberSince')}
                     </label>
                     <div className="text-slate-100 mt-2 font-medium">
                       {user?.created_at
@@ -495,7 +483,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                               day: "numeric",
                             },
                           )
-                        : "N/A"}
+                        : t('common.noResults')}
                     </div>
                   </div>
                 </div>
@@ -505,7 +493,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             {/* Email Update */}
             <div className="card">
               <h2 className="text-2xl font-bold text-cyan-300 mb-6">
-                Update Email
+                {t('settings.updateEmail')}
               </h2>
               <form onSubmit={handleEmailUpdate} className="space-y-4">
                 <div>
@@ -513,7 +501,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     htmlFor="email"
                     className="text-sm font-semibold text-slate-300 block mb-2"
                   >
-                    New Email Address
+                    {t('settings.newEmail')}
                   </label>
                   <input
                     id="email"
@@ -529,7 +517,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   disabled={isUpdating}
                   className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg transition font-medium"
                 >
-                  {isUpdating ? "Updating..." : "Update Email"}
+                  {isUpdating ? t('settings.updating') : t('settings.updateButton')}
                 </button>
               </form>
             </div>
@@ -540,7 +528,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
         {activeTab === "security" && (
           <div className="card">
             <h2 className="text-2xl font-bold text-cyan-300 mb-6">
-              Change Password
+              {t('settings.changePassword')}
             </h2>
             <form onSubmit={handlePasswordUpdate} className="space-y-5">
               <div>
@@ -548,7 +536,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   htmlFor="currentPassword"
                   className="text-sm font-semibold text-slate-300 block mb-2"
                 >
-                  Current Password
+                  {t('settings.currentPassword')}
                 </label>
                 <input
                   id="currentPassword"
@@ -561,7 +549,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     })
                   }
                   className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition"
-                  placeholder="Enter your current password"
+                  placeholder={t('settings.currentPasswordPlaceholder')}
                 />
               </div>
               <div className="border-t border-slate-700 pt-5">
@@ -569,7 +557,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   htmlFor="newPassword"
                   className="text-sm font-semibold text-slate-300 block mb-2"
                 >
-                  New Password
+                  {t('settings.newPassword')}
                 </label>
                 <input
                   id="newPassword"
@@ -582,7 +570,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     })
                   }
                   className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition"
-                  placeholder="Enter your new password (min 6 chars)"
+                  placeholder={t('settings.newPasswordPlaceholder')}
                 />
               </div>
               <div>
@@ -590,7 +578,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   htmlFor="confirmPassword"
                   className="text-sm font-semibold text-slate-300 block mb-2"
                 >
-                  Confirm New Password
+                  {t('settings.confirmPassword')}
                 </label>
                 <input
                   id="confirmPassword"
@@ -603,7 +591,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     })
                   }
                   className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition"
-                  placeholder="Confirm your new password"
+                  placeholder={t('settings.confirmPasswordPlaceholder')}
                 />
               </div>
               <button
@@ -611,7 +599,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                 disabled={isUpdating}
                 className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg transition font-medium"
               >
-                {isUpdating ? "Updating..." : "Change Password"}
+                {isUpdating ? t('settings.updating') : t('settings.changePasswordButton')}
               </button>
             </form>
           </div>
@@ -623,9 +611,9 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             <div>
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-cyan-300">API Keys</h2>
+                  <h2 className="text-2xl font-bold text-cyan-300">{t('settings.apiKeysTitle')}</h2>
                   <p className="text-sm text-slate-400 mt-1">
-                    Manage API keys for programmatic access to Easy Flags
+                    {t('settings.apiKeysDesc')}
                   </p>
                 </div>
                 {!showNewApiKeyForm && (
@@ -633,7 +621,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     onClick={() => setShowNewApiKeyForm(true)}
                     className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition font-medium"
                   >
-                    + Create New
+                    {t('common.create')}
                   </button>
                 )}
               </div>
@@ -641,13 +629,12 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
               {showNewApiKeyForm && (
                 <div className="card mb-6">
                   <h3 className="text-lg font-semibold text-cyan-300 mb-4">
-                    Create New API Key
+                    {t('settings.createNewApiKey')}
                   </h3>
                   <form onSubmit={handleCreateApiKey} className="space-y-4">
                     <div className="p-3 bg-cyan-900/20 border border-cyan-700/30 rounded-lg">
                       <p className="text-sm text-cyan-200">
-                        🔑 A new API key will be generated for your account.
-                        Keep it secure and never share it.
+                        {t('settings.apiKeySecurityNotice')}
                       </p>
                     </div>
                     <div className="flex gap-3">
@@ -656,14 +643,14 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                         disabled={isUpdating}
                         className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white rounded-lg transition font-medium"
                       >
-                        {isUpdating ? "Creating..." : "Generate Key"}
+                        {isUpdating ? t('common.loading') : t('settings.generateKey')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowNewApiKeyForm(false)}
                         className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition font-medium"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </form>
@@ -674,10 +661,9 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             {apiKeys.length === 0 ? (
               <div className="card text-center py-12">
                 <div className="text-4xl mb-3">🔐</div>
-                <p className="text-slate-400 font-medium">No API keys yet</p>
+                <p className="text-slate-400 font-medium">{t('settings.noApiKeys')}</p>
                 <p className="text-slate-500 text-sm mt-1">
-                  Create your first API key to get started with programmatic
-                  access
+                  {t('settings.noApiKeysDesc')}
                 </p>
               </div>
             ) : (
@@ -693,12 +679,12 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                       </div>
                       <div className="flex gap-4 text-xs text-slate-500 mt-3">
                         <span>
-                          📅 Created:{" "}
+                          📅 {t('settings.createdLabel')}:{" "}
                           {new Date(key.created_at).toLocaleDateString()}
                         </span>
                         {key.last_used && (
                           <span>
-                            🕐 Last used:{" "}
+                            🕐 {t('settings.lastUsedLabel')}:{" "}
                             {new Date(key.last_used).toLocaleDateString()}
                           </span>
                         )}
@@ -708,7 +694,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                       onClick={() => handleDeleteApiKey(key.id)}
                       className="ml-4 px-3 py-1 bg-red-900/30 hover:bg-red-900/50 border border-red-500/30 text-red-400 rounded transition text-sm font-medium shrink-0"
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </div>
                 ))}
@@ -813,12 +799,12 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
 
             {/* Coming Soon Features */}
             <div className="card opacity-60 pointer-events-none">
-              <h3 className="font-semibold text-slate-400 mb-4">Coming Soon</h3>
+              <h3 className="font-semibold text-slate-400 mb-4">{t('settings.comingSoon')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-slate-800/20 rounded-lg">
                   <div>
                     <p className="text-slate-400 text-sm">
-                      🔐 Two-Factor Authentication
+                      🔐 {t('settings.tfa')}
                     </p>
                   </div>
                   <span className="text-xs text-slate-500 font-medium">
@@ -828,7 +814,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                 <div className="flex items-center justify-between p-3 bg-slate-800/20 rounded-lg">
                   <div>
                     <p className="text-slate-400 text-sm">
-                      🌙 Dark Mode Toggle
+                      🌙 {t('settings.darkMode')}
                     </p>
                   </div>
                   <span className="text-xs text-slate-500 font-medium">
@@ -846,28 +832,28 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             {/* Revoke My Tokens */}
             <div className="card border-l-4 border-orange-500/50">
               <h2 className="text-2xl font-bold text-orange-400 mb-2">
-                🔐 Active Sessions
+                🔐 {t('settings.activeSessions')}
               </h2>
               <p className="text-slate-400 text-sm mb-6">
-                Manage your authentication tokens and active sessions
+                {t('settings.activeSessionsDesc')}
               </p>
 
               <div className="space-y-4">
                 <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
                   <h3 className="text-lg font-semibold text-cyan-300 mb-3">
-                    Current Session
+                    {t('settings.currentSession')}
                   </h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-400">Status</span>
-                      <span className="text-green-400 font-medium">Active</span>
+                      <span className="text-slate-400">{t('settings.status')}</span>
+                      <span className="text-green-400 font-medium">{t('settings.active')}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-400">User</span>
+                      <span className="text-slate-400">{t('settings.username')}</span>
                       <span className="text-cyan-300">{user?.username}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-400">Login Time</span>
+                      <span className="text-slate-400">{t('settings.loginTime')}</span>
                       <span className="text-slate-300">
                         {user?.created_at
                           ? new Date(user.created_at).toLocaleDateString(
@@ -894,20 +880,19 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   {isRevokingTokens ? (
                     <>
                       <div className="animate-spin h-4 w-4 border-2 border-transparent border-t-white rounded-full"></div>
-                      Revoking...
+                      {t('settings.revoking')}
                     </>
                   ) : (
                     <>
                       <span>🚪</span>
-                      Revoke All Sessions
+                      {t('settings.revokeAllSessions')}
                     </>
                   )}
                 </button>
 
                 <div className="p-3 bg-orange-900/20 border border-orange-700/30 rounded-lg">
                   <p className="text-xs text-orange-200">
-                    ⚠️ Revoking all sessions will log you out from all devices.
-                    You'll need to log in again.
+                    {t('settings.revokeAllNotice')}
                   </p>
                 </div>
               </div>
@@ -917,18 +902,16 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             {user && user.role_id === 1 && (
               <div className="card border-l-4 border-red-500/50">
                 <h2 className="text-2xl font-bold text-red-400 mb-2">
-                  🔑 Admin: Revoke User Tokens
+                  🔑 {t('settings.adminRevokeTitle')}
                 </h2>
                 <p className="text-slate-400 text-sm mb-6">
-                  As a super user, you can revoke tokens for any user (super
-                  user access only)
+                  {t('settings.adminRevokeDesc')}
                 </p>
 
                 <div className="space-y-4">
                   <div className="p-4 bg-red-900/10 border border-red-700/30 rounded-lg">
                     <p className="text-sm text-red-300">
-                      🔐 This action will immediately log out the specified user
-                      from all devices. Use with caution.
+                      {t('settings.adminRevokeNotice')}
                     </p>
                   </div>
 
@@ -938,7 +921,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                         htmlFor="userId"
                         className="text-sm font-semibold text-slate-300 block mb-2"
                       >
-                        User ID
+                        {t('settings.userId')}
                       </label>
                       <input
                         id="userId"
@@ -946,7 +929,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                         value={revokeTargetUserId}
                         onChange={(e) => setRevokeTargetUserId(e.target.value)}
                         className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition"
-                        placeholder="Enter user ID"
+                        placeholder={t('settings.userIdPlaceholder')}
                       />
                     </div>
                     <div>
@@ -954,7 +937,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                         htmlFor="username"
                         className="text-sm font-semibold text-slate-300 block mb-2"
                       >
-                        Username (optional, for confirmation)
+                        {t('settings.usernameLabel')}
                       </label>
                       <input
                         id="username"
@@ -964,7 +947,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                           setRevokeTargetUsername(e.target.value)
                         }
                         className="w-full px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition"
-                        placeholder="e.g., john_doe"
+                        placeholder={t('settings.usernamePlaceholder')}
                       />
                     </div>
                   </div>
@@ -972,7 +955,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                   <button
                     onClick={() => {
                       if (!revokeTargetUserId) {
-                        setError("Please enter a valid user ID");
+                        setError(t('settings.enterValidUserId'));
                         return;
                       }
                       handleRevokeUserTokens(parseInt(revokeTargetUserId, 10));
@@ -983,12 +966,12 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     {isRevokingTokens ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-transparent border-t-white rounded-full"></div>
-                        Revoking...
+                        {t('settings.revoking')}
                       </>
                     ) : (
                       <>
                         <span>⚡</span>
-                        Revoke User Tokens
+                        {t('settings.revokeUserTokens')}
                       </>
                     )}
                   </button>
@@ -999,25 +982,21 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
             {/* Info Card */}
             <div className="card bg-slate-800/20 border-l-4 border-cyan-500/50">
               <h3 className="font-semibold text-cyan-300 mb-3">
-                ℹ️ How Token Revocation Works
+                ℹ️ {t('settings.howRevocationWorks')}
               </h3>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li>
-                  ✅ Revoking your tokens logs you out from all devices
-                  instantly
+                  ✅ {t('settings.revocationStep1')}
                 </li>
                 <li>
-                  ✅ Revoked tokens become invalid immediately (don't wait for
-                  expiration)
+                  ✅ {t('settings.revocationStep2')}
                 </li>
-                <li>✅ You can revoke your own tokens anytime for security</li>
+                <li>✅ {t('settings.revocationStep3')}</li>
                 <li>
-                  ✅ Super users can revoke tokens for any user in case of
-                  compromised accounts
+                  ✅ {t('settings.revocationStep4')}
                 </li>
                 <li>
-                  ⏰ Tokens normally expire after 24 hours (revocation speeds
-                  this up)
+                  ⏰ {t('settings.revocationStep5')}
                 </li>
               </ul>
             </div>

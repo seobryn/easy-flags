@@ -17,6 +17,7 @@ import {
   useAddRowHandler,
   useEditRowHandler,
 } from "./dev/hooks";
+import { Icon } from "./shared/Icon";
 
 export default function DatabaseInspector() {
   // Custom hooks for state management
@@ -59,11 +60,9 @@ export default function DatabaseInspector() {
       <div className="space-y-10">
         {/* Header */}
         <div className="mb-12 pb-10 border-b border-white/5">
-          <h1 className="section-title !mb-4 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-cyan-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 4.477 4 10 4s10-1.79 10-4V7M4 7c0 2.21 4.477 4 10 4s10-1.79 10-4M4 7c0-2.21 4.477-4 10-4s10 1.79 10 4m0 5c0 2.21-4.477 4-10 4s-10-1.79-10-4" />
-              </svg>
+          <h1 className="section-title mb-4! flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
+              <Icon name="Database" size={28} />
             </div>
             <span className="text-gradient text-4xl md:text-5xl">Database Inspector</span>
           </h1>
@@ -75,7 +74,7 @@ export default function DatabaseInspector() {
 
         {tableInspection.error && (
           <div className="mb-8 rounded-2xl bg-red-500/10 border border-red-500/20 p-5 text-red-400 flex items-center gap-3">
-            <span className="text-xl">⚠️</span>
+            <Icon name="AlertTriangle" size={20} />
             <div className="font-medium text-sm">
               Error: {tableInspection.error}
             </div>
@@ -87,7 +86,7 @@ export default function DatabaseInspector() {
           <div className="flex items-center gap-2 border-b border-white/5 overflow-x-auto pb-0 no-scrollbar">
             {tableInspection.loading && tableInspection.tables.length === 0 ? (
               <div className="text-center py-8 flex-1">
-                <div className="inline-block animate-spin text-3xl text-cyan-500">⏳</div>
+                <Icon name="Clock" size={32} className="inline-block animate-spin text-cyan-500" />
                 <p className="text-cyan-500/60 text-sm mt-3 font-bold tracking-widest uppercase">
                   Loading tables...
                 </p>
@@ -119,7 +118,7 @@ export default function DatabaseInspector() {
                       </span>
                     </div>
                     {tableInspection.selectedTable === table.name && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full" />
+                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-cyan-400 to-blue-600 rounded-full" />
                     )}
                   </button>
                 ))}
@@ -128,9 +127,9 @@ export default function DatabaseInspector() {
             <div className="ml-auto pb-2 pl-4">
               <button
                 onClick={tableInspection.fetchTables}
-                className="btn-secondary !text-xs !py-2 !px-4 !rounded-xl border-white/10"
+                className="btn-secondary text-xs! py-2! px-4! rounded-xl! border-white/10"
               >
-                🔄 Refresh
+                <Icon name="RefreshCw" size={12} className="inline mr-1" /> Refresh
               </button>
             </div>
           </div>
@@ -144,30 +143,32 @@ export default function DatabaseInspector() {
               <div className="flex gap-1 mb-8 p-1 bg-white/5 rounded-2xl w-fit">
                 <button
                   onClick={() => tableInspection.setViewTab("records")}
-                  className={`px-6 py-2.5 text-sm font-bold tracking-tight rounded-xl transition-all ${
+                  className={`px-6 py-2.5 text-sm font-bold tracking-tight rounded-xl transition-all flex items-center gap-2 ${
                     tableInspection.viewTab === "records"
                       ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
                       : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
-                  📊 Records
+                  <Icon name="Activity" size={16} />
+                  Records
                 </button>
                 <button
                   onClick={() => tableInspection.setViewTab("structure")}
-                  className={`px-6 py-2.5 text-sm font-bold tracking-tight rounded-xl transition-all ${
+                  className={`px-6 py-2.5 text-sm font-bold tracking-tight rounded-xl transition-all flex items-center gap-2 ${
                     tableInspection.viewTab === "structure"
                       ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
                       : "text-slate-500 hover:text-slate-300"
                   }`}
                 >
-                  📋 Structure
+                  <Icon name="FileText" size={16} />
+                  Structure
                 </button>
               </div>
 
               <div className="space-y-8">
                 {/* Schema Section */}
                 {tableInspection.viewTab === "structure" && (
-                  <div className="card !bg-white/[0.02]">
+                  <div className="card bg-white/1!">
                     <SchemaTable
                       selectedTable={tableInspection.selectedTable}
                       schema={tableInspection.schema}
@@ -177,7 +178,7 @@ export default function DatabaseInspector() {
 
                 {/* Data Section */}
                 {tableInspection.viewTab === "records" && (
-                  <div className="card !bg-white/[0.02] !p-8">
+                  <div className="card bg-white/1! p-8!">
                     <div className="flex items-center justify-between mb-10 flex-wrap gap-6">
                       <h2 className="text-2xl font-bold text-white tracking-tight">
                         Table Records
@@ -213,15 +214,15 @@ export default function DatabaseInspector() {
                         <button
                           onClick={tableInspection.refetchData}
                           disabled={tableInspection.loading}
-                          className="btn-secondary !text-xs !py-2 !px-5"
+                          className="btn-secondary text-xs! py-2! px-5!"
                         >
                           {tableInspection.loading ? "..." : "Fetch"}
                         </button>
                         <button
                           onClick={addRowModal.openAddModal}
-                          className="btn-primary !text-xs !py-2 !px-5 shadow-none hover:shadow-cyan-500/20"
+                          className="btn-primary text-xs! py-2! px-5! shadow-none hover:shadow-cyan-500/20"
                         >
-                          ➕ Add Row
+                          <Icon name="Plus" size={14} className="inline mr-1" /> Add Row
                         </button>
                       </div>
                     </div>
@@ -242,9 +243,7 @@ export default function DatabaseInspector() {
 
                     {tableInspection.loading ? (
                       <div className="text-center py-16">
-                        <div className="inline-block text-5xl animate-spin">
-                          ⏳
-                        </div>
+                        <Icon name="Clock" size={48} className="inline-block animate-spin text-cyan-500" />
                         <p className="text-slate-400 text-lg mt-4">
                           Loading data...
                         </p>
@@ -280,8 +279,8 @@ export default function DatabaseInspector() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-20 bg-white/[0.02] rounded-3xl border border-dashed border-white/10">
-                        <div className="text-4xl mb-4 opacity-50">📂</div>
+                      <div className="text-center py-20 bg-white/2! rounded-3xl border border-dashed border-white/10">
+                        <Icon name="Folder" size={48} className="mx-auto mb-4 opacity-50" />
                         <p className="text-slate-500 font-medium tracking-tight">
                           No records found in this table.
                         </p>
@@ -292,9 +291,9 @@ export default function DatabaseInspector() {
               </div>
             </div>
           ) : (
-            <div className="card !bg-white/[0.02] !p-20 text-center border-dashed">
+            <div className="card bg-white/2! p-20! text-center border-dashed">
               <div className="w-20 h-20 rounded-3xl bg-white/5 flex items-center justify-center text-4xl mx-auto mb-8">
-                🖱️
+                <Icon name="MousePointer" size={40} className="text-cyan-500/50" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">Select a Table</h2>
               <p className="text-slate-500 max-w-sm mx-auto leading-relaxed">

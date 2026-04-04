@@ -1,5 +1,6 @@
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface HeroSectionProps {
   initialLocale?: AvailableLanguages;
@@ -39,20 +40,11 @@ export default function HeroSection({ initialLocale }: HeroSectionProps) {
               aria-label={t('hero.getStarted')}
             >
               {t('hero.getStarted')}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
+              <Icon 
+                name="ArrowRight" 
+                size={20} 
+                className="ml-2 group-hover:translate-x-1 transition-transform" 
+              />
             </a>
             <a href="/docs" className="btn-secondary" aria-label={t('hero.documentation')}>
               {t('hero.documentation')}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import SpaceNavigation from "@/components/react/shared/SpaceNavigation";
 import { Modal } from "@/components/react/shared/Modals";
 import { useTranslate } from "@/infrastructure/i18n/context";
+import { Icon } from "@/components/react/shared/Icon";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 type EnvironmentType = "production" | "staging" | "development" | "other";
@@ -28,125 +29,6 @@ const ENVIRONMENT_TYPES: EnvironmentType[] = [
   "other",
 ];
 
-const Icons = {
-  Production: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  ),
-  Staging: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="m16 12-4-4-4 4" />
-      <path d="M12 16V8" />
-    </svg>
-  ),
-  Development: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m18 16 4-4-4-4" />
-      <path d="m6 8-4 4 4 4" />
-      <path d="m14.5 4-5 16" />
-    </svg>
-  ),
-  Other: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
-  ),
-  Edit: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-    </svg>
-  ),
-  Delete: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-      <line x1="10" x2="10" y1="11" y2="17" />
-      <line x1="14" x2="14" y1="11" y2="17" />
-    </svg>
-  ),
-  ArrowRight: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  ),
-};
-
 const getEnvironmentColor = (type: EnvironmentType) => {
   switch (type) {
     case "production":
@@ -155,7 +37,7 @@ const getEnvironmentColor = (type: EnvironmentType) => {
         border: "border-rose-500/20",
         accent: "text-rose-400",
         badge: "bg-rose-500/10 text-rose-300 border-rose-500/20",
-        icon: <Icons.Production />,
+        icon: "Shield" as const,
         glow: "bg-rose-500/10",
       };
     case "staging":
@@ -164,7 +46,7 @@ const getEnvironmentColor = (type: EnvironmentType) => {
         border: "border-amber-500/20",
         accent: "text-amber-400",
         badge: "bg-amber-500/10 text-amber-300 border-amber-500/20",
-        icon: <Icons.Staging />,
+        icon: "Activity" as const,
         glow: "bg-amber-500/10",
       };
     case "development":
@@ -173,7 +55,7 @@ const getEnvironmentColor = (type: EnvironmentType) => {
         border: "border-blue-500/20",
         accent: "text-blue-400",
         badge: "bg-blue-500/10 text-blue-300 border-blue-500/20",
-        icon: <Icons.Development />,
+        icon: "Zap" as const,
         glow: "bg-blue-500/10",
       };
     case "other":
@@ -183,7 +65,7 @@ const getEnvironmentColor = (type: EnvironmentType) => {
         border: "border-cyan-500/20",
         accent: "text-cyan-400",
         badge: "bg-cyan-500/10 text-cyan-300 border-cyan-500/20",
-        icon: <Icons.Other />,
+        icon: "Info" as const,
         glow: "bg-cyan-500/10",
       };
   }
@@ -372,7 +254,7 @@ export default function EnvironmentsView({
         {error && (
           <div className="mb-8 bg-rose-500/5 border border-rose-500/20 rounded-2xl p-6 flex items-center gap-4 animate-in slide-in-from-top-4">
             <div className="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500">
-              <Icons.Delete />
+              <Icon name="Trash" size={16} strokeWidth={2.5} />
             </div>
             <div>
               <p className="text-rose-400 font-bold text-sm">{t('environments.criticalError')}</p>
@@ -400,7 +282,7 @@ export default function EnvironmentsView({
               disabled={isLoading}
               className="btn-primary flex items-center gap-2 px-8! py-4! shadow-xl shadow-cyan-500/20"
             >
-              <Icons.Other />
+              <Icon name="Plus" size={20} />
               {t('environments.newEnv')}
             </button>
           </div>
@@ -410,28 +292,28 @@ export default function EnvironmentsView({
               type="production"
               label={t('environments.prodStage')}
               color="text-rose-400"
-              icon={<Icons.Production />}
+              iconName="Shield"
               initialLocale={initialLocale}
             />
             <TypePill
               type="staging"
               label={t('environments.qcStage')}
               color="text-amber-400"
-              icon={<Icons.Staging />}
+              iconName="Activity"
               initialLocale={initialLocale}
             />
             <TypePill
               type="development"
               label={t('environments.devStage')}
               color="text-blue-400"
-              icon={<Icons.Development />}
+              iconName="Zap"
               initialLocale={initialLocale}
             />
             <TypePill
               type="other"
               label={t('environments.customStage')}
               color="text-cyan-400"
-              icon={<Icons.Other />}
+              iconName="Info"
               initialLocale={initialLocale}
             />
           </div>
@@ -455,7 +337,7 @@ export default function EnvironmentsView({
                   className={`group relative bg-linear-to-br ${styles.bg} border ${styles.border} rounded-3xl p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full`}
                 >
                   <div
-                    className={`absolute -top-12 -right-12 w-24 h-24 ${styles.glow} blur-[60px] rounded-full pointer-events-none opacity-50`}
+                    className={`absolute -top-12 -right-12 w-24 h-24 ${styles.glow} blur-3xl rounded-full pointer-events-none opacity-50`}
                   ></div>
 
                   <div className="flex items-start justify-between mb-8">
@@ -464,7 +346,7 @@ export default function EnvironmentsView({
                         <div
                           className={`p-2.5 rounded-xl bg-white/5 ${styles.accent} border border-white/5`}
                         >
-                          {styles.icon}
+                          <Icon name={styles.icon} size={20} strokeWidth={2.5} />
                         </div>
                         <div>
                           <h3
@@ -490,7 +372,7 @@ export default function EnvironmentsView({
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-slate-500 hover:text-white transition-all hover:bg-white/10"
                         title={t('environments.editEnv')}
                       >
-                        <Icons.Edit />
+                        <Icon name="Edit" size={16} strokeWidth={2.5} />
                       </button>
                       <button
                         onClick={() => {
@@ -500,13 +382,14 @@ export default function EnvironmentsView({
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-slate-500 hover:text-rose-400 transition-all hover:bg-rose-500/10 hover:border-rose-500/20 border border-transparent"
                         title={t('environments.deleteEnv')}
                       >
-                        <Icons.Delete />
+                        <Icon name="Trash" size={16} strokeWidth={2.5} />
                       </button>
                     </div>
                   </div>
 
                   <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                      <Icon name="Calendar" size={12} strokeWidth={2.5} />
                       {t('environments.depDate', { date: new Date(env.created_at).toLocaleDateString(t === undefined ? "en-US" : (initialLocale || "en-US")) })}
                     </span>
                     <a
@@ -514,7 +397,7 @@ export default function EnvironmentsView({
                       className={`inline-flex items-center gap-2 text-sm font-bold ${styles.accent} hover:underline underline-offset-4 tracking-tight`}
                     >
                       {t('environments.connect')}
-                      <Icons.ArrowRight />
+                      <Icon name="ArrowRight" size={16} strokeWidth={2.5} />
                     </a>
                   </div>
                 </div>
@@ -523,7 +406,9 @@ export default function EnvironmentsView({
 
             {environments.length === 0 && (
               <div className="col-span-full py-24 text-center card border-dashed border-2 bg-transparent flex flex-col items-center justify-center gap-6">
-                <div className="text-6xl grayscale opacity-40">🌍</div>
+                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center">
+                  <Icon name="Globe" size={40} className="text-slate-600" />
+                </div>
                 <h4 className="text-2xl font-bold text-white">{t('environments.dimensionGap')}</h4>
                 <p className="text-slate-500 max-w-sm mx-auto">
                   {t('environments.vacuumDesc')}
@@ -598,11 +483,12 @@ export default function EnvironmentsView({
                         : "bg-slate-950/40 border-transparent text-slate-600 hover:text-slate-400"
                     }`}
                   >
-                    <div
-                      className={isActive ? colors.accent : "text-slate-700"}
-                    >
-                      {colors.icon}
-                    </div>
+                    <Icon 
+                      name={colors.icon} 
+                      size={20} 
+                      strokeWidth={2.5} 
+                      className={isActive ? colors.accent : "text-slate-700"} 
+                    />
                     <span className="text-xs uppercase tracking-widest">
                       {type}
                     </span>
@@ -645,7 +531,7 @@ export default function EnvironmentsView({
         <div className="space-y-8">
           <div className="bg-rose-500/5 border border-rose-500/20 rounded-4xl p-6 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 mx-auto border border-rose-500/20">
-              <Icons.Delete />
+              <Icon name="Trash" size={24} strokeWidth={2.5} />
             </div>
             <div>
               <p className="text-white font-bold text-xl mb-2">{t('environments.deleteStageQ')}</p>
@@ -681,22 +567,22 @@ function TypePill({
   type,
   label,
   color,
-  icon,
+  iconName,
   initialLocale,
 }: {
   type: string;
   label: string;
   color: string;
-  icon: React.ReactNode;
+  iconName: any;
   initialLocale?: AvailableLanguages;
 }) {
   const t = useTranslate(initialLocale);
   return (
-    <div className="flex items-center gap-4 bg-[#0b0e14]/50 border border-white/5 px-5 py-4 rounded-3xl hover:border-white/10 transition-all group">
+    <div className="flex items-center gap-4 bg-[#0b0e14]/50 border border-white/1! px-5 py-4 rounded-3xl hover:border-white/10 transition-all group">
       <div
         className={`${color} bg-white/5 p-2 rounded-xl group-hover:scale-110 transition-transform`}
       >
-        {icon}
+        <Icon name={iconName} size={20} strokeWidth={2.5} />
       </div>
       <div>
         <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest leading-none mb-1">

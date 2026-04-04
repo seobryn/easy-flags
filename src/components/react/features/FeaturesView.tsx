@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
 import { Modal } from "@/components/react/shared/Modals";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface FeatureEnvironmentConfig {
   environmentId: number;
@@ -288,7 +289,7 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
             }}
             className="btn-primary"
           >
-            <span className="mr-2 text-xl">+</span>
+            <Icon name="Plus" size={20} className="mr-2" />
             Create Flag
           </button>
         </section>
@@ -315,7 +316,7 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
                   </div>
                 ))}
                 {environments.length === 0 && (
-                  <div className="col-span-full py-8 text-center bg-white/5 border border-dashed border-white/10 rounded-2xl">
+                  <div className="col-span-full py-8 text-center bg-white/1! border border-dashed border-white/10 rounded-2xl">
                     <p className="text-sm text-slate-500 italic">No environments configured yet</p>
                   </div>
                 )}
@@ -333,7 +334,7 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
           ) : features.length === 0 ? (
             <div className="text-center py-24 card flex flex-col items-center justify-center border-dashed border-white/10">
               <div className="w-20 h-20 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6">
-                <span className="text-4xl">🚩</span>
+                <Icon name="Flag" size={40} className="text-cyan-400" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">No feature flags found</h2>
               <p className="text-slate-500 mb-8 max-w-sm mx-auto">
@@ -380,14 +381,14 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                       title="Edit feature flag"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                      <Icon name="Edit" size={18} />
                     </button>
                     <button
                       onClick={() => deleteFeature(feature.id)}
                       className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all"
                       title="Delete feature flag"
                     >
-                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                       <Icon name="Trash" size={18} />
                     </button>
                   </div>
                 </div>
@@ -431,7 +432,7 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
                 {/* Card Footer */}
                 <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/5">
                   <div className="flex items-center gap-2 text-slate-500 text-[10px] font-bold uppercase tracking-widest">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <Icon name="Clock" size={12} strokeWidth={3} />
                     Created {new Date(feature.created_at).toLocaleDateString()}
                   </div>
                   <a
@@ -439,7 +440,7 @@ export default function FeaturesView({ spaceId, spaceName }: FeaturesViewProps) 
                     className="flex items-center gap-2 text-cyan-400 hover:text-cyan-300 text-xs font-bold uppercase tracking-widest group/link transition-all"
                   >
                     Advanced Config
-                    <span className="group-hover/link:translate-x-1 transition-transform">→</span>
+                    <Icon name="ArrowRight" size={12} className="group-hover/link:translate-x-1 transition-transform" />
                   </a>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface TargetingRule {
   id: string;
@@ -16,126 +17,6 @@ interface AdvancedConfigViewProps {
   featureKey: string;
   featureType: "boolean" | "string" | "json";
 }
-
-const Icons = {
-  Settings: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ),
-  Target: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="6" />
-      <circle cx="12" cy="12" r="2" />
-    </svg>
-  ),
-  Chart: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="12" x2="12" y1="20" y2="10" />
-      <line x1="18" x2="18" y1="20" y2="4" />
-      <line x1="6" x2="6" y1="20" y2="16" />
-    </svg>
-  ),
-  Clock: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  ),
-  ChevronRight: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  ),
-  Trash: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 6h18" />
-      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-      <line x1="10" x2="10" y1="11" y2="17" />
-      <line x1="14" x2="14" y1="11" y2="17" />
-    </svg>
-  ),
-  Save: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-      <polyline points="17 21 17 13 7 13 7 21" />
-      <polyline points="7 3 7 8 15 8" />
-    </svg>
-  ),
-};
 
 export default function AdvancedConfigurationView({
   spaceId,
@@ -247,14 +128,14 @@ export default function AdvancedConfigurationView({
     >
       <div className="animate-in fade-in duration-1000 space-y-12">
         {/* Header Hero */}
-        <div className="relative group overflow-hidden bg-[#0b0e14]/40 border border-white/5 rounded-[2.5rem] p-8 md:p-12 transition-all hover:border-white/10">
+        <div className="relative group overflow-hidden bg-[#0b0e14]/40 border border-white/5 rounded-4xl p-8 md:p-12 transition-all hover:border-white/10">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none group-hover:bg-cyan-500/15 transition-colors duration-700"></div>
 
           <div className="relative z-10">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-cyan-400/20 to-blue-600/20 flex items-center justify-center text-cyan-400 border border-cyan-500/20 shadow-2xl">
-                  <Icons.Settings />
+                  <Icon name="Settings" size={32} />
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-cyan-500 uppercase tracking-[0.3em] mb-1">
@@ -295,7 +176,7 @@ export default function AdvancedConfigurationView({
         {showSaveNotification && (
           <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 text-emerald-400 flex items-center gap-3 animate-in slide-in-from-top-4">
             <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <span className="text-sm">✓</span>
+              <Icon name="Check" size={16} />
             </div>
             <p className="text-sm font-bold uppercase tracking-widest">
               Configuration synced to edge successfully
@@ -313,7 +194,7 @@ export default function AdvancedConfigurationView({
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-10">
                   <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
-                    <Icons.Chart />
+                    <Icon name="Activity" size={24} />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-white tracking-tight">
@@ -430,7 +311,7 @@ export default function AdvancedConfigurationView({
                 <div className="flex items-center justify-between mb-10">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
-                      <Icons.Target />
+                      <Icon name="Target" size={24} />
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-white tracking-tight">
@@ -441,7 +322,7 @@ export default function AdvancedConfigurationView({
                       </p>
                     </div>
                   </div>
-                  <div className="bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                  <div className="bg-white/5 px-4 py-2 rounded-full border border-white/10!">
                     <span className="text-[10px] font-black text-purple-400">
                       RULES: {targetingRules.length}
                     </span>
@@ -480,7 +361,7 @@ export default function AdvancedConfigurationView({
                           onClick={() => handleRemoveRule(rule.id)}
                           className="opacity-0 group-hover/rule:opacity-100 w-8 h-8 rounded-lg hover:bg-red-500/20 text-slate-500 hover:text-red-400 transition-all flex items-center justify-center"
                         >
-                          <Icons.Trash />
+                          <Icon name="Trash" size={14} />
                         </button>
                       </div>
                     ))
@@ -544,9 +425,10 @@ export default function AdvancedConfigurationView({
                   </div>
                   <button
                     onClick={handleAddRule}
-                    className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full py-3 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-400 rounded-xl text-xs font-bold uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
                   >
-                    + Append Targeting Rule
+                    <Icon name="PlusCircle" size={16} />
+                    Append Targeting Rule
                   </button>
                 </div>
               </div>
@@ -559,7 +441,7 @@ export default function AdvancedConfigurationView({
             <section className="bg-linear-to-br from-[#0b0e14] to-black border border-white/5 rounded-4xl p-8">
               <div className="flex items-center gap-4 mb-8">
                 <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
-                  <span className="text-lg">⚙️</span>
+                  <Icon name="Settings" size={20} />
                 </div>
                 <h4 className="font-bold text-white tracking-tight">
                   Fallback State
@@ -617,7 +499,7 @@ export default function AdvancedConfigurationView({
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 border border-amber-500/20">
-                    <Icons.Clock />
+                    <Icon name="Clock" size={20} />
                   </div>
                   <h4 className="font-bold text-white tracking-tight">
                     Timeline
@@ -698,13 +580,18 @@ export default function AdvancedConfigurationView({
                 onClick={handleSaveConfiguration}
                 className="w-full py-5 bg-cyan-500 hover:bg-cyan-400 text-black rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
               >
-                <Icons.Save />
+                <Icon name="Save" size={18} strokeWidth={2.5} />
                 Deploy changes
               </button>
               <a
                 href={`/spaces/${spaceId}/features`}
-                className="block w-full py-4 text-center text-slate-500 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors"
+                className="w-full py-4 text-center text-slate-500 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2 group"
               >
+                <Icon
+                  name="X"
+                  size={14}
+                  className="group-hover:rotate-90 transition-transform"
+                />
                 Discard session
               </a>
             </div>

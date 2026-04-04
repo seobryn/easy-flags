@@ -6,21 +6,12 @@ interface DocsTableOfContentsProps {
   initialLocale?: AvailableLanguages;
 }
 
-const Icons = {
-  Rocket: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-5c1.62-2.2 5-3 5-3"/><path d="M12 15v5s3.03-.55 5-2c2.2-1.62 3-5 3-5"/></svg>,
-  Box: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>,
-  Settings: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>,
-  Globe: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>,
-  Target: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>,
-  Zap: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 14.899 15.223 3 13.825 10.101H20l-11.223 11.899L10.175 14.899H4z"/></svg>,
-  Users: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  Help: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-};
+import { Icon, type IconName } from "../shared/Icon";
 
 interface Section {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  icon: IconName;
   subsections?: { id: string; title: string }[];
 }
 
@@ -33,18 +24,18 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
     {
       id: "getting-started",
       title: t('docs.gettingStartedTitle'),
-      icon: <Icons.Rocket />,
+      icon: "Rocket",
       subsections: [
         { id: "understanding-hierarchy", title: t('docs.hierarchyTitle') },
       ],
     },
-    { id: "creating-spaces", title: t('docs.managingSpacesTitle'), icon: <Icons.Box /> },
-    { id: "creating-features", title: t('docs.managingFeaturesTitle'), icon: <Icons.Settings /> },
-    { id: "environments", title: t('docs.envsTitle'), icon: <Icons.Globe /> },
-    { id: "targeting-rollout", title: t('docs.targetingTitle'), icon: <Icons.Target /> },
-    { id: "api-integration", title: t('docs.apiTitle'), icon: <Icons.Zap /> },
-    { id: "team-management", title: t('docs.teamTitle'), icon: <Icons.Users /> },
-    { id: "troubleshooting", title: t('docs.faqTitle'), icon: <Icons.Help /> },
+    { id: "creating-spaces", title: t('docs.managingSpacesTitle'), icon: "Box" },
+    { id: "creating-features", title: t('docs.managingFeaturesTitle'), icon: "Settings" },
+    { id: "environments", title: t('docs.envsTitle'), icon: "Globe" },
+    { id: "targeting-rollout", title: t('docs.targetingTitle'), icon: "Target" },
+    { id: "api-integration", title: t('docs.apiTitle'), icon: "Zap" },
+    { id: "team-management", title: t('docs.teamTitle'), icon: "Users" },
+    { id: "troubleshooting", title: t('docs.faqTitle'), icon: "HelpCircle" },
   ], [t]);
 
   useEffect(() => {
@@ -97,9 +88,9 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
         className="fixed bottom-8 right-8 md:hidden z-100 w-14 h-14 bg-cyan-500 text-white rounded-full shadow-2xl flex items-center justify-center transition-all active:scale-95 shadow-cyan-500/20"
       >
         {isOpen ? (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          <Icon name="X" size={24} strokeWidth={2.5} />
         ) : (
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          <Icon name="Menu" size={24} strokeWidth={2.5} />
         )}
       </button>
 
@@ -128,7 +119,7 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
                     }`}
                   >
                     <span className={`transition-colors ${isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-cyan-300"}`}>
-                      {section.icon}
+                      <Icon name={section.icon} size={18} />
                     </span>
                     <span className="text-sm">{section.title}</span>
                   </button>
@@ -162,10 +153,10 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
                 className="w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 border bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-white/5"
               >
                 <span className="text-slate-500 group-hover:text-emerald-400 transition-colors">
-                  <Icons.Zap />
+                  <Icon name="Zap" size={18} />
                 </span>
                 <span className="text-sm font-bold">{t('apiReference.title')}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                <Icon name="ArrowRight" size={14} className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
               </a>
             </li>
           </ul>
