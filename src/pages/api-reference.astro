@@ -5,53 +5,184 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getTranslator } from "@/infrastructure/i18n/astro";
 
 const { t } = getTranslator(Astro.request);
+
+const Icons = {
+  Auth: "🔐",
+  Login: "🔑",
+  Spaces: "📦",
+  Features: "⚙️",
+  Envs: "🌍",
+};
 ---
 
-<BaseLayout title={t('apiReference.title')} includeHeader={true}>
-  <article class="max-w-4xl mx-auto py-12">
-    <h1 class="text-4xl font-bold text-gradient mb-6">{t('apiReference.title')}</h1>
+<BaseLayout title={`${t('apiReference.title')} - Easy Flags`} includeHeader={true} fullWidth={true}>
+  <div class="min-h-screen bg-[#06080f] overflow-x-hidden">
+    <!-- Hero Section -->
+    <div class="relative py-24 px-8 md:px-16 overflow-hidden border-b border-white/5">
+      <div class="absolute top-0 left-0 w-full h-full bg-linear-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 blur-[120px] rounded-full"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-600/10 blur-[120px] rounded-full"></div>
 
-    <div class="card space-y-6">
-      <section>
-        <h2 class="text-2xl font-bold text-cyan-300 mb-3">{t('apiReference.authTitle')}</h2>
-        <p class="text-slate-400 mb-4">
-          {t('apiReference.authDesc')}
+      <div class="max-w-5xl mx-auto relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6 anim-fade-in">
+          <span class="w-1 h-1 rounded-full bg-cyan-400 animate-pulse"></span>
+          {t('apiReference.developerInterface')}
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.1] anim-fade-in">
+          {t('apiReference.title').split(' ').map((word, i, arr) => (
+            <>
+              {word.toUpperCase() === 'API' ? <span class="text-gradient">API</span> : word}
+              {i < arr.length - 1 && ' '}
+            </>
+          ))}
+        </h1>
+        <p class="text-slate-400 text-xl leading-relaxed max-w-2xl anim-fade-in delay-100">
+          {t('apiReference.heroDesc')}
         </p>
-        <pre
-          class="bg-slate-900 p-4 rounded-lg overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
-      </section>
-
-      <section>
-        <h3 class="text-xl font-bold text-cyan-300 mb-3">
-          POST /api/auth/login
-        </h3>
-        <p class="text-slate-400 mb-4">
-          {t('apiReference.loginDesc')}
-        </p>
-      </section>
-
-      <section>
-        <h3 class="text-xl font-bold text-cyan-300 mb-3">GET /api/spaces</h3>
-        <p class="text-slate-400 mb-4">
-          {t('apiReference.spacesDesc')}
-        </p>
-      </section>
-
-      <section>
-        <h3 class="text-xl font-bold text-cyan-300 mb-3">
-          POST /api/spaces/:spaceId/features
-        </h3>
-        <p class="text-slate-400 mb-4">
-          {t('apiReference.createFeatureDesc')}
-        </p>
-      </section>
-
-      <section>
-        <h3 class="text-xl font-bold text-cyan-300 mb-3">
-          GET /api/spaces/:spaceId/environments
-        </h3>
-        <p class="text-slate-400 mb-4">{t('apiReference.getEnvsDesc')}</p>
-      </section>
+      </div>
     </div>
-  </article>
+
+    <!-- Main Content -->
+    <div class="max-w-5xl mx-auto px-8 py-20">
+      <div class="grid grid-cols-1 gap-12">
+        
+        <!-- Authentication -->
+        <section class="api-section anim-fade-in">
+          <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 text-xl">
+              {Icons.Auth}
+            </div>
+            <h2 class="text-3xl font-bold text-white tracking-tight">{t('apiReference.authTitle')}</h2>
+          </div>
+          
+          <div class="card p-8 group">
+            <p class="text-slate-400 mb-6 text-lg leading-relaxed">
+              {t('apiReference.authDesc')}
+            </p>
+            <div class="relative overflow-hidden rounded-xl bg-[#0d1117] border border-white/10 group-hover:border-cyan-500/30 transition-colors">
+              <div class="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-white/2">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('apiReference.httpHeader')}</span>
+                <button class="text-slate-500 hover:text-white transition-colors" onclick="navigator.clipboard.writeText('Authorization: Bearer YOUR_JWT_TOKEN')">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                </button>
+              </div>
+              <pre class="p-6 text-cyan-300 font-mono text-sm overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Endpoints -->
+        <section class="space-y-10">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="h-px flex-1 bg-white/5"></span>
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">{t('apiReference.availableEndpoints')}</span>
+            <span class="h-px flex-1 bg-white/5"></span>
+          </div>
+
+          <!-- Login -->
+          <div class="card p-0 overflow-hidden group hover:border-blue-500/30 transition-all anim-fade-in delay-200">
+            <div class="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/2">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-widest uppercase">POST</span>
+                <code class="text-white font-bold text-sm tracking-tight">/api/auth/login</code>
+              </div>
+              <span class="text-xl opacity-50 group-hover:opacity-100 transition-opacity">{Icons.Login}</span>
+            </div>
+            <div class="p-8">
+              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+                {t('apiReference.loginDesc')}
+              </p>
+            </div>
+          </div>
+
+          <!-- Spaces -->
+          <div class="card p-0 overflow-hidden group hover:border-purple-500/30 transition-all anim-fade-in delay-300">
+            <div class="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/2">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-widest uppercase">GET</span>
+                <code class="text-white font-bold text-sm tracking-tight">/api/spaces</code>
+              </div>
+              <span class="text-xl opacity-50 group-hover:opacity-100 transition-opacity">{Icons.Spaces}</span>
+            </div>
+            <div class="p-8">
+              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+                {t('apiReference.spacesDesc')}
+              </p>
+            </div>
+          </div>
+
+          <!-- Create Feature -->
+          <div class="card p-0 overflow-hidden group hover:border-amber-500/30 transition-all anim-fade-in delay-400">
+            <div class="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/2">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 text-[10px] font-black tracking-widest uppercase">POST</span>
+                <code class="text-white font-bold text-sm tracking-tight">/api/spaces/:spaceId/features</code>
+              </div>
+              <span class="text-xl opacity-50 group-hover:opacity-100 transition-opacity">{Icons.Features}</span>
+            </div>
+            <div class="p-8">
+              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+                {t('apiReference.createFeatureDesc')}
+              </p>
+            </div>
+          </div>
+
+          <!-- Get Environments -->
+          <div class="card p-0 overflow-hidden group hover:border-cyan-500/30 transition-all anim-fade-in delay-500">
+            <div class="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/2">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 text-[10px] font-black tracking-widest uppercase">GET</span>
+                <code class="text-white font-bold text-sm tracking-tight">/api/spaces/:spaceId/environments</code>
+              </div>
+              <span class="text-xl opacity-50 group-hover:opacity-100 transition-opacity">{Icons.Envs}</span>
+            </div>
+            <div class="p-8">
+              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+                {t('apiReference.getEnvsDesc')}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Support Footer -->
+      <div class="mt-32 p-12 rounded-[2.5rem] bg-linear-to-br from-cyan-500 to-blue-600 relative overflow-hidden group anim-fade-in delay-600">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
+        <div class="relative z-10 text-center max-w-xl mx-auto">
+          <h3 class="text-3xl font-bold text-white mb-4 tracking-tight">{t('apiReference.customIntegrationTitle')}</h3>
+          <p class="text-white/80 mb-8 font-medium italic">{t('apiReference.customIntegrationDesc')}</p>
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-3.5 rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
+            {t('apiReference.contactSupport')}
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 </BaseLayout>
+
+<style is:global>
+  .anim-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .delay-100 { animation-delay: 0.1s; }
+  .delay-200 { animation-delay: 0.2s; }
+  .delay-300 { animation-delay: 0.3s; }
+  .delay-400 { animation-delay: 0.4s; }
+  .delay-500 { animation-delay: 0.5s; }
+  .delay-600 { animation-delay: 0.6s; }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .api-section {
+    scroll-margin-top: 8rem;
+  }
+</style>

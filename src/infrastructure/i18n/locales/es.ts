@@ -87,6 +87,13 @@ export const es = {
     spacesDesc: 'Enumerar todos los espacios para el usuario autenticado.',
     createFeatureDesc: 'Cree una nueva función en el espacio especificado.',
     getEnvsDesc: 'Obtenga todos los entornos en un espacio.',
+    developerInterface: 'Interfaz para Desarrolladores',
+    heroDesc: 'API REST potente para automatizar tus flujos de trabajo de banderas de función e integrarlos con tus tuberías de CI/CD existentes.',
+    httpHeader: 'Encabezado HTTP',
+    availableEndpoints: 'Puntos de Acceso Disponibles',
+    customIntegrationTitle: '¿Necesitas una integración personalizada?',
+    customIntegrationDesc: 'Nuestra API está construida para escalar. Si tienes necesidades específicas, contacta a nuestro equipo.',
+    contactSupport: 'Contactar Soporte',
   },
   settings: {
     title: 'Configuración',

@@ -87,6 +87,13 @@ export const en = {
     spacesDesc: 'List all spaces for the authenticated user.',
     createFeatureDesc: 'Create a new feature in the specified space.',
     getEnvsDesc: 'Get all environments in a space.',
+    developerInterface: 'Developer Interface',
+    heroDesc: 'Powerful REST API to automate your feature flag workflows and integrate with your existing CI/CD pipelines.',
+    httpHeader: 'HTTP Header',
+    availableEndpoints: 'Available Endpoints',
+    customIntegrationTitle: 'Need a custom integration?',
+    customIntegrationDesc: 'Our API is built for scale. If you have specific needs, reach out to our team.',
+    contactSupport: 'Contact Support',
   },
   settings: {
     title: 'Settings',
