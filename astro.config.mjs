@@ -4,10 +4,13 @@ import react from "@astrojs/react";
 import tailwindcss from "@tailwindcss/vite";
 import node from "@astrojs/node";
 import vercel from "@astrojs/vercel";
+import sitemap from "@astrojs/sitemap";
+import robotsTxt from "astro-robots-txt";
 
-const isProduction = process.env.VERCEL === "1";
+const isProduction = process.env.NODE_ENV === "production";
 
 export default defineConfig({
+  site: "https://easy-flags.orangeember.com",
   output: "server",
   server: {
     port: 3000,
@@ -19,6 +22,6 @@ export default defineConfig({
     },
     plugins: [tailwindcss()],
   },
-  integrations: [react()],
+  integrations: [react(), sitemap(), robotsTxt()],
   adapter: isProduction ? vercel() : node({ mode: "standalone" }),
 });
