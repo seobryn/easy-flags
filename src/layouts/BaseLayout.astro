@@ -3,24 +3,52 @@ import "@/styles/globals.css";
 import Header from "@/components/astro/Header.astro";
 import Modals from "@/components/react/shared/Modals";
 import { I18nProvider } from "@/infrastructure/i18n/context";
-import { getLocale } from "@/infrastructure/i18n/astro";
+import { getLocale, getTranslator } from "@/infrastructure/i18n/astro";
 
 interface Props {
   title?: string;
   description?: string;
+  seoKey?: string; // Optional key to pull title/description from current locale's "seo" section
+  ogImage?: string;
+  ogType?: "website" | "article";
   includeHeader?: boolean;
   fullWidth?: boolean;
   children?: any;
 }
 
 const {
-  title = "Easy Flags",
-  description = "Feature flag management system",
+  seoKey,
   includeHeader = true,
   fullWidth = false,
+  ogImage = "/og-image.png", // Default image
+  ogType = "website",
 } = Astro.props;
 
 const locale = getLocale(Astro.request);
+const { t } = getTranslator(Astro.request);
+
+// SEO logic: Priority: Props > Translation via seoKey > Defaults
+let finalTitle = Astro.props.title;
+let finalDescription = Astro.props.description;
+
+if (seoKey) {
+  const transTitle = t(`seo.${seoKey}.title`);
+  const transDesc = t(`seo.${seoKey}.description`);
+
+  // Only use if the translator didn't just return the key
+  if (transTitle !== `seo.${seoKey}.title`) finalTitle = transTitle;
+  if (transDesc !== `seo.${seoKey}.description`) finalDescription = transDesc;
+}
+
+const siteTitle = t("seo.siteName") || "Easy Flags";
+finalTitle = finalTitle ? `${finalTitle}` : siteTitle;
+finalDescription =
+  finalDescription ||
+  t("seo.home.description") ||
+  "Feature flag management system";
+
+const siteOrigin = Astro.site?.origin || "https://easy-flags.orangeember.com";
+const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
 ---
 
 <!doctype html>
@@ -28,8 +56,80 @@ const locale = getLocale(Astro.request);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
+
+    <!-- Primary Meta Tags -->
+    <title>{finalTitle}</title>
+    <meta name="title" content={finalTitle} />
+    <meta name="description" content={finalDescription} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={finalTitle} />
+    <meta property="og:description" content={finalDescription} />
+    <meta property="og:image" content={new URL(ogImage, Astro.url)} />
+    <meta property="og:site_name" content={siteTitle} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
+    <meta property="twitter:title" content={finalTitle} />
+    <meta property="twitter:description" content={finalDescription} />
+    <meta property="twitter:image" content={new URL(ogImage, Astro.url)} />
+
+    <!-- Language Alternates -->
+    <link
+      rel="alternate"
+      hreflang="en"
+      href={`${siteOrigin}${Astro.url.pathname}?lang=en`}
+    />
+    <link
+      rel="alternate"
+      hreflang="es"
+      href={`${siteOrigin}${Astro.url.pathname}?lang=es`}
+    />
+    <link
+      rel="alternate"
+      hreflang="fr"
+      href={`${siteOrigin}${Astro.url.pathname}?lang=fr`}
+    />
+    <link
+      rel="alternate"
+      hreflang="x-default"
+      href={`${siteOrigin}${Astro.url.pathname}`}
+    />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: siteTitle,
+        url: siteOrigin,
+        logo: `${siteOrigin}/logo.svg`,
+        description: finalDescription,
+      })}
+    />
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: siteTitle,
+        url: siteOrigin,
+        potentialAction: {
+          "@type": "SearchAction",
+          target: `${siteOrigin}/docs?q={search_term_string}`,
+          "query-input": "required name=search_term_string",
+        },
+      })}
+    />
+
+    <!-- Fonts & Favicon -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       rel="preconnect"
@@ -41,8 +141,13 @@ const locale = getLocale(Astro.request);
       rel="stylesheet"
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- SEO Best Practices: Robots & Sitemap -->
+    <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
-  <body class={`bg-[#06080f] text-slate-100 selection:bg-cyan-500/30 min-h-screen`}>
+  <body
+    class={`bg-[#06080f] text-slate-100 selection:bg-cyan-500/30 min-h-screen`}
+  >
     <I18nProvider client:load initialLocale={locale}>
       <div class="root flex flex-col min-h-screen">
         {includeHeader && <Header />}
@@ -62,6 +167,6 @@ const locale = getLocale(Astro.request);
 </html>
 
 <script>
-  // Client-side interactivity can be added here
+  // SEO structured data could be added here if needed
   console.log("Layout loaded");
 </script>

@@ -25,10 +25,6 @@ if (!isDevelopment && (!user || !isSuperUser(user))) {
 }
 ---
 
-<BaseLayout
-  title={t('admin.dbInspectorTitle')}
-  description={t('admin.dbInspectorDesc')}
-  includeHeader={true}
->
+<BaseLayout seoKey="admin" includeHeader={true}>
   <DatabaseInspector client:load />
 </BaseLayout>

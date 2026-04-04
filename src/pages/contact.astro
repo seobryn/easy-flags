@@ -9,7 +9,7 @@ const { t } = getTranslator(Astro.request);
 const initialLocale = getLocale(Astro.request);
 ---
 
-<BaseLayout title={t('contact.title')} includeHeader={true}>
+<BaseLayout seoKey="contact" includeHeader={true}>
   <article class="max-w-2xl mx-auto py-12 px-4">
     <h1 class="text-4xl font-bold text-gradient mb-6">{t('contact.title')}</h1>
 

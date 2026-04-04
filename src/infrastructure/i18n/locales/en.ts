@@ -1,4 +1,63 @@
 export const en = {
+  seo: {
+    home: {
+      title: "Easy Flags - Launch Ideas Without Stress",
+      description: "Take full control of your release cycle with Easy Flags. Toggle features instantly, target specific users, and deploy with confidence.",
+    },
+    docs: {
+      title: "Documentation | Easy Flags",
+      description: "Learn how to integrate and master feature flags with Easy Flags. Guides, best practices, and more.",
+    },
+    apiReference: {
+      title: "API Reference | Easy Flags",
+      description: "Powerful REST API to automate your feature flag workflows and integrate with your CI/CD pipelines.",
+    },
+    pricing: {
+      title: "Pricing & Plans | Easy Flags",
+      description: "Choose the perfect plan for your team. From free to enterprise solutions.",
+    },
+    contact: {
+      title: "Contact Us | Easy Flags",
+      description: "Have questions? Reach out to our team for help with your integration or any feedback.",
+    },
+    login: {
+      title: "Login | Easy Flags",
+      description: "Sign in to your Easy Flags account to manage your feature flags.",
+    },
+    createAccount: {
+      title: "Create Account | Easy Flags",
+      description: "Start managing your feature flags today. Create your free account in minutes.",
+    },
+    settings: {
+      title: "Settings | Easy Flags",
+      description: "Manage your account, preferences, and API keys.",
+    },
+    metrics: {
+      title: "Metrics & Performance | Easy Flags",
+      description: "Monitor the performance of your feature flags and system health in real-time.",
+    },
+    spaces: {
+      title: "Your Spaces | Easy Flags",
+      description: "Organize and manage your projects and environments.",
+    },
+    privacy: {
+      title: "Privacy Policy | Easy Flags",
+      description: "How we protect and handle your personal data.",
+    },
+    terms: {
+      title: "Terms of Service | Easy Flags",
+      description: "Our legal terms for using the Easy Flags platform.",
+    },
+    analytics: {
+      title: "Analytics | Easy Flags",
+      description: "In-depth insights into your feature flag usage and performance.",
+    },
+    admin: {
+      title: "Admin Console | Easy Flags",
+      description: "System administration and database management tools.",
+    },
+    siteName: "Easy Flags",
+  },
   common: {
     save: 'Save',
     cancel: 'Cancel',

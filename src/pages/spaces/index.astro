@@ -15,6 +15,6 @@ if (!requireAuth(Astro)) {
 }
 ---
 
-<BaseLayout title={`${t('spaces.title')} - Easy Flags`} includeHeader={true}>
+<BaseLayout seoKey="spaces" includeHeader={true}>
   <SpacesDashboard client:load initialLocale={initialLocale} />
 </BaseLayout>

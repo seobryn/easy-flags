@@ -7,7 +7,7 @@ import { getTranslator } from "@/infrastructure/i18n/astro";
 const { t } = getTranslator(Astro.request);
 ---
 
-<BaseLayout title={t('terms.title')} includeHeader={true}>
+<BaseLayout seoKey="terms" includeHeader={true}>
   <article class="max-w-4xl mx-auto py-12">
     <h1 class="text-4xl font-bold text-gradient mb-6">{t('terms.title')}</h1>
 

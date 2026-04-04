@@ -22,6 +22,6 @@ if (!user) {
 }
 ---
 
-<BaseLayout title={`${t('navigation.metrics')} - Easy Flags`} includeHeader={true}>
+<BaseLayout seoKey="metrics" includeHeader={true}>
     <MetricsMonitor client:load userId={String(user.id)} initialLocale={initialLocale} />
 </BaseLayout>

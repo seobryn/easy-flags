@@ -11,11 +11,7 @@ const { t } = getTranslator(Astro.request);
 const locale = getLocale(Astro.request);
 ---
 
-<BaseLayout
-  title={`${t('docs.title')} - Easy Flags`}
-  includeHeader={true}
-  fullWidth={true}
->
+<BaseLayout seoKey="docs" includeHeader={true} fullWidth={true}>
   <div class="flex h-[calc(100vh-5rem)] overflow-hidden">
     <!-- Table of Contents Sidebar -->
     <DocsTableOfContents client:load initialLocale={locale} />

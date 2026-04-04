@@ -1,4 +1,63 @@
 export const fr = {
+  seo: {
+    home: {
+      title: "Easy Flags - Lancez vos Idées sans Stress",
+      description: "Prenez le contrôle total de votre cycle de déploiement avec Easy Flags. Activez des fonctionnalités instantanément, ciblez des utilisateurs spécifiques et déployez avec confiance.",
+    },
+    docs: {
+      title: "Documentation | Easy Flags",
+      description: "Apprenez à intégrer et à maîtriser les feature flags avec Easy Flags. Guides, bonnes pratiques, et plus.",
+    },
+    apiReference: {
+      title: "Référence API | Easy Flags",
+      description: "API REST puissante pour automatiser vos flux de travail de feature flags et les intégrer à vos pipelines CI/CD.",
+    },
+    pricing: {
+      title: "Tarification et Plans | Easy Flags",
+      description: "Choisissez le plan parfait pour votre équipe. Des solutions gratuites aux solutions d'entreprise.",
+    },
+    contact: {
+      title: "Contactez-nous | Easy Flags",
+      description: "Vous avez des questions ? Contactez notre équipe pour obtenir de l'aide sur votre intégration ou tout retour d'expérience.",
+    },
+    login: {
+      title: "Connexion | Easy Flags",
+      description: "Connectez-vous à votre compte Easy Flags pour gérer vos feature flags.",
+    },
+    createAccount: {
+      title: "Créer un Compte | Easy Flags",
+      description: "Commencez à gérer vos feature flags dès aujourd'hui. Créez votre compte gratuit en quelques minutes.",
+    },
+    settings: {
+      title: "Paramètres | Easy Flags",
+      description: "Gérez votre compte, vos préférences et vos clés API.",
+    },
+    metrics: {
+      title: "Métriques et Performance | Easy Flags",
+      description: "Surveillez la performance de vos feature flags et l'état du système en temps réel.",
+    },
+    spaces: {
+      title: "Vos Espaces | Easy Flags",
+      description: "Organisez et gérez vos projets et environnements.",
+    },
+    privacy: {
+      title: "Politique de Confidentialité | Easy Flags",
+      description: "Comment nous protégeons et traitons vos données personnelles.",
+    },
+    terms: {
+      title: "Conditions d'Utilisation | Easy Flags",
+      description: "Nos conditions légales pour l'utilisation de la plateforme Easy Flags.",
+    },
+    analytics: {
+      title: "Analytique | Easy Flags",
+      description: "Informations détaillées sur l'utilisation et la performance de vos feature flags.",
+    },
+    admin: {
+      title: "Console d'Admin | Easy Flags",
+      description: "Outils d'administration du système et gestion de la base de données.",
+    },
+    siteName: "Easy Flags",
+  },
   common: {
     save: "Enregistrer",
     cancel: "Annuler",

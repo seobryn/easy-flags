@@ -14,6 +14,6 @@ if (!requireAuth(Astro)) {
 }
 ---
 
-<BaseLayout title={`${t('settings.title')} - Easy Flags`} includeHeader={true}>
+<BaseLayout seoKey="settings" includeHeader={true}>
   <SettingsView initialLocale={lang} client:load />
 </BaseLayout>

@@ -1,4 +1,63 @@
 export const es = {
+  seo: {
+    home: {
+      title: "Easy Flags - Lanza Ideas sin Estrés",
+      description: "Toma el control total de tu ciclo de lanzamientos con Easy Flags. Activa funciones al instante, segmenta usuarios específicos y despliega con confianza.",
+    },
+    docs: {
+      title: "Documentación | Easy Flags",
+      description: "Aprende cómo integrar y dominar las banderas de función con Easy Flags. Guías, mejores prácticas y más.",
+    },
+    apiReference: {
+      title: "Referencia API | Easy Flags",
+      description: "API REST potente para automatizar tus flujos de trabajo de banderas de función e integrarlos con tus tuberías de CI/CD.",
+    },
+    pricing: {
+      title: "Precios y Planes | Easy Flags",
+      description: "Elige el plan perfecto para tu equipo. Desde soluciones gratuitas hasta empresariales.",
+    },
+    contact: {
+      title: "Contáctanos | Easy Flags",
+      description: "¿Tienes preguntas? Contacta a nuestro equipo para obtener ayuda con tu integración o enviarnos tus comentarios.",
+    },
+    login: {
+      title: "Iniciar Sesión | Easy Flags",
+      description: "Inicia sesión en tu cuenta de Easy Flags para gestionar tus banderas de función.",
+    },
+    createAccount: {
+      title: "Crear Cuenta | Easy Flags",
+      description: "Comienza a gestionar tus banderas de función hoy mismo. Crea tu cuenta gratuita en minutos.",
+    },
+    settings: {
+      title: "Configuración | Easy Flags",
+      description: "Gestiona tu cuenta, preferencias y claves API.",
+    },
+    metrics: {
+      title: "Métricas y Rendimiento | Easy Flags",
+      description: "Monitorea el rendimiento de tus banderas de función y la salud del sistema en tiempo real.",
+    },
+    spaces: {
+      title: "Tus Espacios | Easy Flags",
+      description: "Organiza y gestiona tus proyectos y entornos.",
+    },
+    privacy: {
+      title: "Política de Privacidad | Easy Flags",
+      description: "Cómo protegemos y manejamos tus datos personales.",
+    },
+    terms: {
+      title: "Términos de Servicio | Easy Flags",
+      description: "Nuestros términos legales para el uso de la plataforma Easy Flags.",
+    },
+    analytics: {
+      title: "Analíticas | Easy Flags",
+      description: "Información detallada sobre el uso y rendimiento de tus banderas de función.",
+    },
+    admin: {
+      title: "Consola de Administración | Easy Flags",
+      description: "Herramientas de administración del sistema y gestión de la base de datos.",
+    },
+    siteName: "Easy Flags",
+  },
   common: {
     save: "Guardar",
     cancel: "Cancelar",

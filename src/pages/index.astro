@@ -10,7 +10,7 @@ import WhyLoveSection from "@/components/react/WhyLoveSection";
 const locale = getLocale(Astro.request);
 ---
 
-<BaseLayout title="Easy Flags UI" includeHeader={true} fullWidth={true}>
+<BaseLayout seoKey="home" includeHeader={true} fullWidth={true}>
   <HeroSection client:load initialLocale={locale} />
   <QuickStartSection client:load initialLocale={locale} />
   <WhyLoveSection client:load initialLocale={locale} />
