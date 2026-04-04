@@ -22,6 +22,6 @@ if (!checkResourceExists(space, Astro, "Space")) {
 }
 ---
 
-<BaseLayout title="Space Details" includeHeader={true}>
+<BaseLayout title="Space Details" includeHeader={true} fullWidth={true}>
   <SpaceDetailView client:load spaceId={spaceSlug} />
 </BaseLayout>

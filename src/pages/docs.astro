@@ -14,11 +14,15 @@ const Icons = {
   Target: "🎯",
   Zap: "🔌",
   Users: "👥",
-  Help: "🔍"
+  Help: "🔍",
 };
 ---
 
-<BaseLayout title="Documentation - Easy Flags" includeHeader={true} fullWidth={true}>
+<BaseLayout
+  title="Documentation - Easy Flags"
+  includeHeader={true}
+  fullWidth={true}
+>
   <div class="flex h-[calc(100vh-5rem)] overflow-hidden">
     <!-- Table of Contents Sidebar -->
     <DocsTableOfContents client:load />
@@ -26,21 +30,37 @@ const Icons = {
     <!-- Main Content -->
     <article class="flex-1 overflow-y-auto scroll-smooth bg-[#06080f]">
       <!-- Hero Section -->
-      <div class="relative py-20 px-8 md:px-16 overflow-hidden border-b border-white/5">
-        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none"></div>
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 blur-[120px] rounded-full"></div>
-        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-600/10 blur-[120px] rounded-full"></div>
-        
+      <div
+        class="relative py-20 px-8 md:px-16 overflow-hidden border-b border-white/5"
+      >
+        <div
+          class="absolute top-0 left-0 w-full h-full bg-linear-to-br from-cyan-500/5 via-transparent to-purple-500/5 pointer-events-none"
+        >
+        </div>
+        <div
+          class="absolute -top-40 -right-40 w-80 h-80 bg-cyan-500/10 blur-[120px] rounded-full"
+        >
+        </div>
+        <div
+          class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-600/10 blur-[120px] rounded-full"
+        >
+        </div>
+
         <div class="max-w-4xl relative z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6"
+          >
             <span class="w-1 h-1 rounded-full bg-cyan-400 animate-pulse"></span>
             Knowledge Base
           </div>
-          <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
+          <h1
+            class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight leading-[1.1]"
+          >
             Master Your <span class="text-gradient">Feature Flags</span>
           </h1>
           <p class="text-slate-400 text-xl leading-relaxed max-w-2xl">
-            Complete guide to integrating, managing, and scaling feature flags with Easy Flags. From first setup to advanced targeting strategies.
+            Complete guide to integrating, managing, and scaling feature flags
+            with Easy Flags. From first setup to advanced targeting strategies.
           </p>
         </div>
       </div>
@@ -50,12 +70,18 @@ const Icons = {
           <!-- Getting Started Section -->
           <div id="getting-started" class="docs-section scroll-mt-28">
             <div class="flex items-center gap-4 mb-8">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20">
-                <Icons.Rocket />
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20"
+              >
+                {Icons.Rocket}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Getting Started</h2>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Getting Started
+              </h2>
             </div>
-            
+
             <p class="text-slate-300 text-lg mb-8 leading-relaxed">
               Welcome to Easy Flags! This guide will help you set up feature
               flags in your application. Feature flags allow you to control
@@ -64,70 +90,114 @@ const Icons = {
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-               <div class="card !p-5 group">
-                  <div class="text-cyan-400 mb-3 font-bold">01. Create Space</div>
-                  <p class="text-xs text-slate-500 leading-relaxed">Organize your projects and teams into dedicated workspaces.</p>
-               </div>
-               <div class="card !p-5 group">
-                  <div class="text-cyan-400 mb-3 font-bold">02. Add Flags</div>
-                  <p class="text-xs text-slate-500 leading-relaxed">Define features and targeting rules for each environment.</p>
-               </div>
-               <div class="card !p-5 group">
-                  <div class="text-cyan-400 mb-3 font-bold">03. Connect SDK</div>
-                  <p class="text-xs text-slate-500 leading-relaxed">Integrate our light-weight API into your codebase in seconds.</p>
-               </div>
+              <div class="card p-5 group">
+                <div class="text-cyan-400 mb-3 font-bold">01. Create Space</div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  Organize your projects and teams into dedicated workspaces.
+                </p>
+              </div>
+              <div class="card p-5 group">
+                <div class="text-cyan-400 mb-3 font-bold">02. Add Flags</div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  Define features and targeting rules for each environment.
+                </p>
+              </div>
+              <div class="card p-5 group">
+                <div class="text-cyan-400 mb-3 font-bold">03. Connect SDK</div>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  Integrate our light-weight API into your codebase in seconds.
+                </p>
+              </div>
             </div>
 
             <!-- Hierarchy Explanation -->
             <div id="understanding-hierarchy" class="scroll-mt-28 mb-12">
-              <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <h3
+                class="text-xl font-bold text-white mb-6 flex items-center gap-2"
+              >
                 <span class="w-6 h-px bg-cyan-500"></span>
                 Understanding the Hierarchy
               </h3>
-              
+
               <div class="space-y-4">
-                <div class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-cyan-500/30 transition-all">
-                   <div class="flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">📦</div>
-                      <div>
-                         <h4 class="text-white font-bold mb-1">Spaces</h4>
-                         <p class="text-slate-400 text-sm leading-relaxed">Top-level organizations or projects. Think of a Space as a product team or a standalone platform.</p>
-                      </div>
-                   </div>
-                </div>
-                
-                <div class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-cyan-500/30 transition-all">
-                   <div class="flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">🌍</div>
-                      <div>
-                         <h4 class="text-white font-bold mb-1">Environments</h4>
-                         <p class="text-slate-400 text-sm leading-relaxed">Deployment stages like Production, Staging, or Development. Flags are configured independently per environment.</p>
-                      </div>
-                   </div>
+                <div
+                  class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-cyan-500/30 transition-all"
+                >
+                  <div class="flex items-start gap-4">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl"
+                    >
+                      📦
+                    </div>
+                    <div>
+                      <h4 class="text-white font-bold mb-1">Spaces</h4>
+                      <p class="text-slate-400 text-sm leading-relaxed">
+                        Top-level organizations or projects. Think of a Space as
+                        a product team or a standalone platform.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-cyan-500/30 transition-all">
-                   <div class="flex items-start gap-4">
-                      <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">⚙️</div>
-                      <div>
-                         <h4 class="text-white font-bold mb-1">Features</h4>
-                         <p class="text-slate-400 text-sm leading-relaxed">Individual feature flags. These are the toggles you reference in your code to control behavior.</p>
-                      </div>
-                   </div>
+                <div
+                  class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-primary/30 transition-all"
+                >
+                  <div class="flex items-start gap-4">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl"
+                    >
+                      🌍
+                    </div>
+                    <div>
+                      <h4 class="text-white font-bold mb-1">Environments</h4>
+                      <p class="text-slate-400 text-sm leading-relaxed">
+                        Deployment stages like Production, Staging, or
+                        Development. Flags are configured independently per
+                        environment.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="group bg-white/5 border border-white/5 rounded-2xl p-6 hover:border-primary/30 transition-all"
+                >
+                  <div class="flex items-start gap-4">
+                    <div
+                      class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl"
+                    >
+                      ⚙️
+                    </div>
+                    <div>
+                      <h4 class="text-white font-bold mb-1">Features</h4>
+                      <p class="text-slate-400 text-sm leading-relaxed">
+                        Individual feature flags. These are the toggles you
+                        reference in your code to control behavior.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="docs-code !bg-[#0d1117] !border-white/10 group relative">
-              <div class="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
-                 <div class="flex gap-1.5">
-                    <div class="w-3 h-3 rounded-full bg-rose-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-amber-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-emerald-500/50"></div>
-                 </div>
-                 <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Example Structure</span>
+            <div
+              class="bg-[#0d1117] border border-white/10 rounded-lg p-6 group relative overflow-x-auto"
+            >
+              <div
+                class="flex items-center justify-between mb-4 pb-4 border-b border-white/5"
+              >
+                <div class="flex gap-1.5">
+                  <div class="w-3 h-3 rounded-full bg-rose-500/50"></div>
+                  <div class="w-3 h-3 rounded-full bg-amber-500/50"></div>
+                  <div class="w-3 h-3 rounded-full bg-emerald-500/50"></div>
+                </div>
+                <span
+                  class="text-[10px] font-bold text-slate-600 uppercase tracking-widest"
+                  >Example Structure</span
+                >
               </div>
-              <pre class="text-cyan-300 font-mono text-sm leading-relaxed">
+              <pre
+                class="text-cyan-300 font-mono text-sm leading-relaxed">
 📦 Space: "Acme Corp"
 <span class="text-slate-500">├─ 🌍 Environment: Production</span>
 <span class="text-slate-500">│ ├─ ⚙️ Feature: new_dashboard (100%)</span>
@@ -141,135 +211,313 @@ const Icons = {
           <!-- Creating a Space Section -->
           <div id="creating-spaces" class="docs-section scroll-mt-28">
             <div class="flex items-center gap-4 mb-8">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
-                <Icons.Box />
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-blue-400 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20"
+              >
+                {Icons.Box}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Managing Spaces</h2>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Managing Spaces
+              </h2>
             </div>
-            
+
             <p class="text-slate-400 text-lg mb-10">
-              Spaces are your top-level containers. Everything in Easy Flags exists within a Space. 
-              Usually, you'll have one Space per project or one per team in a large organization.
+              Spaces are your top-level containers. Everything in Easy Flags
+              exists within a Space. Usually, you'll have one Space per project
+              or one per team in a large organization.
             </p>
 
             <div class="space-y-6">
               <div class="card relative overflow-hidden group">
-                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <Icons.Box />
-                 </div>
-                 <h4 class="text-white font-bold mb-4 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                    Workspace Setup
-                 </h4>
-                 <ol class="space-y-4">
-                    <li class="flex gap-4">
-                       <span class="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">1</span>
-                       <p class="text-slate-400 text-sm">Navigate to the <strong>Spaces</strong> section in your dashboard.</p>
-                    </li>
-                    <li class="flex gap-4">
-                       <span class="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">2</span>
-                       <p class="text-slate-400 text-sm">Click <strong>"Create New Space"</strong> and give it a descriptive name.</p>
-                    </li>
-                    <li class="flex gap-4">
-                       <span class="flex-shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">3</span>
-                       <p class="text-slate-400 text-sm">Configure your environments (Dev, Staging, Prod) within the space settings.</p>
-                    </li>
-                 </ol>
+                <div
+                  class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"
+                >
+                  {Icons.Box}
+                </div>
+                <h4 class="text-white font-bold mb-4 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                  Workspace Setup
+                </h4>
+                <ol class="space-y-4">
+                  <li class="flex gap-4">
+                    <span
+                      class="shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold"
+                      >1</span
+                    >
+                    <p class="text-slate-400 text-sm">
+                      Navigate to the <strong>Spaces</strong> section in your dashboard.
+                    </p>
+                  </li>
+                  <li class="flex gap-4">
+                    <span
+                      class="shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold"
+                      >2</span
+                    >
+                    <p class="text-slate-400 text-sm">
+                      Click <strong>"Create New Space"</strong> and give it a descriptive
+                      name.
+                    </p>
+                  </li>
+                  <li class="flex gap-4">
+                    <span
+                      class="shrink-0 w-6 h-6 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold"
+                      >3</span
+                    >
+                    <p class="text-slate-400 text-sm">
+                      Configure your environments (Dev, Staging, Prod) within
+                      the space settings.
+                    </p>
+                  </li>
+                </ol>
               </div>
 
-               <div class="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6">
-                  <h5 class="text-blue-400 font-bold mb-2 flex items-center gap-2">
-                    <Icons.Zap />
-                    Pro Tip
-                  </h5>
-                  <p class="text-slate-400 text-sm">Use meaningful names for your spaces like <code>Mobile App</code> or <code>Core API</code> instead of vague names like <code>Project 1</code>.</p>
-               </div>
+              <div
+                class="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-6"
+              >
+                <h5
+                  class="text-blue-400 font-bold mb-2 flex items-center gap-2"
+                >
+                  {Icons.Zap}
+                  Pro Tip
+                </h5>
+                <p class="text-slate-400 text-sm">
+                  Use meaningful names for your spaces like <code
+                    >Mobile App</code
+                  > or <code>Core API</code> instead of vague names like <code
+                    >Project 1</code
+                  >.
+                </p>
+              </div>
             </div>
           </div>
 
           <!-- Creating Features Section -->
           <div id="creating-features" class="docs-section scroll-mt-28">
             <div class="flex items-center gap-4 mb-8">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20">
-                <Icons.Settings />
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-amber-400 to-orange-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/20"
+              >
+                {Icons.Settings}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Managing Features</h2>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Managing Features
+              </h2>
             </div>
-            
+
             <p class="text-slate-400 text-lg mb-10">
-              Features are the individual items you want to control. Each feature can have different values across your environments.
+              Features are the individual items you want to control. Each
+              feature can have different values across your environments.
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-               <div class="card group hover:border-amber-500/30">
-                  <h4 class="text-white font-bold mb-3 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                    Feature Types
-                  </h4>
-                  <ul class="space-y-3">
-                     <li class="flex items-center justify-between text-sm">
-                        <span class="text-slate-400">Boolean</span>
-                        <span class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase">On / Off</span>
-                     </li>
-                     <li class="flex items-center justify-between text-sm">
-                        <span class="text-slate-400">String</span>
-                        <span class="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-500 text-[10px] font-bold uppercase">Config Text</span>
-                     </li>
-                     <li class="flex items-center justify-between text-sm">
-                        <span class="text-slate-400">JSON</span>
-                        <span class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-500 text-[10px] font-bold uppercase">Complex Context</span>
-                     </li>
-                  </ul>
-               </div>
-               
-               <div class="card group hover:border-emerald-500/30">
-                  <h4 class="text-white font-bold mb-3 flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    Best Practices
-                  </h4>
-                  <ul class="space-y-2 text-xs text-slate-500">
-                     <li class="flex items-start gap-2">
-                        <span class="text-emerald-500">✓</span> 
-                        Use kebab-case for keys (<code>new-search-bar</code>)
-                     </li>
-                     <li class="flex items-start gap-2">
-                        <span class="text-emerald-500">✓</span> 
-                        Set deadlines for feature flag removals
-                     </li>
-                     <li class="flex items-start gap-2">
-                        <span class="text-emerald-500">✓</span> 
-                        Audit flags every 2 weeks
-                     </li>
-                  </ul>
-               </div>
+              <div class="card group hover:border-amber-500/30">
+                <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  Feature Types
+                </h4>
+                <ul class="space-y-3">
+                  <li class="flex items-center justify-between text-sm">
+                    <span class="text-slate-400">Boolean</span>
+                    <span
+                      class="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase"
+                      >On / Off</span
+                    >
+                  </li>
+                  <li class="flex items-center justify-between text-sm">
+                    <span class="text-slate-400">String</span>
+                    <span
+                      class="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-500 text-[10px] font-bold uppercase"
+                      >Config Text</span
+                    >
+                  </li>
+                  <li class="flex items-center justify-between text-sm">
+                    <span class="text-slate-400">JSON</span>
+                    <span
+                      class="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-500 text-[10px] font-bold uppercase"
+                      >Complex Context</span
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card group hover:border-emerald-500/30">
+                <h4 class="text-white font-bold mb-3 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  Best Practices
+                </h4>
+                <ul class="space-y-2 text-xs text-slate-500">
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-500">✓</span>
+                    Use kebab-case for keys (<code>new-search-bar</code>)
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-500">✓</span>
+                    Set deadlines for feature flag removals
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <span class="text-emerald-500">✓</span>
+                    Audit flags every 2 weeks
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Environments Section -->
+          <div id="environments" class="docs-section scroll-mt-28">
+            <div class="flex items-center gap-4 mb-8">
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20"
+              >
+                {Icons.Globe}
+              </div>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Environments
+              </h2>
+            </div>
+            <p class="text-slate-400 text-lg mb-10">
+              Isolate your feature flags across different stages of your
+              delivery pipeline. Configure variations independently for each
+              environment.
+            </p>
+
+            <div class="space-y-4 mb-12">
+              <div class="card p-6 border-white/5 bg-white/2">
+                <h4 class="text-white font-bold mb-2 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Production
+                </h4>
+                <p class="text-sm text-slate-400">
+                  The live environment where your end-users interact with
+                  features. High stability and strict rollout rules.
+                </p>
+              </div>
+              <div class="card p-6 border-white/5 bg-white/2">
+                <h4 class="text-white font-bold mb-2 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  Staging
+                </h4>
+                <p class="text-sm text-slate-400">
+                  A pre-production environment for final testing and QA
+                  validation before going live.
+                </p>
+              </div>
+              <div class="card p-6 border-white/5 bg-white/2">
+                <h4 class="text-white font-bold mb-2 flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  Development
+                </h4>
+                <p class="text-sm text-slate-400">
+                  Where engineering teams build and test new features. Rapid
+                  iteration and experimental values.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Targeting Section -->
+          <div id="targeting-rollout" class="docs-section scroll-mt-28">
+            <div class="flex items-center gap-4 mb-8">
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-rose-400 to-red-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/20"
+              >
+                {Icons.Target}
+              </div>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Targeting & Rollout
+              </h2>
+            </div>
+            <p class="text-slate-400 text-lg mb-10">
+              Control exactly who sees what. Use advanced rules to target users
+              by attributes or roll out features gradually to a percentage of
+              your audience.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              <div class="card bg-rose-500/5 border-rose-500/10">
+                <h4 class="text-white font-bold mb-2">Percentage Rollouts</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Incrementally increase the user base for a feature from 0% to
+                  100% to ensure system stability and monitor metrics.
+                </p>
+              </div>
+              <div class="card bg-blue-500/5 border-blue-500/10">
+                <h4 class="text-white font-bold mb-2">User Attributes</h4>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Target by email domain, subscription tier, geographic
+                  location, or any custom metadata you send to the API.
+                </p>
+              </div>
             </div>
           </div>
 
           <!-- API Integration Section -->
           <div id="api-integration" class="docs-section scroll-mt-28">
             <div class="flex items-center gap-4 mb-8">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                <Icons.Zap />
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-emerald-400 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20"
+              >
+                {Icons.Zap}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">API Integration</h2>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                API Integration
+              </h2>
             </div>
-            
+
             <p class="text-slate-400 text-lg mb-10">
-              Integrate Easy Flags effortlessly into any stack. Our RESTful API is fast, secure, and globally distributed.
+              Integrate Easy Flags effortlessly into any stack. Our RESTful API
+              is fast, secure, and globally distributed.
             </p>
 
-            <div class="docs-code !bg-[#0d1117] !p-0 !border-white/10 group mb-12">
-               <div class="flex items-center justify-between px-6 py-4 border-b border-white/5">
-                  <div class="flex items-center gap-2">
-                     <span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest">GET</span>
-                     <span class="text-xs font-mono text-slate-400">/api/features/:key/evaluate</span>
-                  </div>
-                  <button class="text-slate-500 hover:text-white transition-colors cursor-pointer" onclick="navigator.clipboard.writeText('GET /api/features/:key/evaluate')">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                  </button>
-               </div>
-               <div class="p-6">
-                 <pre class="text-xs sm:text-sm font-mono leading-relaxed"><span class="text-purple-400">const</span> <span class="text-blue-400">evaluateFlag</span> = <span class="text-purple-400">async</span> (key, userId) => &#123;
+            <div
+              class="bg-[#0d1117] border border-white/10 rounded-lg group mb-12 overflow-hidden"
+            >
+              <div
+                class="flex items-center justify-between px-6 py-4 border-b border-white/5"
+              >
+                <div class="flex items-center gap-2">
+                  <span
+                    class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest"
+                    >GET</span
+                  >
+                  <span class="text-xs font-mono text-slate-400"
+                    >/api/features/:key/evaluate</span
+                  >
+                </div>
+                <button
+                  class="text-slate-500 hover:text-white transition-colors cursor-pointer"
+                  onclick="navigator.clipboard.writeText('GET /api/features/:key/evaluate')"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    ><rect width="14" height="14" x="8" y="8" rx="2" ry="2"
+                    ></rect><path
+                      d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                    ></path></svg
+                  >
+                </button>
+              </div>
+              <div class="p-6">
+                <pre
+                  class="text-xs sm:text-sm font-mono leading-relaxed"><span class="text-purple-400">const</span> <span class="text-blue-400">evaluateFlag</span> = <span class="text-purple-400">async</span> (key, userId) => &#123;
   <span class="text-purple-400">const</span> response = <span class="text-purple-400">await</span> <span class="text-blue-400">fetch</span>(<span class="text-emerald-400">`/api/v1/evaluate/$&#123;key&#125;`</span>, &#123;
     <span class="text-cyan-400">headers</span>: &#123;
       <span class="text-emerald-400">'X-API-Key'</span>: <span class="text-emerald-400">'YOUR_SECRET_KEY'</span>,
@@ -278,62 +526,190 @@ const Icons = {
   &#125;);
   <span class="text-purple-400">return</span> response.<span class="text-blue-400">json</span>();
 &#125;;</pre>
-               </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Team Management Section -->
+          <div id="team-management" class="docs-section scroll-mt-28">
+            <div class="flex items-center gap-4 mb-8">
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20"
+              >
+                {Icons.Users}
+              </div>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Team & Roles
+              </h2>
+            </div>
+            <p class="text-slate-400 text-lg mb-10">
+              Collaborate securely with your entire team. Assign specific
+              permissions to control who can view, create, or publish feature
+              flags.
+            </p>
+
+            <div class="card overflow-hidden">
+              <table class="w-full text-left text-sm">
+                <thead class="border-b border-white/5 text-slate-400">
+                  <tr>
+                    <th class="py-4 px-2">Role</th>
+                    <th class="py-4 px-2">Permissions</th>
+                  </tr>
+                </thead>
+                <tbody class="text-slate-300">
+                  <tr class="border-b border-white/5">
+                    <td class="py-4 px-2 font-bold text-white">Owner</td>
+                    <td class="py-4 px-2"
+                      >Full access to billing, team management, and all spaces.</td
+                    >
+                  </tr>
+                  <tr class="border-b border-white/5">
+                    <td class="py-4 px-2 font-bold text-white">Admin</td>
+                    <td class="py-4 px-2"
+                      >Can manage environments and flags across assigned spaces.</td
+                    >
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-2 font-bold text-white">Viewer</td>
+                    <td class="py-4 px-2"
+                      >Read-only access to flag configurations and evaluation
+                      history.</td
+                    >
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           <!-- FAQ & Support -->
           <div id="troubleshooting" class="docs-section scroll-mt-28">
-             <div class="flex items-center gap-4 mb-12">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
-                <Icons.Help />
+            <div class="flex items-center gap-4 mb-12">
+              <div
+                class="w-12 h-12 rounded-2xl bg-linear-to-br from-purple-400 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20"
+              >
+                {Icons.Help}
               </div>
-              <h2 class="text-3xl md:text-4xl font-bold text-white tracking-tight">Common Questions</h2>
+              <h2
+                class="text-3xl md:text-4xl font-bold text-white tracking-tight"
+              >
+                Common Questions
+              </h2>
             </div>
-            
-            <div class="space-y-6">
-               <details class="group bg-white/5 border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 open:border-cyan-500/30">
-                  <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
-                     <span class="text-white font-bold">How fast are flag evaluations?</span>
-                     <span class="text-slate-500 group-open:rotate-180 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 12 12 6-6"/></svg>
-                     </span>
-                  </summary>
-                  <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed">
-                      Evaluations typically take less than 10ms. Our engine is built on top of a globally distributed edge network, ensuring low latency regardless of your user's location.
-                  </div>
-               </details>
 
-               <details class="group bg-white/5 border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 open:border-cyan-500/30">
-                  <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
-                     <span class="text-white font-bold">Can I target specific email domains?</span>
-                     <span class="text-slate-500 group-open:rotate-180 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 12 12 6-6"/></svg>
-                     </span>
-                  </summary>
-                  <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed">
-                     Yes! You can set up targeting rules based on any user attribute, including email patterns, subscription level, or geographic location.
-                  </div>
-               </details>
+            <div class="space-y-6">
+              <details
+                class="group bg-white/5 border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 open:border-primary/30"
+              >
+                <summary
+                  class="flex items-center justify-between p-6 cursor-pointer list-none"
+                >
+                  <span class="text-white font-bold"
+                    >How fast are flag evaluations?</span
+                  >
+                  <span
+                    class="text-slate-500 group-open:rotate-180 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      ><path d="m6 9 6 6 6-6"></path></svg
+                    >
+                  </span>
+                </summary>
+                <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                  Evaluations typically take less than 10ms. Our engine is built
+                  on top of a globally distributed edge network, ensuring low
+                  latency regardless of your user's location.
+                </div>
+              </details>
+
+              <details
+                class="group bg-white/5 border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 open:border-primary/30"
+              >
+                <summary
+                  class="flex items-center justify-between p-6 cursor-pointer list-none"
+                >
+                  <span class="text-white font-bold"
+                    >Can I target specific email domains?</span
+                  >
+                  <span
+                    class="text-slate-500 group-open:rotate-180 transition-transform"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      ><path d="m6 9 6 6 6-6"></path></svg
+                    >
+                  </span>
+                </summary>
+                <div class="px-6 pb-6 text-slate-400 text-sm leading-relaxed">
+                  Yes! You can set up targeting rules based on any user
+                  attribute, including email patterns, subscription level, or
+                  geographic location.
+                </div>
+              </details>
             </div>
           </div>
         </div>
 
         <!-- Support Footer -->
-        <div class="mt-32 p-12 rounded-[2.5rem] bg-gradient-to-br from-cyan-500 to-blue-600 relative overflow-hidden group">
-           <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2"></div>
-           <div class="relative z-10 text-center max-w-xl mx-auto">
-              <h3 class="text-3xl font-bold text-white mb-4 tracking-tight">Still stuck?</h3>
-              <p class="text-white/80 mb-8 font-medium">Our engineers are ready to help you with your integration.</p>
-              <a href="/contact" class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-3.5 rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all">
-                Talk to an Expert
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-              </a>
-           </div>
+        <div
+          class="mt-32 p-12 rounded-[2.5rem] bg-linear-to-br from-cyan-500 to-blue-600 relative overflow-hidden group"
+        >
+          <div
+            class="absolute top-0 right-0 w-64 h-64 bg-white/10 blur-[80px] rounded-full translate-x-1/2 -translate-y-1/2"
+          >
+          </div>
+          <div class="relative z-10 text-center max-w-xl mx-auto">
+            <h3 class="text-3xl font-bold text-white mb-4 tracking-tight">
+              Still stuck?
+            </h3>
+            <p class="text-white/80 mb-8 font-medium">
+              Our engineers are ready to help you with your integration.
+            </p>
+            <a
+              href="/contact"
+              class="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-3.5 rounded-full font-bold shadow-xl hover:scale-105 active:scale-95 transition-all"
+            >
+              Talk to an Expert
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                ><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg
+              >
+            </a>
+          </div>
         </div>
-        
+
         <footer class="mt-20 py-10 border-t border-white/5 text-center">
-           <p class="text-slate-600 text-xs font-medium uppercase tracking-[0.2em]">© 2026 Easy Flags Documentation</p>
+          <p
+            class="text-slate-600 text-xs font-medium uppercase tracking-[0.2em]"
+          >
+            © 2026 Easy Flags Documentation
+          </p>
         </footer>
       </div>
     </article>
@@ -348,22 +724,28 @@ const Icons = {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   /* Custom details animations */
   details summary::-webkit-details-marker {
     display: none;
   }
-  
+
   article {
     scroll-behavior: smooth;
   }
-  
+
   .docs-section {
     animation: fadeIn 0.8s ease-out forwards;
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>

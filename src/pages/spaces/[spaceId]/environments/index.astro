@@ -23,5 +23,5 @@ if (!checkResourceExists(space, Astro, "Space")) {
 ---
 
 <BaseLayout title="Environments" includeHeader={true}>
-  <EnvironmentsView client:load spaceId={spaceSlug} />
+  <EnvironmentsView client:load spaceId={spaceSlug} spaceName={space.name} />
 </BaseLayout>

@@ -16,6 +16,7 @@ interface TargetingRule {
 
 interface AdvancedConfigViewProps {
   spaceId: string | undefined;
+  spaceName: string;
   featureId: string | undefined;
   featureName: string;
   featureKey: string;
@@ -24,6 +25,7 @@ interface AdvancedConfigViewProps {
 
 export default function AdvancedConfigurationView({
   spaceId,
+  spaceName,
   featureId,
   featureName,
   featureKey,
@@ -125,7 +127,7 @@ export default function AdvancedConfigurationView({
   return (
     <PageContainer
       spaceId={spaceId}
-      spaceName="Acme Corporation"
+      spaceName={spaceName}
       currentTab="features"
       subPage={{ name: featureName, path: `/spaces/${spaceId}/features` }}
     >

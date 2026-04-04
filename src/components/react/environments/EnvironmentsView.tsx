@@ -15,6 +15,7 @@ interface Environment {
 
 interface EnvironmentsViewProps {
   spaceId: string | undefined;
+  spaceName?: string;
 }
 
 const ENVIRONMENT_TYPES: EnvironmentType[] = [
@@ -185,7 +186,10 @@ const getEnvironmentColor = (type: EnvironmentType) => {
   }
 };
 
-export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
+export default function EnvironmentsView({
+  spaceId,
+  spaceName,
+}: EnvironmentsViewProps) {
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -353,7 +357,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
     <div className="max-w-7xl mx-auto py-12 px-6 animate-in fade-in duration-700">
       <SpaceNavigation
         spaceId={spaceId}
-        spaceName="Acme Corporation"
+        spaceName={spaceName}
         currentTab="environments"
       />
 
@@ -389,7 +393,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                 setShowCreateModal(true);
               }}
               disabled={isLoading}
-              className="btn-primary flex items-center gap-2 !px-8 !py-4 shadow-xl shadow-cyan-500/20"
+              className="btn-primary flex items-center gap-2 px-8! py-4! shadow-xl shadow-cyan-500/20"
             >
               <Icons.Other />
               New Environment
@@ -439,7 +443,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
               return (
                 <div
                   key={env.id}
-                  className={`group relative bg-gradient-to-br ${styles.bg} border ${styles.border} rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full`}
+                  className={`group relative bg-linear-to-br ${styles.bg} border ${styles.border} rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 flex flex-col h-full`}
                 >
                   <div
                     className={`absolute -top-12 -right-12 w-24 h-24 ${styles.glow} blur-[60px] rounded-full pointer-events-none opacity-50`}
@@ -518,7 +522,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
                 </p>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="btn-primary !px-10"
+                  className="btn-primary px-10!"
                 >
                   Bridge Dimension
                 </button>
@@ -563,7 +567,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
               value={newEnvDescription}
               onChange={(e) => setNewEnvDescription(e.target.value)}
               placeholder="Optional: Briefly describe this environment stage"
-              className="w-full bg-slate-950/40 border border-white/5 rounded-[2rem] px-5 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all h-28 resize-none text-sm font-medium"
+              className="w-full bg-slate-950/40 border border-white/5 rounded-4xl px-5 py-4 text-white placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all h-28 resize-none text-sm font-medium"
             />
           </div>
 
@@ -611,7 +615,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 btn-primary !py-4 shadow-xl shadow-cyan-500/20"
+              className="flex-1 btn-primary py-4! shadow-xl shadow-cyan-500/20"
             >
               {isSubmitting
                 ? "Saving..."
@@ -631,7 +635,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
         title="Confirm Deletion"
       >
         <div className="space-y-8">
-          <div className="bg-rose-500/5 border border-rose-500/20 rounded-[2rem] p-6 text-center space-y-4">
+          <div className="bg-rose-500/5 border border-rose-500/20 rounded-4xl p-6 text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-500 mx-auto border border-rose-500/20">
               <Icons.Delete />
             </div>
@@ -658,7 +662,7 @@ export default function EnvironmentsView({ spaceId }: EnvironmentsViewProps) {
             <button
               onClick={handleDeleteEnvironment}
               disabled={isSubmitting}
-              className="flex-1 btn-primary !py-4 shadow-xl shadow-rose-500/20 !bg-gradient-to-r !from-rose-600 !to-red-700"
+              className="flex-1 btn-primary py-4! shadow-xl shadow-rose-500/20 bg-linear-to-r! from-rose-600! to-red-700!"
             >
               {isSubmitting ? "Processing..." : "Confirm Delete"}
             </button>
@@ -681,7 +685,7 @@ function TypePill({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-4 bg-[#0b0e14]/50 border border-white/5 px-5 py-4 rounded-[1.5rem] hover:border-white/10 transition-all group">
+    <div className="flex items-center gap-4 bg-[#0b0e14]/50 border border-white/5 px-5 py-4 rounded-3xl hover:border-white/10 transition-all group">
       <div
         className={`${color} bg-white/5 p-2 rounded-xl group-hover:scale-110 transition-transform`}
       >

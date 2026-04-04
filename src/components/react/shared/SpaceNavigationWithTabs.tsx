@@ -20,8 +20,8 @@ export default function SpaceNavigationWithTabs({
   children,
 }: SpaceNavigationWithTabsProps) {
   const isActive = (tab: string) =>
-    currentTab === tab 
-      ? "text-cyan-400 after:w-full after:bg-cyan-500 after:shadow-[0_0_10px_rgba(6,182,212,0.5)]" 
+    currentTab === tab
+      ? "text-cyan-400 after:w-full after:bg-cyan-500 after:shadow-[0_0_10px_rgba(6,182,212,0.5)]"
       : "text-slate-500 hover:text-slate-200 after:w-0";
 
   const isPermissionSubTabActive = (tab: string) =>
@@ -38,7 +38,10 @@ export default function SpaceNavigationWithTabs({
             href="/spaces"
             className="group flex items-center gap-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 transition-all"
           >
-            <span className="transition-transform group-hover:-translate-x-1">←</span> Back to Workspace
+            <span className="transition-transform group-hover:-translate-x-1">
+              ←
+            </span>{" "}
+            Back to space
           </a>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <a
@@ -57,9 +60,21 @@ export default function SpaceNavigationWithTabs({
         <nav className="flex gap-4 md:gap-10 overflow-x-auto no-scrollbar">
           {[
             { id: "overview", label: "Overview", path: `/spaces/${spaceId}` },
-            { id: "environments", label: "Environments", path: `/spaces/${spaceId}/environments` },
-            { id: "features", label: "Features", path: `/spaces/${spaceId}/features` },
-            { id: "permissions", label: "Access Control", path: `/spaces/${spaceId}/permissions` },
+            {
+              id: "environments",
+              label: "Environments",
+              path: `/spaces/${spaceId}/environments`,
+            },
+            {
+              id: "features",
+              label: "Features",
+              path: `/spaces/${spaceId}/features`,
+            },
+            {
+              id: "permissions",
+              label: "Access Control",
+              path: `/spaces/${spaceId}/permissions`,
+            },
           ].map((tab) => (
             <a
               key={tab.id}
@@ -95,4 +110,3 @@ export default function SpaceNavigationWithTabs({
     </div>
   );
 }
-

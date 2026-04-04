@@ -23,5 +23,5 @@ if (!checkResourceExists(space, Astro, "Space")) {
 ---
 
 <BaseLayout title="Features" includeHeader={true}>
-  <FeaturesView client:load spaceId={spaceSlug} />
+  <FeaturesView client:load spaceId={spaceSlug} spaceName={space.name} />
 </BaseLayout>

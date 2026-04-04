@@ -15,11 +15,11 @@ import type { AstroGlobal } from "astro";
  * ---
  * ```
  */
-export function checkResourceExists(
-  resource: any,
+export function checkResourceExists<T>(
+  resource: T | null | undefined,
   astroContext: AstroGlobal,
   resourceName: string = "Resource",
-): boolean {
+): resource is T {
   if (!resource || resource === null || resource === undefined) {
     console.warn(`${resourceName} not found, redirecting to 404`);
     return false;
