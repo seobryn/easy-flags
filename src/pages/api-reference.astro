@@ -39,27 +39,177 @@ const { t } = getTranslator(Astro.request);
     <div class="max-w-5xl mx-auto px-8 py-20">
       <div class="grid grid-cols-1 gap-12">
         
-        <!-- Authentication -->
+
+
+        <!-- SDK Integration -->
         <section class="api-section anim-fade-in">
           <div class="flex items-center gap-4 mb-8">
-            <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 text-xl">
-              <Icon name="Lock" size={24} />
+            <div class="w-12 h-12 rounded-2xl bg-linear-to-br from-purple-400 to-pink-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20 text-xl">
+              <Icon name="Box" size={24} />
             </div>
-            <h2 class="text-3xl font-bold text-white tracking-tight">{t('apiReference.authTitle')}</h2>
+            <h2 class="text-3xl font-bold text-white tracking-tight">{t('apiReference.sdk.title')}</h2>
           </div>
           
-          <div class="card p-8 group">
-            <p class="text-slate-400 mb-6 text-lg leading-relaxed">
-              {t('apiReference.authDesc')}
-            </p>
-            <div class="relative overflow-hidden rounded-xl bg-[#0d1117] border border-white/10 group-hover:border-cyan-500/30 transition-colors">
-              <div class="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-white/2">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t('apiReference.httpHeader')}</span>
-                <button class="text-slate-500 hover:text-white transition-colors" onclick="navigator.clipboard.writeText('Authorization: Bearer YOUR_JWT_TOKEN')">
-                   <Icon name="Copy" size={14} />
-                </button>
+          <div class="card p-8 space-y-12">
+            <!-- Introduction -->
+            <div>
+              <p class="text-slate-400 text-lg leading-relaxed">
+                {t('apiReference.sdk.description')}
+              </p>
+            </div>
+
+            <!-- Installation -->
+            <div>
+              <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-purple-500 rounded-full"></span>
+                {t('apiReference.sdk.installation')}
+              </h3>
+              <p class="text-slate-400 mb-6 text-sm">{t('apiReference.sdk.installDesc')}</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- NPM -->
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-purple-500/50 transition-colors cursor-pointer group" onclick="navigator.clipboard.writeText('npm install @orange-ember/easy-flags-sdk')">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">npm</span>
+                    <Icon name="Copy" size={14} className="text-slate-500 group-hover:text-white" />
+                  </div>
+                  <code class="text-xs text-purple-300">npm install @orange-ember/easy-flags-sdk</code>
+                </div>
+                <!-- Yarn -->
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-purple-500/50 transition-colors cursor-pointer group" onclick="navigator.clipboard.writeText('yarn add @orange-ember/easy-flags-sdk')">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">yarn</span>
+                    <Icon name="Copy" size={14} className="text-slate-500 group-hover:text-white" />
+                  </div>
+                  <code class="text-xs text-purple-300">yarn add @orange-ember/easy-flags-sdk</code>
+                </div>
+                <!-- PNPM -->
+                <div class="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-purple-500/50 transition-colors cursor-pointer group" onclick="navigator.clipboard.writeText('pnpm add @orange-ember/easy-flags-sdk')">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">pnpm</span>
+                    <Icon name="Copy" size={14} className="text-slate-500 group-hover:text-white" />
+                  </div>
+                  <code class="text-xs text-purple-300">pnpm add @orange-ember/easy-flags-sdk</code>
+                </div>
               </div>
-              <pre class="p-6 text-cyan-300 font-mono text-sm overflow-x-auto"><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
+            </div>
+
+            <!-- Usage Steps -->
+            <div class="space-y-10">
+              <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <span class="w-1.5 h-6 bg-pink-500 rounded-full"></span>
+                {t('apiReference.sdk.usage')}
+              </h3>
+              <p class="text-slate-400 text-sm -mt-2">{t('apiReference.sdk.usageDesc')}</p>
+              
+              <!-- Step 1: Init -->
+              <div class="space-y-4">
+                <h4 class="text-white font-bold text-sm tracking-wide">{t('apiReference.sdk.initTitle')}</h4>
+                <p class="text-slate-400 text-sm">{t('apiReference.sdk.initDesc')}</p>
+                <div class="relative overflow-hidden rounded-xl bg-[#0d1117] border border-white/10">
+                  <div class="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-white/2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">JavaScript / TypeScript</span>
+                    <button class="text-slate-500 hover:text-white transition-colors" onclick="navigator.clipboard.writeText(document.getElementById('init-code').innerText)">
+                      <Icon name="Copy" size={14} />
+                    </button>
+                  </div>
+                  <pre class="p-6 text-cyan-300 font-mono text-xs overflow-x-auto"><code id="init-code">import {'{'} EasyFlagsClient {'}'} from "@orange-ember/easy-flags-sdk";
+
+const client = new EasyFlagsClient({'{'}
+  apiKey: "YOUR_API_KEY",
+  spaceId: "YOUR_SPACE_ID",
+  environmentId: "YOUR_ENVIRONMENT_ID",
+{'}'});</code></pre>
+                </div>
+              </div>
+
+              <!-- Step 2: Evaluate -->
+              <div class="space-y-4">
+                <h4 class="text-white font-bold text-sm tracking-wide">{t('apiReference.sdk.evalTitle')}</h4>
+                <p class="text-slate-400 text-sm">{t('apiReference.sdk.evalDesc')}</p>
+                <div class="relative overflow-hidden rounded-xl bg-[#0d1117] border border-white/10">
+                  <div class="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-white/2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">JavaScript</span>
+                    <button class="text-slate-500 hover:text-white transition-colors" onclick="navigator.clipboard.writeText(document.getElementById('eval-code').innerText)">
+                      <Icon name="Copy" size={14} />
+                    </button>
+                  </div>
+                  <pre class="p-6 text-emerald-300 font-mono text-xs overflow-x-auto"><code id="eval-code">const isFeatureEnabled = await client.evaluate("new-navigation", {'{'}
+  defaultValue: false,
+{'}'});
+
+if (isFeatureEnabled) {'{'}
+  // Render new navigation
+{'}'}</code></pre>
+                </div>
+              </div>
+
+              <!-- Step 3: Advanced -->
+              <div class="space-y-4">
+                <h4 class="text-white font-bold text-sm tracking-wide">{t('apiReference.sdk.advancedTitle')}</h4>
+                <p class="text-slate-400 text-sm">{t('apiReference.sdk.advancedDesc')}</p>
+                <div class="relative overflow-hidden rounded-xl bg-[#0d1117] border border-white/10">
+                  <div class="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-white/2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">TypeScript</span>
+                    <button class="text-slate-500 hover:text-white transition-colors" onclick="navigator.clipboard.writeText(document.getElementById('advanced-code').innerText)">
+                      <Icon name="Copy" size={14} />
+                    </button>
+                  </div>
+                  <pre class="p-6 text-amber-300 font-mono text-xs overflow-x-auto"><code id="advanced-code">const themeColor = await client.evaluate&lt;string&gt;("user-theme", {'{'}
+  defaultValue: "#ffffff",
+  userId: "user_789", // Required for deterministic rollouts
+  context: {'{'}
+    plan: "premium",
+    version: "2.4.0"
+  {'}'}
+{'}'});</code></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Configuration Table -->
+            <div>
+              <h3 class="text-xl font-bold text-white mb-6 uppercase tracking-widest text-[10px] text-slate-500">
+                {t('apiReference.sdk.configTitle')}
+              </h3>
+              <div class="overflow-hidden rounded-xl border border-white/10 bg-white/1">
+                <table class="w-full text-left text-sm">
+                  <thead class="bg-white/2 border-b border-white/10">
+                    <tr>
+                      <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-[10px]">Property</th>
+                      <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-[10px]">Type</th>
+                      <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-[10px]">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-white/5">
+                    <tr>
+                      <td class="px-6 py-4 font-mono text-cyan-400 text-xs">apiKey</td>
+                      <td class="px-6 py-4 text-slate-500 text-xs">string</td>
+                      <td class="px-6 py-4 text-slate-300">{t('apiReference.sdk.configApiKey')}</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 font-mono text-cyan-400 text-xs">spaceId</td>
+                      <td class="px-6 py-4 text-slate-500 text-xs">string</td>
+                      <td class="px-6 py-4 text-slate-300">{t('apiReference.sdk.configSpaceId')}</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 font-mono text-cyan-400 text-xs">environmentId</td>
+                      <td class="px-6 py-4 text-slate-500 text-xs">string</td>
+                      <td class="px-6 py-4 text-slate-300">{t('apiReference.sdk.configEnvId')}</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 font-mono text-cyan-400 text-xs">cacheTTL</td>
+                      <td class="px-6 py-4 text-slate-500 text-xs">number</td>
+                      <td class="px-6 py-4 text-slate-300">{t('apiReference.sdk.configCache')}</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 font-mono text-cyan-400 text-xs">timeout</td>
+                      <td class="px-6 py-4 text-slate-500 text-xs">number</td>
+                      <td class="px-6 py-4 text-slate-300">{t('apiReference.sdk.configTimeout')}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </section>
@@ -102,9 +252,13 @@ const { t } = getTranslator(Astro.request);
               </span>
             </div>
             <div class="p-8">
-              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+              <p class="text-slate-400 mb-4 leading-relaxed text-lg">
                 {t('apiReference.spacesDesc')}
               </p>
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                <Icon name="Lock" size={12} />
+                {t('apiReference.jwtAuth')}
+              </div>
             </div>
           </div>
 
@@ -120,9 +274,13 @@ const { t } = getTranslator(Astro.request);
               </span>
             </div>
             <div class="p-8">
-              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+              <p class="text-slate-400 mb-4 leading-relaxed text-lg">
                 {t('apiReference.createFeatureDesc')}
               </p>
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                <Icon name="Lock" size={12} />
+                {t('apiReference.jwtAuth')}
+              </div>
             </div>
           </div>
 
@@ -138,9 +296,41 @@ const { t } = getTranslator(Astro.request);
               </span>
             </div>
             <div class="p-8">
-              <p class="text-slate-400 mb-0 leading-relaxed text-lg">
+              <p class="text-slate-400 mb-4 leading-relaxed text-lg">
                 {t('apiReference.getEnvsDesc')}
               </p>
+              <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                <Icon name="Lock" size={12} />
+                {t('apiReference.jwtAuth')}
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluate -->
+          <div class="card p-0 overflow-hidden group hover:border-pink-500/30 transition-all anim-fade-in delay-600">
+            <div class="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/2">
+              <div class="flex items-center gap-3">
+                <span class="px-2.5 py-1 rounded-md bg-pink-500/10 text-pink-400 text-[10px] font-black tracking-widest uppercase">GET/POST</span>
+                <code class="text-white font-bold text-sm tracking-tight">/api/features/:featureKey/evaluate</code>
+              </div>
+              <span class="opacity-50 group-hover:opacity-100 transition-opacity">
+                <Icon name="Zap" size={20} />
+              </span>
+            </div>
+            <div class="p-8">
+              <p class="text-slate-400 mb-4 leading-relaxed text-lg">
+                {t('apiReference.evaluateDesc')}
+              </p>
+              <div class="flex flex-wrap gap-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider">
+                  <Icon name="Lock" size={12} />
+                  {t('apiReference.jwtAuth')}
+                </div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-wider">
+                  <Icon name="Key" size={12} />
+                  {t('apiReference.apiKeyAuth')}
+                </div>
+              </div>
             </div>
           </div>
         </section>

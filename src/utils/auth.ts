@@ -49,6 +49,13 @@ export async function verifyTokenWithVersion(
 }
 
 export function getTokenFromCookies(context: APIContext): string | null {
+  // Try Authorization header first
+  const authHeader = context.request.headers.get("Authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.substring(7);
+  }
+
+  // Fallback to cookies
   const cookies = context.cookies;
   return cookies.get("ff_token")?.value || null;
 }
