@@ -175,8 +175,8 @@ function CustomerDataModal({
                 {step === 1
                   ? t("billing.customerDataTitle")
                   : step === 2 
-                    ? "Dirección de Facturación"
-                    : "Método de Pago"}
+                    ? t("billing.billingAddressTitle")
+                    : t("billing.paymentMethodTitle")}
               </h2>
               {step === 3 && (
                 <div className="px-2 py-1 bg-white/10 rounded-lg border border-white/10 flex items-center">
@@ -192,8 +192,8 @@ function CustomerDataModal({
               {step === 1
                 ? t("billing.customerDataSubtitle")
                 : step === 2
-                  ? "Completa tus datos de envío y facturación"
-                  : "Ingresa los datos de tu tarjeta"}
+                  ? t("billing.billingAddressSubtitle")
+                  : t("billing.paymentMethodSubtitle")}
             </p>
           </div>
           <button
@@ -223,6 +223,7 @@ function CustomerDataModal({
                       selectedCountry={formData.country}
                       phonePrefix={formData.phoneNumberPrefix}
                       onCountryChange={handleCountryChange}
+                      initialLocale={initialLocale}
                     />
                   }
                 />
@@ -233,6 +234,7 @@ function CustomerDataModal({
                       label={t("billing.legalIdType")}
                       value={formData.legalIdType}
                       onChange={(val) => setFormData({ ...formData, legalIdType: val })}
+                      initialLocale={initialLocale}
                       options={[
                         { value: "CC", label: "CC" },
                         { value: "CE", label: "CE" },
@@ -260,15 +262,16 @@ function CustomerDataModal({
             ) : step === 2 ? (
               <>
                 <BillingSelector
-                  label="País"
+                  label={t("billing.countryLabel")}
                   searchable
                   value={formData.country}
                   onChange={(val) => handleCountryChange(val)}
+                  initialLocale={initialLocale}
                   options={countries.map(c => ({ value: c.code, label: c.name, flag: c.flag }))}
                 />
 
                 <BillingInput
-                  label="Dirección"
+                  label={t("billing.addressLabel")}
                   icon="MapPin"
                   required
                   value={formData.addressLine1}
@@ -278,23 +281,25 @@ function CustomerDataModal({
 
                 <div className="grid grid-cols-2 gap-6">
                   <BillingSelector
-                    label={formData.country === "CO" ? "Departamento" : "Estado / Provincia"}
+                    label={formData.country === "CO" ? t("billing.regionLabelCO") : t("billing.regionLabel")}
                     searchable
                     loading={loadingGeo}
                     disabled={loadingGeo || states.length === 0}
                     value={formData.regionCode}
-                    placeholder="Seleccionar..."
+                    placeholder={t("billing.selectPlaceholder")}
                     onChange={(val, label) => handleStateChange(val, label)}
+                    initialLocale={initialLocale}
                     options={states.map(s => ({ value: s.code, label: s.name }))}
                   />
                   <BillingSelector
-                    label="Ciudad"
+                    label={t("billing.cityLabel")}
                     searchable
                     loading={loadingGeo}
                     disabled={loadingGeo || cities.length === 0}
                     value={formData.city}
-                    placeholder="Seleccionar..."
+                    placeholder={t("billing.selectPlaceholder")}
                     onChange={(val) => setFormData({ ...formData, city: val })}
+                    initialLocale={initialLocale}
                     options={cities.map(c => ({ value: c.name, label: c.name }))}
                   />
                 </div>
@@ -302,14 +307,14 @@ function CustomerDataModal({
             ) : (
               <div className="space-y-5">
                 <BillingInput
-                  label="Titular de la Tarjeta"
+                  label={t("billing.cardHolder")}
                   required
                   value={formData.cardHolder}
                   onChange={(e) => setFormData({ ...formData, cardHolder: e.target.value })}
                 />
                 
                 <BillingInput
-                  label="Número de Tarjeta"
+                  label={t("billing.cardNumber")}
                   required
                   maxLength={19}
                   placeholder="4242 4242 4242 4242"
@@ -332,7 +337,7 @@ function CustomerDataModal({
                 <div className="grid grid-cols-3 gap-4">
                   <div className="col-span-1">
                     <BillingInput
-                      label="CVV"
+                      label={t("billing.cvv")}
                       required
                       maxLength={4}
                       value={formData.cvv}
@@ -341,7 +346,7 @@ function CustomerDataModal({
                   </div>
                   <div className="col-span-2 grid grid-cols-2 gap-3">
                     <BillingInput
-                      label="Mes"
+                      label={t("billing.monthLabel")}
                       required
                       maxLength={2}
                       placeholder="MM"
@@ -349,7 +354,7 @@ function CustomerDataModal({
                       onChange={(e) => setFormData({ ...formData, expiryMonth: e.target.value.replace(/\D/g, "") })}
                     />
                     <BillingInput
-                      label="Año"
+                      label={t("billing.yearLabel")}
                       required
                       maxLength={4}
                       placeholder="YY"
@@ -371,7 +376,11 @@ function CustomerDataModal({
                         className="mt-1 accent-cyan-500 w-4 h-4"
                       />
                       <label htmlFor="acceptTerms" className="text-[10px] text-slate-400 leading-relaxed">
-                        Acepto los <a href={acceptanceData.acceptanceText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">Términos y Condiciones</a> del servicio.
+                        {t("billing.termsAcceptance").split("{terms}")[0]}
+                        <a href={acceptanceData.acceptanceText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">
+                          {t("billing.termsLink") || "Términos y Condiciones"}
+                        </a>
+                        {t("billing.termsAcceptance").split("{terms}")[1]}
                       </label>
                     </div>
                     <div className="flex items-start gap-3">
@@ -384,7 +393,11 @@ function CustomerDataModal({
                         className="mt-1 accent-cyan-500 w-4 h-4"
                       />
                       <label htmlFor="acceptPrivacy" className="text-[10px] text-slate-400 leading-relaxed">
-                        Acepto el <a href={acceptanceData.dataPrivacyText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">Tratamiento de Datos Personales</a>.
+                        {t("billing.privacyAcceptance").split("{privacy}")[0]}
+                        <a href={acceptanceData.dataPrivacyText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">
+                          {t("billing.privacyLink") || "Tratamiento de Datos Personales"}
+                        </a>
+                        {t("billing.privacyAcceptance").split("{privacy}")[1]}
                       </label>
                     </div>
                   </div>
@@ -401,7 +414,7 @@ function CustomerDataModal({
                 disabled={loading}
                 className="flex-1 py-3.5 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-white transition-colors"
               >
-                Volver
+                {t("billing.back")}
               </button>
             )}
             {step < 3 ? (
@@ -420,7 +433,7 @@ function CustomerDataModal({
                   type="submit"
                   className="flex-2 bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold uppercase tracking-widest text-[10px] py-3.5 rounded-2xl transition shadow-lg shadow-cyan-500/20"
                 >
-                  Siguiente
+                  {t("billing.next")}
                 </button>
               </>
             ) : (
@@ -436,12 +449,12 @@ function CustomerDataModal({
                       {t("billing.processing")}
                     </span>
                   ) : (
-                    "Pagar Ahora"
+                    t("billing.payNow")
                   )}
                 </button>
                 <div className="flex items-center justify-center gap-2 text-[8px] text-slate-500 uppercase tracking-tighter">
                   <Icon name="Lock" size={8} />
-                  <span>Pago Seguro via Wompi</span>
+                  <span>{t("billing.securePayment")}</span>
                 </div>
               </div>
             )}

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Icon } from "../shared/Icon";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface Option {
   value: string;
@@ -17,6 +19,7 @@ interface BillingSelectorProps {
   loading?: boolean;
   disabled?: boolean;
   className?: string;
+  initialLocale?: AvailableLanguages;
 }
 
 export const BillingSelector: React.FC<BillingSelectorProps> = ({
@@ -24,12 +27,14 @@ export const BillingSelector: React.FC<BillingSelectorProps> = ({
   value,
   onChange,
   options,
-  placeholder = "Seleccionar...",
+  placeholder,
   searchable = false,
   loading = false,
   disabled = false,
   className = "",
+  initialLocale,
 }) => {
+  const t = useTranslate(initialLocale);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -135,7 +140,7 @@ export const BillingSelector: React.FC<BillingSelectorProps> = ({
               <span>{selectedOption.label}</span>
             </>
           ) : (
-            <span className="text-slate-700">{placeholder}</span>
+            <span className="text-slate-700">{placeholder || t("billing.selectPlaceholder")}</span>
           )}
         </span>
         <div className="flex items-center gap-2">
@@ -159,7 +164,7 @@ export const BillingSelector: React.FC<BillingSelectorProps> = ({
                 <input
                   ref={searchInputRef}
                   type="text"
-                  placeholder="Buscar..."
+                  placeholder={t("billing.searchPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-9 pr-4 py-2 bg-slate-950/60 border border-white/5 rounded-xl text-sm text-white focus:outline-none focus:border-cyan-500/30 transition-all"
@@ -169,7 +174,6 @@ export const BillingSelector: React.FC<BillingSelectorProps> = ({
           )}
 
           <ul
-            ref={listRef}
             role="listbox"
             className="max-h-60 overflow-y-auto py-2 custom-scrollbar"
           >
@@ -198,7 +202,7 @@ export const BillingSelector: React.FC<BillingSelectorProps> = ({
               ))
             ) : (
               <li className="px-5 py-4 text-xs text-slate-600 text-center uppercase tracking-widest font-bold">
-                No se encontraron resultados
+                {t("billing.noResults")}
               </li>
             )}
           </ul>

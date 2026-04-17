@@ -86,13 +86,11 @@ try {
             <h3
               class={`text-xl font-bold mb-3 ${plan.is_recommended ? "text-cyan-400" : "text-white"}`}
             >
-              {plan.name}
+              {t(`billing.plans.${plan.slug}.name`) || plan.name}
             </h3>
-            {plan.description && (
-              <p class="text-slate-400 text-sm leading-relaxed">
-                {plan.description}
-              </p>
-            )}
+            <p class="text-slate-400 text-sm leading-relaxed">
+              {t(`billing.plans.${plan.slug}.description`) || plan.description}
+            </p>
           </div>
 
           <div class="flex items-baseline gap-1 mb-8">
@@ -115,7 +113,7 @@ try {
               {t('billing.whatsIncluded')}
             </p>
             {plan.features?.length ? (
-              plan.features.map((feature) => (
+              plan.features.map((feature, index) => (
                 <div class="flex gap-3 items-center">
                   <div
                     class={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.is_recommended ? "bg-cyan-500/20 text-cyan-400" : "bg-white/10 text-slate-400"}`}
@@ -123,7 +121,7 @@ try {
                     <Icon name="Check" size={12} strokeWidth={4} />
                   </div>
                   <span class="text-slate-300 text-sm font-medium">
-                    {feature.feature_name}
+                    {t(`billing.plans.${plan.slug}.features.${index}`) || feature.feature_name}
                   </span>
                 </div>
               ))
