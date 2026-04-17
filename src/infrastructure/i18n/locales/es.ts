@@ -119,10 +119,11 @@ export const es = {
       "Error al cargar los planes de precios. Por favor, intente actualizar la página.",
     persistenceNotice: "Si esto persiste, por favor contacte a soporte.",
     noFeatures: "No hay funciones específicas listadas",
-    planSelected:
-      "Plan {name} seleccionado. ¡El procesamiento de pagos estará disponible pronto!",
     processing: "Procesando...",
-    paymentComingSoon: "El procesamiento de pagos estará disponible pronto",
+    failedInitialize: "Error al iniciar el pago. Por favor intente de nuevo.",
+    scriptLoadError: "Error al cargar la pasarela de pago. Por favor revise su conexión a internet.",
+    paymentDeclined: "El pago fue declinado. Por favor intente con otro medio de pago.",
+    paymentError: "Ocurrió un error durante el proceso de pago. Por favor intente más tarde.",
   },
   contact: {
     title: "Contáctanos",

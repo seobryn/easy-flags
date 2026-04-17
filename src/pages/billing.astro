@@ -8,11 +8,8 @@ import { getTranslator } from "@/infrastructure/i18n/astro";
 
 const { t } = getTranslator(Astro.request);
 
-// Redirect logged-in users to dashboard
+// Allow logged-in users to see plans
 const user = getUserFromContext(Astro);
-if (user) {
-  return Astro.redirect("/spaces");
-}
 ---
 
 <BaseLayout seoKey="pricing" includeHeader={true}>

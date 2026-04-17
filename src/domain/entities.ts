@@ -535,3 +535,27 @@ export interface UpdateSpaceSubscriptionDTO {
   cancellation_date?: string;
   canceled_at?: string;
 }
+
+// ====================
+// Payments
+// ====================
+
+export type PaymentStatus =
+  | "PENDING"
+  | "APPROVED"
+  | "DECLINED"
+  | "VOIDED"
+  | "ERROR";
+
+export interface PaymentTransaction {
+  id: number;
+  space_id: number;
+  pricing_plan_id: number;
+  amount: number;
+  currency: string;
+  reference: string;
+  status: PaymentStatus;
+  external_id?: string;
+  created_at: string;
+  updated_at: string;
+}

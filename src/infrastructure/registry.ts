@@ -54,6 +54,7 @@ import {
   LibSqlPricingPlanLimitRepository,
   LibSqlSpaceSubscriptionRepository,
 } from "./adapters/libsql-pricing.adapter";
+import { LibSqlPaymentRepository } from "./adapters/libsql-payment.adapter";
 
 class LibSqlRepositoryRegistry implements RepositoryRegistry {
   private userRepository: UserRepository | null = null;
@@ -82,6 +83,7 @@ class LibSqlRepositoryRegistry implements RepositoryRegistry {
   private pricingPlanLimitRepository: PricingPlanLimitRepository | null = null;
   private spaceSubscriptionRepository: SpaceSubscriptionRepository | null =
     null;
+  private paymentRepository: PaymentRepository | null = null;
 
   getUserRepository(): UserRepository {
     if (!this.userRepository) {
@@ -233,6 +235,13 @@ class LibSqlRepositoryRegistry implements RepositoryRegistry {
         new LibSqlSpaceSubscriptionRepository();
     }
     return this.spaceSubscriptionRepository;
+  }
+
+  getPaymentRepository(): PaymentRepository {
+    if (!this.paymentRepository) {
+      this.paymentRepository = new LibSqlPaymentRepository();
+    }
+    return this.paymentRepository;
   }
 }
 

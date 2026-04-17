@@ -5,7 +5,8 @@
 
 import { getRepositoryRegistry } from "@infrastructure/registry";
 import { FlagEvaluationService } from "./evaluation.service";
-export { FlagEvaluationService };
+import { PaymentService } from "./payment.service";
+export { FlagEvaluationService, PaymentService };
 import type {
   Space,
   Feature,

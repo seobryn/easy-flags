@@ -20,12 +20,64 @@ export default function CheckoutButton({ plan, initialLocale }: CheckoutButtonPr
         credentials: "include",
       });
       if (!userResponse.ok) {
-        window.location.href = "/login";
+        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
         return;
       }
 
-      // TODO: Implement payment processing
-      alert(t('billing.planSelected', { name: plan.name }));
+      // Initialize checkout on backend
+      const checkoutResponse = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          planSlug: plan.slug,
+        }),
+      });
+
+      if (!checkoutResponse.ok) {
+        const errorData = await checkoutResponse.json();
+        throw new Error(errorData.error || t('billing.failedInitialize'));
+      }
+
+      const { data } = await checkoutResponse.json();
+
+      // Inject Wompi script if not already present
+      if (!window.WidgetCheckout) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://checkout.wompi.co/widget.js";
+          script.async = true;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error(t('billing.scriptLoadError')));
+          document.head.appendChild(script);
+        });
+      }
+
+      // Configure Wompi Widget
+      const checkout = new window.WidgetCheckout({
+        currency: data.currency,
+        amountInCents: data.amountInCents,
+        publicKey: data.publicKey,
+        reference: data.transaction.reference,
+        signature: data.signature,
+        redirectUrl: `${window.location.origin}/billing?payment=completed`,
+      });
+
+      // Open the widget
+      checkout.open((result: any) => {
+        const transaction = result.transaction;
+        if (transaction.status === "APPROVED") {
+          window.location.href = "/billing?status=success";
+        } else if (transaction.status === "DECLINED") {
+          alert(t('billing.paymentDeclined'));
+        } else if (transaction.status === "ERROR") {
+          alert(t('billing.paymentError'));
+        }
+      });
+    } catch (error: any) {
+      console.error("[Checkout Error]:", error);
+      alert(error.message || t('billing.paymentError'));
     } finally {
       setLoading(false);
     }
@@ -45,7 +97,7 @@ export default function CheckoutButton({ plan, initialLocale }: CheckoutButtonPr
     );
   }
 
-  // Paid plans - coming soon
+  // Paid plans
   return (
     <div className="space-y-2 mb-6">
       <button
@@ -57,9 +109,6 @@ export default function CheckoutButton({ plan, initialLocale }: CheckoutButtonPr
       >
         {loading ? t('billing.processing') : t('auth.getStarted')}
       </button>
-      <p className="text-sm text-slate-400 text-center">
-        {t('billing.paymentComingSoon')}
-      </p>
     </div>
   );
 }

@@ -117,9 +117,11 @@ export const en = {
     failedLoad: 'Failed to load pricing plans. Please try refreshing the page.',
     persistenceNotice: 'If this persists, please contact support.',
     noFeatures: 'No specific features listed',
-    planSelected: '{name} plan selected. Payment processing coming soon!',
     processing: 'Processing...',
-    paymentComingSoon: 'Payment processing coming soon',
+    failedInitialize: 'Failed to initialize payment. Please try again.',
+    scriptLoadError: 'Failed to load payment gateway. Please check your internet connection.',
+    paymentDeclined: 'The payment was declined. Please try with another payment method.',
+    paymentError: 'An error occurred during the payment process. Please try again later.',
   },
   contact: {
     title: 'Contact Us',

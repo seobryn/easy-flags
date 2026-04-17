@@ -45,6 +45,8 @@ import type {
   CreatePricingPlanLimitDTO,
   CreateSpaceSubscriptionDTO,
   UpdateSpaceSubscriptionDTO,
+  PaymentStatus,
+  PaymentTransaction,
 } from "@domain/entities";
 
 // ====================
@@ -400,6 +402,35 @@ export interface SpaceSubscriptionRepository {
 }
 
 // ====================
+// Payment Repository Port
+// ====================
+
+export interface PaymentRepository {
+  create(
+    payment: Omit<PaymentTransaction, "id" | "created_at" | "updated_at">,
+  ): Promise<PaymentTransaction>;
+  update(
+    id: number,
+    updates: Partial<PaymentTransaction>,
+  ): Promise<PaymentTransaction>;
+  findById(id: number): Promise<PaymentTransaction | null>;
+  findByReference(reference: string): Promise<PaymentTransaction | null>;
+}
+
+// ====================
+// Payment Gateway Port
+// ====================
+
+export interface PaymentGateway {
+  generateIntegritySignature(
+    reference: string,
+    amount: number,
+    currency: string,
+  ): string;
+  verifyWebhookSignature(payload: any, signature: string): boolean;
+}
+
+// ====================
 // Repository Registry Port
 // ====================
 
@@ -425,4 +456,5 @@ export interface RepositoryRegistry {
   getPricingPlanFeatureRepository(): PricingPlanFeatureRepository;
   getPricingPlanLimitRepository(): PricingPlanLimitRepository;
   getSpaceSubscriptionRepository(): SpaceSubscriptionRepository;
+  getPaymentRepository(): PaymentRepository;
 }
