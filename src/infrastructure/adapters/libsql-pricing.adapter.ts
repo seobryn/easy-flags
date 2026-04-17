@@ -758,7 +758,7 @@ export class LibSqlUserSubscriptionRepository implements UserSubscriptionReposit
 
     // Fetch the pricing plan details
     const planRepo = new LibSqlPricingPlanRepository();
-    subscription.pricing_plan =
+    subscription.plan =
       (await planRepo.findByIdWithDetails(subscription.pricing_plan_id)) ||
       undefined;
 

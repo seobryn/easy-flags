@@ -178,12 +178,24 @@ export class PaymentService {
     };
 
     const wompiTx = await this.paymentGateway.createTransaction(payload);
+    const paymentStatus = this.mapWompiStatus(wompiTx.status);
 
     // Update transaction with external ID
     await paymentRepo.update(transaction.id, {
       external_id: wompiTx.id,
-      status: this.mapWompiStatus(wompiTx.status),
+      status: paymentStatus,
     });
+
+    // If payment is approved, assign the plan to the user immediately
+    if (paymentStatus === "APPROVED") {
+      const plan = await registry.getPricingPlanRepository().findById(transaction.pricing_plan_id);
+      if (plan) {
+        await PricingService.getInstance().assignPlanToUser(
+          transaction.user_id,
+          plan.slug
+        );
+      }
+    }
 
     return wompiTx;
   }

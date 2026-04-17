@@ -153,6 +153,9 @@ export const en = {
     searchPlaceholder: 'Search...',
     noResults: 'No results found',
     searchCountry: 'Search country or code...',
+    upgradePlan: 'Upgrade',
+    downgradePlan: 'Downgrade',
+    currentPlan: 'Current Plan',
     plans: {
       lab: {
         name: 'Lab',

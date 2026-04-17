@@ -474,7 +474,7 @@ export interface UserSubscription {
   canceled_at?: string;
   created_at: string;
   updated_at: string;
-  pricing_plan?: PricingPlan;
+  plan?: PricingPlan;
 }
 
 // ====================

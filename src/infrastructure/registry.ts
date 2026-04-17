@@ -52,7 +52,7 @@ import {
   LibSqlPricingPlanRepository,
   LibSqlPricingPlanFeatureRepository,
   LibSqlPricingPlanLimitRepository,
-  LibSqlSpaceSubscriptionRepository,
+  LibSqlUserSubscriptionRepository,
 } from "./adapters/libsql-pricing.adapter";
 import { LibSqlPaymentRepository } from "./adapters/libsql-payment.adapter";
 
@@ -81,8 +81,7 @@ class LibSqlRepositoryRegistry implements RepositoryRegistry {
   private pricingPlanFeatureRepository: PricingPlanFeatureRepository | null =
     null;
   private pricingPlanLimitRepository: PricingPlanLimitRepository | null = null;
-  private spaceSubscriptionRepository: SpaceSubscriptionRepository | null =
-    null;
+  private userSubscriptionRepository: UserSubscriptionRepository | null = null;
   private paymentRepository: PaymentRepository | null = null;
 
   getUserRepository(): UserRepository {

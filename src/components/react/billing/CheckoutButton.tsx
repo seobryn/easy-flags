@@ -12,6 +12,7 @@ import { PhonePrefixSelector } from "./PhonePrefixSelector";
 interface CheckoutButtonProps {
   plan: PricingPlan;
   initialLocale?: AvailableLanguages;
+  action: "checkout" | "upgrade" | "downgrade" | "current" | "login";
 }
 
 interface CustomerDataModalProps {
@@ -94,7 +95,9 @@ function CustomerDataModal({
   const loadStates = async (countryCode: string) => {
     setLoadingGeo(true);
     try {
-      const res = await fetch(`/api/system/geo?type=states&countryCode=${countryCode}`);
+      const res = await fetch(
+        `/api/system/geo?type=states&countryCode=${countryCode}`
+      );
       const result = await res.json();
       if (result.success) {
         setStates(result.data);
@@ -110,7 +113,9 @@ function CustomerDataModal({
   const loadCities = async (countryCode: string, stateCode: string) => {
     setLoadingGeo(true);
     try {
-      const res = await fetch(`/api/system/geo?type=cities&countryCode=${countryCode}&stateCode=${stateCode}`);
+      const res = await fetch(
+        `/api/system/geo?type=cities&countryCode=${countryCode}&stateCode=${stateCode}`
+      );
       const result = await res.json();
       if (result.success) {
         setCities(result.data);
@@ -123,16 +128,18 @@ function CustomerDataModal({
   };
 
   const handleCountryChange = (code: string) => {
-    const country = countries.find(c => c.code === code);
-    const phonePrefix = country ? `+${country.phoneCode.replace("+", "")}` : "+57";
-    
-    setFormData({ 
-      ...formData, 
-      country: code, 
+    const country = countries.find((c) => c.code === code);
+    const phonePrefix = country
+      ? `+${country.phoneCode.replace("+", "")}`
+      : "+57";
+
+    setFormData({
+      ...formData,
+      country: code,
       phoneNumberPrefix: phonePrefix,
-      region: "", 
-      regionCode: "", 
-      city: "" 
+      region: "",
+      regionCode: "",
+      city: "",
     });
     loadStates(code);
   };
@@ -152,7 +159,9 @@ function CustomerDataModal({
       setStep(3);
     } else {
       if (!formData.acceptTerms || !formData.acceptPrivacy) {
-        alert("Debes aceptar los términos y el tratamiento de datos para continuar.");
+        alert(
+          "Debes aceptar los términos y el tratamiento de datos para continuar."
+        );
         return;
       }
       onSubmit(formData);
@@ -174,15 +183,15 @@ function CustomerDataModal({
               <h2 className="text-2xl font-bold text-white tracking-tight">
                 {step === 1
                   ? t("billing.customerDataTitle")
-                  : step === 2 
-                    ? t("billing.billingAddressTitle")
-                    : t("billing.paymentMethodTitle")}
+                  : step === 2
+                  ? t("billing.billingAddressTitle")
+                  : t("billing.paymentMethodTitle")}
               </h2>
               {step === 3 && (
                 <div className="px-2 py-1 bg-white/10 rounded-lg border border-white/10 flex items-center">
-                  <img 
-                    src="https://wompi.com/assets/downloadble/logos_wompi/Wompi_ContraccionPrincipal.svg" 
-                    alt="Wompi" 
+                  <img
+                    src="https://wompi.com/assets/downloadble/logos_wompi/Wompi_ContraccionPrincipal.svg"
+                    alt="Wompi"
                     className="h-5 brightness-0 invert opacity-90"
                   />
                 </div>
@@ -192,8 +201,8 @@ function CustomerDataModal({
               {step === 1
                 ? t("billing.customerDataSubtitle")
                 : step === 2
-                  ? t("billing.billingAddressSubtitle")
-                  : t("billing.paymentMethodSubtitle")}
+                ? t("billing.billingAddressSubtitle")
+                : t("billing.paymentMethodSubtitle")}
             </p>
           </div>
           <button
@@ -215,7 +224,9 @@ function CustomerDataModal({
                   type="tel"
                   required
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phoneNumber: e.target.value })
+                  }
                   placeholder="3001234567"
                   prefix={
                     <PhonePrefixSelector
@@ -233,7 +244,9 @@ function CustomerDataModal({
                     <BillingSelector
                       label={t("billing.legalIdType")}
                       value={formData.legalIdType}
-                      onChange={(val) => setFormData({ ...formData, legalIdType: val })}
+                      onChange={(val) =>
+                        setFormData({ ...formData, legalIdType: val })
+                      }
                       initialLocale={initialLocale}
                       options={[
                         { value: "CC", label: "CC" },
@@ -253,7 +266,9 @@ function CustomerDataModal({
                       icon="CreditCard"
                       required
                       value={formData.legalId}
-                      onChange={(e) => setFormData({ ...formData, legalId: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, legalId: e.target.value })
+                      }
                       placeholder="123456789"
                     />
                   </div>
@@ -267,7 +282,11 @@ function CustomerDataModal({
                   value={formData.country}
                   onChange={(val) => handleCountryChange(val)}
                   initialLocale={initialLocale}
-                  options={countries.map(c => ({ value: c.code, label: c.name, flag: c.flag }))}
+                  options={countries.map((c) => ({
+                    value: c.code,
+                    label: c.name,
+                    flag: c.flag,
+                  }))}
                 />
 
                 <BillingInput
@@ -275,13 +294,19 @@ function CustomerDataModal({
                   icon="MapPin"
                   required
                   value={formData.addressLine1}
-                  onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, addressLine1: e.target.value })
+                  }
                   placeholder="Calle 123 # 45-67"
                 />
 
                 <div className="grid grid-cols-2 gap-6">
                   <BillingSelector
-                    label={formData.country === "CO" ? t("billing.regionLabelCO") : t("billing.regionLabel")}
+                    label={
+                      formData.country === "CO"
+                        ? t("billing.regionLabelCO")
+                        : t("billing.regionLabel")
+                    }
                     searchable
                     loading={loadingGeo}
                     disabled={loadingGeo || states.length === 0}
@@ -289,7 +314,10 @@ function CustomerDataModal({
                     placeholder={t("billing.selectPlaceholder")}
                     onChange={(val, label) => handleStateChange(val, label)}
                     initialLocale={initialLocale}
-                    options={states.map(s => ({ value: s.code, label: s.name }))}
+                    options={states.map((s) => ({
+                      value: s.code,
+                      label: s.name,
+                    }))}
                   />
                   <BillingSelector
                     label={t("billing.cityLabel")}
@@ -300,7 +328,10 @@ function CustomerDataModal({
                     placeholder={t("billing.selectPlaceholder")}
                     onChange={(val) => setFormData({ ...formData, city: val })}
                     initialLocale={initialLocale}
-                    options={cities.map(c => ({ value: c.name, label: c.name }))}
+                    options={cities.map((c) => ({
+                      value: c.name,
+                      label: c.name,
+                    }))}
                   />
                 </div>
               </>
@@ -310,9 +341,11 @@ function CustomerDataModal({
                   label={t("billing.cardHolder")}
                   required
                   value={formData.cardHolder}
-                  onChange={(e) => setFormData({ ...formData, cardHolder: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, cardHolder: e.target.value })
+                  }
                 />
-                
+
                 <BillingInput
                   label={t("billing.cardNumber")}
                   required
@@ -321,14 +354,29 @@ function CustomerDataModal({
                   value={formData.cardNumber}
                   onChange={(e) => {
                     const val = e.target.value.replace(/[^\d\s]/g, "");
-                    const formatted = val.replace(/\s/g, "").replace(/(.{4})/g, "$1 ").trim();
+                    const formatted = val
+                      .replace(/\s/g, "")
+                      .replace(/(.{4})/g, "$1 ")
+                      .trim();
                     setFormData({ ...formData, cardNumber: formatted });
                   }}
                   prefix={
                     <div className="flex gap-2 opacity-80 h-full items-center pl-2 pr-4 border-r border-white/5 mr-4">
-                      <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/visa.svg" alt="Visa" className="h-4" />
-                      <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/mastercard.svg" alt="Mastercard" className="h-4" />
-                      <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg" alt="Amex" className="h-4" />
+                      <img
+                        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/visa.svg"
+                        alt="Visa"
+                        className="h-4"
+                      />
+                      <img
+                        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/mastercard.svg"
+                        alt="Mastercard"
+                        className="h-4"
+                      />
+                      <img
+                        src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons@master/flat/amex.svg"
+                        alt="Amex"
+                        className="h-4"
+                      />
                     </div>
                   }
                   className="pl-36!"
@@ -341,7 +389,12 @@ function CustomerDataModal({
                       required
                       maxLength={4}
                       value={formData.cvv}
-                      onChange={(e) => setFormData({ ...formData, cvv: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          cvv: e.target.value.replace(/\D/g, ""),
+                        })
+                      }
                     />
                   </div>
                   <div className="col-span-2 grid grid-cols-2 gap-3">
@@ -351,7 +404,12 @@ function CustomerDataModal({
                       maxLength={2}
                       placeholder="MM"
                       value={formData.expiryMonth}
-                      onChange={(e) => setFormData({ ...formData, expiryMonth: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          expiryMonth: e.target.value.replace(/\D/g, ""),
+                        })
+                      }
                     />
                     <BillingInput
                       label={t("billing.yearLabel")}
@@ -359,7 +417,12 @@ function CustomerDataModal({
                       maxLength={4}
                       placeholder="YY"
                       value={formData.expiryYear}
-                      onChange={(e) => setFormData({ ...formData, expiryYear: e.target.value.replace(/\D/g, "") })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          expiryYear: e.target.value.replace(/\D/g, ""),
+                        })
+                      }
                     />
                   </div>
                 </div>
@@ -367,35 +430,62 @@ function CustomerDataModal({
                 {acceptanceData && (
                   <div className="space-y-3 pt-3">
                     <div className="flex items-start gap-3">
-                      <input 
-                        type="checkbox" 
-                        id="acceptTerms" 
+                      <input
+                        type="checkbox"
+                        id="acceptTerms"
                         required
                         checked={formData.acceptTerms}
-                        onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            acceptTerms: e.target.checked,
+                          })
+                        }
                         className="mt-1 accent-cyan-500 w-4 h-4"
                       />
-                      <label htmlFor="acceptTerms" className="text-[10px] text-slate-400 leading-relaxed">
+                      <label
+                        htmlFor="acceptTerms"
+                        className="text-[10px] text-slate-400 leading-relaxed"
+                      >
                         {t("billing.termsAcceptance").split("{terms}")[0]}
-                        <a href={acceptanceData.acceptanceText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">
+                        <a
+                          href={acceptanceData.acceptanceText}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-500 hover:underline"
+                        >
                           {t("billing.termsLink") || "Términos y Condiciones"}
                         </a>
                         {t("billing.termsAcceptance").split("{terms}")[1]}
                       </label>
                     </div>
                     <div className="flex items-start gap-3">
-                      <input 
-                        type="checkbox" 
-                        id="acceptPrivacy" 
+                      <input
+                        type="checkbox"
+                        id="acceptPrivacy"
                         required
                         checked={formData.acceptPrivacy}
-                        onChange={(e) => setFormData({ ...formData, acceptPrivacy: e.target.checked })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            acceptPrivacy: e.target.checked,
+                          })
+                        }
                         className="mt-1 accent-cyan-500 w-4 h-4"
                       />
-                      <label htmlFor="acceptPrivacy" className="text-[10px] text-slate-400 leading-relaxed">
+                      <label
+                        htmlFor="acceptPrivacy"
+                        className="text-[10px] text-slate-400 leading-relaxed"
+                      >
                         {t("billing.privacyAcceptance").split("{privacy}")[0]}
-                        <a href={acceptanceData.dataPrivacyText} target="_blank" rel="noopener noreferrer" className="text-cyan-500 hover:underline">
-                          {t("billing.privacyLink") || "Tratamiento de Datos Personales"}
+                        <a
+                          href={acceptanceData.dataPrivacyText}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-cyan-500 hover:underline"
+                        >
+                          {t("billing.privacyLink") ||
+                            "Tratamiento de Datos Personales"}
                         </a>
                         {t("billing.privacyAcceptance").split("{privacy}")[1]}
                       </label>
@@ -470,6 +560,7 @@ function CustomerDataModal({
 export default function CheckoutButton({
   plan,
   initialLocale,
+  action,
 }: CheckoutButtonProps) {
   const t = useTranslate(initialLocale);
   const [loading, setLoading] = useState(false);
@@ -479,13 +570,23 @@ export default function CheckoutButton({
 
   const handleCheckoutClick = async () => {
     setLoading(true);
+
+    if (action === "login") {
+      window.location.href = `/login?redirect=${encodeURIComponent(
+        "/billing"
+      )}`;
+      return;
+    }
+
     try {
       // Check if user is logged in
       const userResponse = await fetch("/api/auth/me", {
         credentials: "include",
       });
-      if (!userResponse.ok) {
-        window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+      if (!userResponse.ok && action !== "login") {
+        window.location.href = `/login?redirect=${encodeURIComponent(
+          window.location.pathname
+        )}`;
         return;
       }
 
@@ -513,7 +614,12 @@ export default function CheckoutButton({
         return;
       }
 
-      // For free plans
+      // For free plans or downgrades to free
+      await fetch("/api/pricing/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planSlug: plan.slug }),
+      });
       window.location.href = "/spaces";
     } catch (error: any) {
       console.error("[Checkout Error]:", error);
@@ -555,8 +661,8 @@ export default function CheckoutButton({
 
       // 1. Tokenize card with Wompi Direct API
       const isProd = !data.publicKey.startsWith("pub_test_");
-      const tokenBaseUrl = isProd 
-        ? "https://production.wompi.co/v1" 
+      const tokenBaseUrl = isProd
+        ? "https://production.wompi.co/v1"
         : "https://sandbox.wompi.co/v1";
 
       const cleanNumber = formData.cardNumber.replace(/\s+/g, "").replace(/\D/g, "");
@@ -583,22 +689,26 @@ export default function CheckoutButton({
         length: cleanNumber.length,
         luhnLocal: isLuhnValid(cleanNumber),
         publicKey: data.publicKey.substring(0, 15) + "...",
-        env: data.publicKey.startsWith("pub_test") ? "SANDBOX" : "PROD"
+        env: data.publicKey.startsWith("pub_test") ? "SANDBOX" : "PROD",
       });
 
       if (cleanNumber.length < 15 || cleanNumber.length > 16) {
-        throw new Error(`El número de tarjeta debe tener 15 o 16 dígitos (tienes ${cleanNumber.length}).`);
+        throw new Error(
+          `El número de tarjeta debe tener 15 o 16 dígitos (tienes ${cleanNumber.length}).`
+        );
       }
 
       if (!isLuhnValid(cleanNumber)) {
-        throw new Error("El número de tarjeta no pasa la validación de Luhn (algoritmo de tarjeta inválido). Revisa que lo hayas copiado bien.");
+        throw new Error(
+          "El número de tarjeta no pasa la validación de Luhn (algoritmo de tarjeta inválido). Revisa que lo hayas copiado bien."
+        );
       }
 
       const tokenizeResponse = await fetch(`${tokenBaseUrl}/tokens/cards`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${data.publicKey}`,
+          Authorization: `Bearer ${data.publicKey}`,
         },
         body: JSON.stringify({
           number: cleanNumber,
@@ -612,18 +722,21 @@ export default function CheckoutButton({
       const tokenResult = await tokenizeResponse.json();
       if (!tokenizeResponse.ok) {
         console.error("[Tokenization Failed Full Result]:", tokenResult);
-        
+
         const errorMapping: Record<string, string> = {
-          'invalid_card_data': 'Los datos de la tarjeta son inválidos.',
-          'invalid_request_error': 'Error en la petición de pago.',
-          'card_not_supported': 'La tarjeta no es soportada.',
-          'network_error': 'Error de red al procesar la tarjeta.',
-          'not_found': 'Recurso no encontrado.',
-          'internal_server_error': 'Error interno del servidor de pagos.',
+          invalid_card_data: "Los datos de la tarjeta son inválidos.",
+          invalid_request_error: "Error en la petición de pago.",
+          card_not_supported: "La tarjeta no es soportada.",
+          network_error: "Error de red al procesar la tarjeta.",
+          not_found: "Recurso no encontrado.",
+          internal_server_error: "Error interno del servidor de pagos.",
         };
 
-        let errorMessage = errorMapping[tokenResult.error?.reason] || tokenResult.error?.reason || "Error al tokenizar la tarjeta.";
-        
+        let errorMessage =
+          errorMapping[tokenResult.error?.reason] ||
+          tokenResult.error?.reason ||
+          "Error al tokenizar la tarjeta.";
+
         if (tokenResult.error?.messages) {
           const detailedMessages = Object.entries(tokenResult.error.messages)
             .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(", ")}`)
@@ -632,7 +745,7 @@ export default function CheckoutButton({
             errorMessage = `${errorMessage} Detalle: ${detailedMessages}`;
           }
         }
-        
+
         throw new Error(errorMessage);
       }
 
@@ -691,17 +804,36 @@ export default function CheckoutButton({
     }
   };
 
-  // Paid plans
+  const getButtonText = () => {
+    if (loading) return t("billing.processing");
+    switch (action) {
+      case "upgrade":
+        return t("billing.upgradePlan");
+      case "downgrade":
+        return t("billing.downgradePlan");
+      case "current":
+        return t("billing.currentPlan");
+      case "login":
+      case "checkout":
+      default:
+        return t("auth.getStarted");
+    }
+  };
+
+  const isButtonDisabled = loading || action === "current";
+
   return (
     <div className="space-y-2 mb-6">
       <button
         onClick={handleCheckoutClick}
-        disabled={loading}
-        className={`w-full bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-semibold py-3 px-4 rounded-lg transition ${
-          loading ? "opacity-50 cursor-not-allowed" : ""
+        disabled={isButtonDisabled}
+        className={`w-full font-semibold py-3 px-4 rounded-lg transition ${
+          isButtonDisabled
+            ? "bg-slate-700/50 text-slate-400/80 cursor-not-allowed"
+            : "bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white"
         }`}
       >
-        {loading ? t("billing.processing") : t("auth.getStarted")}
+        {getButtonText()}
       </button>
 
       <CustomerDataModal

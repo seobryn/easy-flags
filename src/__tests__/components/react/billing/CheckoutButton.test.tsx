@@ -30,48 +30,131 @@ describe("CheckoutButton", () => {
   });
 
   it("renders a button for free plans", () => {
-    render(<CheckoutButton plan={{ ...basePlan, name: "Free", price_usd: 0 }} />);
+    render(
+      <CheckoutButton
+        plan={{ ...basePlan, name: "Free", price_usd: 0 }}
+        action="checkout"
+        initialLocale="en"
+      />
+    );
 
-    expect(screen.getByRole("button", { name: /get started/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /get started/i })
+    ).toBeInTheDocument();
   });
 
   it("checks auth and initializes checkout for paid plans", async () => {
     const user = userEvent.setup();
-    const fetchMock = vi.fn()
-        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 1 }) }) // /api/auth/me
-        .mockResolvedValueOnce({ 
-            ok: true, 
-            json: () => Promise.resolve({ 
-                data: { 
-                    currency: "COP", 
-                    amountInCents: 200000, 
-                    publicKey: "pub_test",
-                    transaction: { reference: "EF-123" },
-                    acceptance: {
-                        acceptanceToken: "token1",
-                        acceptanceText: "text1",
-                        dataPrivacyToken: "token2",
-                        dataPrivacyText: "text2"
-                    }
-                } 
-            }) 
-        }); // /api/payments/checkout
-    
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 1 }) }) // /api/auth/me
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            data: {
+              currency: "COP",
+              amountInCents: 200000,
+              publicKey: "pub_test",
+              transaction: { reference: "EF-123" },
+              acceptance: {
+                acceptanceToken: "token1",
+                acceptanceText: "text1",
+                dataPrivacyToken: "token2",
+                dataPrivacyText: "text2",
+              },
+            },
+          }),
+      }); // /api/payments/checkout
+
     vi.stubGlobal("fetch", fetchMock);
 
-    render(<CheckoutButton plan={basePlan} />);
+    render(
+      <CheckoutButton plan={basePlan} action="checkout" initialLocale="es" />
+    );
 
-    await user.click(screen.getByRole("button", { name: /get started/i }));
+    await user.click(screen.getByRole("button", { name: /empezar ahora/i }));
 
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/me", {
       credentials: "include",
     });
 
     await waitFor(() => {
-        expect(fetchMock).toHaveBeenCalledWith("/api/payments/checkout", expect.any(Object));
+      expect(fetchMock).toHaveBeenCalledWith(
+        "/api/payments/checkout",
+        expect.any(Object)
+      );
     });
 
     // Check if modal title is present (meaning it opened)
-    expect(await screen.findByText("Información del Cliente")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Datos del Cliente")
+    ).toBeInTheDocument();
+  });
+
+  it('renders "Upgrade" for upgrade action', () => {
+    render(
+      <CheckoutButton
+        plan={basePlan}
+        action="upgrade"
+        initialLocale="en"
+      />
+    );
+    expect(
+      screen.getByRole("button", { name: /upgrade/i })
+    ).toBeInTheDocument();
+  });
+
+  it('renders "Downgrade" for downgrade action', () => {
+    render(
+      <CheckoutButton
+        plan={basePlan}
+        action="downgrade"
+        initialLocale="en"
+      />
+    );
+    expect(
+      screen.getByRole("button", { name: /downgrade/i })
+    ).toBeInTheDocument();
+  });
+
+  it('renders "Current Plan" and is disabled for current action', () => {
+    render(
+      <CheckoutButton
+        plan={basePlan}
+        action="current"
+        initialLocale="en"
+      />
+    );
+    const button = screen.getByRole("button", { name: /current plan/i });
+    expect(button).toBeInTheDocument();
+    expect(button).toBeDisabled();
+  });
+
+  it('renders "Get Started" for login action', () => {
+    render(
+      <CheckoutButton
+        plan={basePlan}
+        action="login"
+        initialLocale="en"
+      />
+    );
+    expect(
+      screen.getByRole("button", { name: /get started/i })
+    ).toBeInTheDocument();
+  });
+
+  it('renders "Get Started" for checkout action', () => {
+    render(
+      <CheckoutButton
+        plan={basePlan}
+        action="checkout"
+        initialLocale="en"
+      />
+    );
+    expect(
+      screen.getByRole("button", { name: /get started/i })
+    ).toBeInTheDocument();
   });
 });
+

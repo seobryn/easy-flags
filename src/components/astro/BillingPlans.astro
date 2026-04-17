@@ -1,48 +1,67 @@
 ---
 import CheckoutButton from "@/components/react/billing/CheckoutButton";
 import { PricingService } from "@application/services/pricing.service";
-import type { PricingPlan } from "@domain/entities";
+import type { PricingPlan, User, UserSubscription } from "@domain/entities";
 import { getTranslator, getLocale } from "@/infrastructure/i18n/astro";
 import { Icon } from "@/components/react/shared/Icon";
+import { getUserFromContext } from "@/utils/auth";
 
 const { t } = getTranslator(Astro.request);
 const locale = getLocale(Astro.request);
+const user: User | null = getUserFromContext(Astro);
 
 // Detect user country (simplified)
 let ip = "";
 try {
   ip = Astro.clientAddress;
 } catch (e) {
-  ip = Astro.request.headers.get("x-forwarded-for") || 
-       Astro.request.headers.get("x-real-ip") || 
-       "";
+  ip =
+    Astro.request.headers.get("x-forwarded-for") ||
+    Astro.request.headers.get("x-real-ip") ||
+    "";
 }
 
-const isColombia = ip === "::1" || ip === "127.0.0.1" || (await (async () => {
-  try {
-    const res = await fetch(`https://ipapi.co/${ip}/country/`);
-    if (res.ok) return (await res.text()).trim() === "CO";
-  } catch (e) {}
-  return true; // Default to true (CO) for this example/demo
-})());
+const isColombia =
+  ip === "::1" ||
+  ip === "127.0.0.1" ||
+  (await (async () => {
+    try {
+      const res = await fetch(`https://ipapi.co/${ip}/country/`);
+      if (res.ok) return (await res.text()).trim() === "CO";
+    } catch (e) {}
+    return true; // Default to true (CO) for this example/demo
+  })());
 
 // Fetch pricing plans from database
 const pricingService = PricingService.getInstance();
 let plans: PricingPlan[] = [];
 let loadingError: string | null = null;
+let userSubscription: UserSubscription | null = null;
 
 try {
   // Initialize default pricing plans if not already done
   await pricingService.initializeDefaultPricing();
 
   // Fetch all active pricing plans with features and limits
-  plans = await pricingService.getAllPricingPlans();
+  const allPlansPromise = pricingService.getAllPricingPlans();
+
+  // Fetch user subscription if logged in
+  const userSubPromise = user
+    ? pricingService.getUserSubscription(user.id)
+    : Promise.resolve(null);
+
+  const [allPlans, sub] = await Promise.all([allPlansPromise, userSubPromise]);
+  plans = allPlans;
+  userSubscription = sub;
 } catch (error) {
   const errorMessage = error instanceof Error ? error.message : String(error);
   console.error("Error loading pricing plans:", error);
-  loadingError = t('billing.failedLoad');
+  loadingError = t("billing.failedLoad");
   plans = [];
 }
+
+const currentPlanId = userSubscription?.pricing_plan_id;
+const currentPlanPrice = userSubscription?.plan?.price_usd ?? -1;
 ---
 
 {
@@ -53,86 +72,126 @@ try {
         {loadingError}
       </p>
       <p class="text-red-400 text-sm mt-2">
-        {t('billing.persistenceNotice')}
+        {t("billing.persistenceNotice")}
       </p>
     </div>
   ) : plans.length === 0 ? (
     <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-8 my-12 text-center">
       <p class="text-slate-300">
-         <Icon name="FileText" size={16} className="inline mr-1" />
-         {t('billing.noPricingPlans')}
+        <Icon name="FileText" size={16} className="inline mr-1" />
+        {t("billing.noPricingPlans")}
       </p>
       <p class="text-slate-400 text-sm mt-2">
-        {t('billing.contactSupport')}
+        {t("billing.contactSupport")}
       </p>
     </div>
   ) : (
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto my-16 md:my-24 px-4">
-      {plans.map((plan) => (
-        <div
-          class={`relative group flex flex-col p-8 rounded-4xl transition-all duration-500 border ${
-            plan.is_recommended
-              ? "bg-white/5 border-cyan-500/50 shadow-[0_0_40px_-15px_rgba(6,182,212,0.3)] scale-105 z-10"
-              : "bg-white/3 border-white/5 hover:border-white/10 hover:bg-white/5"
-          }`}
-        >
-          {plan.is_recommended && (
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-xs font-bold text-white tracking-widest uppercase shadow-lg shadow-cyan-500/20">
-              {t('billing.mostPopular')}
-            </div>
-          )}
+      {plans.map((plan) => {
+        const isCurrentPlan = plan.id === currentPlanId;
+        const isUpgrade =
+          userSubscription && !isCurrentPlan && plan.price_usd > currentPlanPrice;
+        const isDowngrade =
+          userSubscription && !isCurrentPlan && plan.price_usd < currentPlanPrice;
 
-          <div class="mb-8">
-            <h3
-              class={`text-xl font-bold mb-3 ${plan.is_recommended ? "text-cyan-400" : "text-white"}`}
-            >
-              {t(`billing.plans.${plan.slug}.name`) || plan.name}
-            </h3>
-            <p class="text-slate-400 text-sm leading-relaxed">
-              {t(`billing.plans.${plan.slug}.description`) || plan.description}
-            </p>
-          </div>
+        let action: "checkout" | "upgrade" | "downgrade" | "current" | "login" =
+          "checkout";
+        if (user) {
+          if (isCurrentPlan) {
+            action = "current";
+          } else if (isUpgrade) {
+            action = "upgrade";
+          } else if (isDowngrade) {
+            action = "downgrade";
+          }
+        } else {
+          action = "login";
+        }
 
-          <div class="flex items-baseline gap-1 mb-8">
-            <span class="text-5xl font-extrabold text-white tracking-tighter">
-              {plan.price_usd === 0
-                ? t('billing.free')
-                : isColombia 
-                  ? `${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(plan.price_cop)}`
-                  : `$${plan.price_usd}`}
-            </span>
-            <span class="text-slate-500 font-medium">{t('billing.perMonth')}</span>
-          </div>
-
-          <div class="mb-10 w-full">
-            <CheckoutButton client:load plan={plan} initialLocale={locale} />
-          </div>
-
-          <div class="space-y-4 flex-1">
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
-              {t('billing.whatsIncluded')}
-            </p>
-            {plan.features?.length ? (
-              plan.features.map((feature, index) => (
-                <div class="flex gap-3 items-center">
-                  <div
-                    class={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.is_recommended ? "bg-cyan-500/20 text-cyan-400" : "bg-white/10 text-slate-400"}`}
-                  >
-                    <Icon name="Check" size={12} strokeWidth={4} />
-                  </div>
-                  <span class="text-slate-300 text-sm font-medium">
-                    {t(`billing.plans.${plan.slug}.features.${index}`) || feature.feature_name}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p class="text-slate-400 text-sm italic">
-                {t('billing.noFeatures')}
-              </p>
+        return (
+          <div
+            class={`relative group flex flex-col p-8 rounded-4xl transition-all duration-500 border ${
+              plan.is_recommended
+                ? "bg-white/5 border-cyan-500/50 shadow-[0_0_40px_-15px_rgba(6,182,212,0.3)] scale-105 z-10"
+                : "bg-white/3 border-white/5 hover:border-white/10 hover:bg-white/5"
+            }`}
+          >
+            {plan.is_recommended && (
+              <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-xs font-bold text-white tracking-widest uppercase shadow-lg shadow-cyan-500/20">
+                {t("billing.mostPopular")}
+              </div>
             )}
+
+            <div class="mb-8">
+              <h3
+                class={`text-xl font-bold mb-3 ${
+                  plan.is_recommended ? "text-cyan-400" : "text-white"
+                }`}
+              >
+                {t(`billing.plans.${plan.slug}.name`) || plan.name}
+              </h3>
+              <p class="text-slate-400 text-sm leading-relaxed">
+                {t(`billing.plans.${plan.slug}.description`) || plan.description}
+              </p>
+            </div>
+
+            <div class="flex items-baseline gap-1 mb-8">
+              <span class="text-5xl font-extrabold text-white tracking-tighter">
+                {plan.price_usd === 0
+                  ? t("billing.free")
+                  : isColombia
+                  ? `${new Intl.NumberFormat("es-CO", {
+                      style: "currency",
+                      currency: "COP",
+                      maximumFractionDigits: 0,
+                    }).format(plan.price_cop)}`
+                  : `$${plan.price_usd}`}
+              </span>
+              <span class="text-slate-500 font-medium">
+                {t("billing.perMonth")}
+              </span>
+            </div>
+
+            <div class="mb-10 w-full">
+              <CheckoutButton
+                client:load
+                plan={plan}
+                initialLocale={locale}
+                action={action}
+              />
+            </div>
+
+            <div class="space-y-4 flex-1">
+              <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+                {t("billing.whatsIncluded")}
+              </p>
+              {plan.features?.length ? (
+                plan.features.map((feature, index) => (
+                  <div class="flex gap-3 items-center">
+                    <div
+                      class={`shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${
+                        plan.is_recommended
+                          ? "bg-cyan-500/20 text-cyan-400"
+                          : "bg-white/10 text-slate-400"
+                      }`}
+                    >
+                      <Icon name="Check" size={12} strokeWidth={4} />
+                    </div>
+                    <span class="text-slate-300 text-sm font-medium">
+                      {t(`billing.plans.${plan.slug}.features.${index}`) ||
+                        feature.feature_name}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p class="text-slate-400 text-sm italic">
+                  {t("billing.noFeatures")}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   )
 }

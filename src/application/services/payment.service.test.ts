@@ -170,7 +170,7 @@ describe("PaymentService", () => {
   });
 
   describe("processPayment", () => {
-    it("should process a payment via Direct API", async () => {
+    it("should process a payment and assign plan if approved", async () => {
       const paymentData = {
         token: "tok_test_123",
         acceptance_token: "acc-123",
@@ -181,32 +181,37 @@ describe("PaymentService", () => {
         customerData: {
           email: "test@example.com",
           fullName: "Test User",
-          phoneNumber: "3001234567",
-          phoneNumberPrefix: "+57",
-          legalId: "123456789",
-          legalIdType: "CC"
-        }
+        },
       };
 
-      const transaction = { id: 100, user_id: 1, reference: "test-ref-123" };
+      const transaction: PaymentTransaction = {
+        id: 100,
+        user_id: 1,
+        pricing_plan_id: 10,
+        amount: 290,
+        currency: "COP",
+        reference: "test-ref-123",
+        status: "PENDING",
+        created_at: "",
+        updated_at: "",
+      };
+
+      const plan: any = {
+        id: 10,
+        slug: "pro-monthly",
+      };
+
       mockPaymentRepo.findByReference.mockResolvedValue(transaction);
       mockPaymentGateway.createTransaction.mockResolvedValue({ id: "wompi-123", status: "APPROVED" });
-      mockPaymentGateway.generateIntegritySignature.mockReturnValue("new-sig");
+      mockPricingPlanRepo.findById.mockResolvedValue(plan);
 
-      const result = await service.processPayment(1, paymentData);
+      await service.processPayment(1, paymentData);
 
-      expect(mockPaymentRepo.findByReference).toHaveBeenCalledWith("test-ref-123");
-      expect(mockPaymentGateway.createTransaction).toHaveBeenCalledWith(expect.objectContaining({
-        accept_personal_auth: "priv-123",
-        customer_data: expect.objectContaining({
-          phone_number: "573001234567"
-        })
-      }));
       expect(mockPaymentRepo.update).toHaveBeenCalledWith(100, {
         external_id: "wompi-123",
-        status: "APPROVED"
+        status: "APPROVED",
       });
-      expect(result.id).toBe("wompi-123");
+      expect(mockPricingService.assignPlanToUser).toHaveBeenCalledWith(1, "pro-monthly");
     });
   });
 

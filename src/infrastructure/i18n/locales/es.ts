@@ -155,6 +155,9 @@ export const es = {
     searchPlaceholder: "Buscar...",
     noResults: "No se encontraron resultados",
     searchCountry: "Buscar país o código...",
+    upgradePlan: 'Actualizar',
+    downgradePlan: 'Bajar de Plan',
+    currentPlan: 'Plan Actual',
     plans: {
       lab: {
         name: "Lab",
