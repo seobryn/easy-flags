@@ -11,6 +11,17 @@ interface User {
   created_at: string;
 }
 
+interface UserSubscription {
+  id: number;
+  user_id: number;
+  pricing_plan_id: number;
+  status: "active" | "canceled" | "past_due" | "trial";
+  plan?: {
+    name: string;
+    description: string;
+  };
+}
+
 interface ApiKey {
   id: number;
   key: string;
@@ -76,6 +87,7 @@ interface SettingsViewProps {
 export default function SettingsView({ initialLocale }: SettingsViewProps) {
   const t = useTranslate(initialLocale);
   const [user, setUser] = useState<User | null>(null);
+  const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -103,9 +115,24 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
 
   useEffect(() => {
     fetchUser();
+    fetchSubscription();
     fetchApiKeys();
     fetchPreferences();
   }, []);
+
+  const fetchSubscription = async () => {
+    try {
+      const response = await fetch("/api/pricing/subscription", {
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSubscription(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch subscription:", error);
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -467,6 +494,27 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     </label>
                     <div className="text-slate-100 mt-2 font-medium">
                       {user?.email}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                      {t('settings.subscription')}
+                    </label>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-slate-100 font-medium">
+                        {subscription?.plan?.name || "Free"}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                          subscription?.status === "active"
+                            ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                            : subscription?.status === "trial"
+                            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                            : "bg-red-500/20 text-red-400 border border-red-500/30"
+                        }`}
+                      >
+                        {subscription?.status || "Free"}
+                      </span>
                     </div>
                   </div>
                   <div className="p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">

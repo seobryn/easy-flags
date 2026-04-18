@@ -70,6 +70,7 @@ export const en = {
     overview: 'Overview',
     create: 'Create',
     close: 'Close',
+    updated: 'Successfully updated',
   },
   navigation: {
     dashboard: 'Dashboard',
