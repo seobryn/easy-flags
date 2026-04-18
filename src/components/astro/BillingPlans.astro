@@ -1,14 +1,14 @@
 ---
 import CheckoutButton from "@/components/react/billing/CheckoutButton";
 import { PricingService } from "@application/services/pricing.service";
-import type { PricingPlan, User, UserSubscription } from "@domain/entities";
+import type { PricingPlan, UserSubscription } from "@domain/entities";
 import { getTranslator, getLocale } from "@/infrastructure/i18n/astro";
 import { Icon } from "@/components/react/shared/Icon";
-import { getUserFromContext } from "@/utils/auth";
+import { getUserFromContext, type UserPayload } from "@/utils/auth";
 
 const { t } = getTranslator(Astro.request);
 const locale = getLocale(Astro.request);
-const user: User | null = getUserFromContext(Astro);
+const user: UserPayload | null = getUserFromContext(Astro);
 
 // Detect user country (simplified)
 let ip = "";

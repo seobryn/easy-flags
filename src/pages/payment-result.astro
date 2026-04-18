@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { Icon } from "../components/react/shared/Icon";
+import { Icon, type IconName } from "../components/react/shared/Icon";
 import { getDatabase } from "@/lib/db";
 
 export const prerender = false;
@@ -87,7 +87,7 @@ const config =
       >
         <div class={`absolute inset-0 ${config.bg} blur-xl rounded-full`}></div>
         <div class={config.color}>
-          <Icon name={config.icon} size={40} strokeWidth={2.5} />
+          <Icon name={config.icon as IconName} size={40} strokeWidth={2.5} />
         </div>
       </div>
 
