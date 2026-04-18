@@ -106,7 +106,9 @@ export default function FeaturesView({
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [editingFeature, setEditingFeature] = useState<Feature | null>(null);
+  const [featureToDelete, setFeatureToDelete] = useState<Feature | null>(null);
 
   // Form states
   const [newFeatureKey, setNewFeatureKey] = useState("");
@@ -121,9 +123,17 @@ export default function FeaturesView({
   } | null>(null);
   const [isLimitReached, setIsLimitReached] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     fetchInitialData();
   }, [spaceId]);
+
+  const filteredFeatures = features.filter(
+    (f) =>
+      f.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      f.key.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   const fetchInitialData = async () => {
     if (!spaceId) return;
@@ -276,25 +286,31 @@ export default function FeaturesView({
     setShowEditModal(true);
   };
 
-  const deleteFeature = async (id: number) => {
-    if (
-      !confirm("Are you sure you want to delete this feature flag?") ||
-      !spaceId
-    )
-      return;
+  const deleteFeature = async () => {
+    if (!featureToDelete || !spaceId) return;
 
     try {
-      const response = await fetch(`/api/spaces/${spaceId}/features/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `/api/spaces/${spaceId}/features/${featureToDelete.id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
 
       if (response.ok) {
+        setShowDeleteModal(false);
+        setFeatureToDelete(null);
         await fetchFeatures();
       }
     } catch (error) {
       console.error("Failed to delete feature:", error);
     }
+  };
+
+  const confirmDeleteFeature = (feature: Feature) => {
+    setFeatureToDelete(feature);
+    setShowDeleteModal(true);
   };
 
   const toggleEnvironmentFlag = (featureId: number, environmentId: number) => {
@@ -320,255 +336,259 @@ export default function FeaturesView({
       spaceName={spaceName}
       currentTab="features"
     >
-      <div className="space-y-12">
+      <div className="space-y-8 max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="relative group overflow-hidden bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-[40px] p-8 md:p-14 transition-all hover:bg-white/[0.04] hover:border-white/10">
-          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-cyan-500/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+        <div className="relative group overflow-hidden bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] p-8 md:p-12 transition-all hover:bg-white/[0.04] hover:border-white/10 shadow-2xl">
+          <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-cyan-500/[0.05] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
 
-          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6">
+          <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-4">
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-                Feature Hub
+                Control Center
               </div>
-              <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight">
                 {t("navigation.flags")}
               </h1>
-              <p className="text-slate-400 text-lg leading-relaxed font-medium">
-                Create once, deploy everywhere. Configure your flags
-                independently across environments with a single click.
+              <p className="text-slate-400 text-sm md:text-base leading-relaxed font-medium">
+                Manage your application's behavior in real-time. Toggle features
+                instantly across all environments.
               </p>
             </div>
-            <button
-              onClick={() => {
-                if (isLimitReached) return;
-                resetForm();
-                setShowCreateModal(true);
-              }}
-              disabled={isLimitReached}
-              className={`w-full lg:w-auto btn-primary flex items-center justify-center gap-3 px-10! py-5! shadow-2xl shadow-cyan-500/25 ${isLimitReached ? "opacity-50 cursor-not-allowed grayscale" : "hover:scale-105 active:scale-95 transition-all"}`}
-              title={
-                isLimitReached
-                  ? `Limit of ${limits?.max_flags} flags reached`
-                  : ""
-              }
-            >
-              <Icon
-                name={isLimitReached ? "Lock" : "Plus"}
-                size={20}
-                className={
-                  !isLimitReached
-                    ? "group-hover:rotate-90 transition-transform duration-300"
-                    : ""
-                }
-              />
-              <span className="font-bold">
-                {isLimitReached ? "Limit Reached" : "Create Flag"}
-              </span>
-            </button>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+              {/* Search Bar */}
+              <div className="relative w-full sm:w-64 group/search">
+                <Icon
+                  name="Search"
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/search:text-cyan-400 transition-colors"
+                />
+                <input
+                  type="text"
+                  placeholder="Search flags..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-sm text-white focus:outline-none focus:border-cyan-500/30 focus:bg-white/[0.05] transition-all"
+                />
+              </div>
+
+              <button
+                onClick={() => {
+                  if (isLimitReached) return;
+                  resetForm();
+                  setShowCreateModal(true);
+                }}
+                disabled={isLimitReached}
+                className={`w-full sm:w-auto btn-primary flex items-center justify-center gap-3 px-8 py-3.5 shadow-2xl shadow-cyan-500/25 ${isLimitReached ? "opacity-50 cursor-not-allowed grayscale" : "hover:scale-105 active:scale-95 transition-all"}`}
+              >
+                <Icon
+                  name={isLimitReached ? "Lock" : "Plus"}
+                  size={18}
+                  className={!isLimitReached ? "animate-bounce-subtle" : ""}
+                />
+                <span className="font-bold text-sm tracking-tight">
+                  {isLimitReached ? "Limit Reached" : "Create Flag"}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Environment Legend */}
-        <section className="animate-in fade-in slide-in-from-bottom-2 duration-700 delay-100">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Environment Quick Legend */}
+        {!isLoading && environments.length > 0 && (
+          <div className="flex flex-wrap gap-4 px-4 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-100">
+            {environments.map((env) => (
+              <div
+                key={env.id}
+                className="flex items-center gap-2 bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-full hover:bg-white/[0.05] transition-all group"
+              >
+                <span className="text-sm group-hover:scale-110 transition-transform">
+                  {getEnvironmentEmoji(env.type)}
+                </span>
+                <span className="text-[10px] font-bold text-slate-400 group-hover:text-white transition-colors capitalize">
+                  {env.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Features Table View */}
+        <div className="relative group">
+          {/* Subtle background glow */}
+          <div className="absolute -inset-4 bg-cyan-500/5 blur-3xl rounded-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+
+          <div className="relative bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[32px] overflow-hidden shadow-2xl">
             {isLoading ? (
-              Array(3)
-                .fill(0)
-                .map((_, i) => <SkeletonCard key={i} />)
-            ) : (
-              <>
-                {environments.map((env) => (
-                  <div
-                    key={env.id}
-                    className="flex items-center gap-5 bg-white/[0.02] backdrop-blur-md border border-white/5 px-6 py-5 rounded-3xl hover:bg-white/[0.05] hover:border-white/10 transition-all group overflow-hidden relative"
+              <div className="p-8 space-y-4">
+                {Array(5)
+                  .fill(0)
+                  .map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-16 w-full bg-white/[0.03] animate-pulse rounded-2xl"
+                    ></div>
+                  ))}
+              </div>
+            ) : filteredFeatures.length === 0 ? (
+              <div className="py-32 flex flex-col items-center justify-center text-center px-6">
+                <div className="w-20 h-20 bg-cyan-500/5 rounded-full flex items-center justify-center mb-6 group/empty">
+                  <Icon
+                    name="Flag"
+                    size={40}
+                    className="text-cyan-500/40 group-hover:scale-110 group-hover:text-cyan-400 transition-all duration-500"
+                  />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">
+                  No flags found
+                </h3>
+                <p className="text-slate-500 text-sm max-w-xs transition-colors group-hover:text-slate-400">
+                  {searchTerm
+                    ? `No flags match your search "${searchTerm}"`
+                    : "Ready to start toggling? Create your first feature flag to begin."}
+                </p>
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="mt-6 text-cyan-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-500 shadow-inner relative z-10">
-                      {getEnvironmentEmoji(env.type)}
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-xs font-bold text-white tracking-tight mb-0.5">
-                        {env.name}
-                      </h3>
-                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">
-                        {getEnvironmentDefaultDescription(env.type)}
-                      </p>
-                    </div>
-                    <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-white/[0.02] rounded-full blur-xl group-hover:bg-white/[0.05] transition-all"></div>
-                  </div>
-                ))}
-                {environments.length === 0 && (
-                  <div className="col-span-full py-8 text-center bg-white/[0.01] border border-dashed border-white/10 rounded-[32px]">
-                    <p className="text-sm text-slate-500 italic">
-                      No environments configured yet
-                    </p>
-                  </div>
+                    Clear Search
+                  </button>
                 )}
-              </>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-white/5 bg-white/[0.01]">
+                      <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        Flag
+                      </th>
+                      <th className="px-6 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] hidden xl:table-cell">
+                        Key
+                      </th>
+                      <th className="px-6 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        Type
+                      </th>
+                      <th className="px-6 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                        Environments
+                      </th>
+                      <th className="px-8 py-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.03]">
+                    {filteredFeatures.map((feature) => (
+                      <tr
+                        key={feature.id}
+                        className="group/row hover:bg-white/[0.03] transition-all duration-300"
+                      >
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col">
+                            <span className="text-white font-bold text-sm mb-1 group-hover/row:text-cyan-400 transition-colors">
+                              {feature.name}
+                            </span>
+                            <span className="text-slate-500 text-[11px] font-medium xl:hidden">
+                              {feature.key}
+                            </span>
+                            {feature.description && (
+                              <p className="text-slate-500 text-xs mt-2 line-clamp-1 max-w-xs font-medium">
+                                {feature.description}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-6 hidden xl:table-cell">
+                          <code className="text-cyan-500/70 bg-cyan-500/5 px-3 py-1.5 rounded-lg text-[10px] font-mono border border-cyan-500/10 tracking-tight">
+                            {feature.key}
+                          </code>
+                        </td>
+                        <td className="px-6 py-6">
+                          <div
+                            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border ${typeColors[feature.type].bg} ${typeColors[feature.type].text}`}
+                          >
+                            <Icon
+                              name={
+                                (
+                                  {
+                                    boolean: "Zap",
+                                    string: "Type",
+                                    json: "Code",
+                                  } as const
+                                )[feature.type]
+                              }
+                              size={10}
+                            />
+                            {feature.type}
+                          </div>
+                        </td>
+                        <td className="px-6 py-6">
+                          <div className="flex items-center gap-2">
+                            {feature.environments.map((envConfig) => {
+                              const env = environments.find(
+                                (e) => e.id === envConfig.environmentId,
+                              );
+                              if (!env) return null;
+
+                              return (
+                                <button
+                                  key={env.id}
+                                  onClick={() =>
+                                    toggleEnvironmentFlag(feature.id, env.id)
+                                  }
+                                  className={`relative w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-500 group/env overflow-hidden border ${
+                                    envConfig.enabled
+                                      ? "bg-cyan-500/20 border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+                                      : "bg-white/[0.03] border-white/5 text-slate-600 hover:bg-white/[0.08] hover:border-white/10"
+                                  }`}
+                                  title={`${env.name}: ${envConfig.enabled ? "Enabled" : "Disabled"}`}
+                                >
+                                  <span className="text-xs relative z-10 transition-transform group-active/env:scale-90">
+                                    {getEnvironmentEmoji(env.type)}
+                                  </span>
+                                  {envConfig.enabled && (
+                                    <span className="absolute inset-0 bg-cyan-400/10 animate-pulse"></span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover/row:opacity-100 transition-all transform translate-x-2 group-hover/row:translate-x-0">
+                            <a
+                              href={`/spaces/${spaceId}/features/${feature.id}`}
+                              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.05] text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/20 transition-all shadow-inner"
+                              title="Advanced Configuration"
+                            >
+                              <Icon name="Settings" size={16} />
+                            </a>
+                            <button
+                              onClick={() => startEditingFeature(feature)}
+                              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.05] text-slate-400 hover:text-white hover:bg-white/10 border border-white/5 transition-all shadow-inner"
+                              title="Edit Details"
+                            >
+                              <Icon name="Edit" size={16} />
+                            </button>
+                            <button
+                              onClick={() => confirmDeleteFeature(feature)}
+                              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.05] text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-white/5 transition-all shadow-inner"
+                              title="Delete Flag"
+                            >
+                              <Icon name="Trash" size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
-        </section>
-
-        {/* Features List */}
-        <section className="space-y-6 animate-in fade-in duration-700 delay-200">
-          {isLoading ? (
-            Array(2)
-              .fill(0)
-              .map((_, i) => (
-                <div
-                  key={i}
-                  className="card h-64 animate-pulse bg-white/5"
-                ></div>
-              ))
-          ) : features.length === 0 ? (
-            <div className="text-center py-24 card flex flex-col items-center justify-center border-dashed border-white/10">
-              <div className="w-20 h-20 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6">
-                <Icon name="Flag" size={40} className="text-cyan-400" />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                No feature flags found
-              </h2>
-              <p className="text-slate-500 mb-8 max-w-sm mx-auto">
-                Start by creating your first feature flag to manage your
-                application's behavior.
-              </p>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="btn-secondary"
-              >
-                Create your first flag
-              </button>
-            </div>
-          ) : (
-            features.map((feature) => (
-              <div
-                key={feature.id}
-                className="bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-[40px] p-8 md:p-12 transition-all duration-500 hover:bg-white/[0.04] hover:border-white/10 group overflow-hidden relative"
-              >
-                <div className="absolute top-0 right-0 w-full h-full bg-linear-to-br from-cyan-500/[0.01] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-
-                {/* Feature Header */}
-                <div className="flex flex-col md:flex-row items-start justify-between gap-8 mb-10 relative z-10">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-4 mb-6">
-                      <h3 className="text-3xl font-extrabold text-white tracking-tight group-hover:text-cyan-400 transition-colors drop-shadow-[0_0_10px_rgba(255,255,255,0.05)]">
-                        {feature.name}
-                      </h3>
-                      <div
-                        className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] border shadow-inner ${typeColors[feature.type].bg} ${typeColors[feature.type].text}`}
-                      >
-                        {feature.type}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 mb-6">
-                      <code className="bg-slate-950/60 text-cyan-400 px-4 py-2 rounded-xl font-mono text-xs border border-white/5 shadow-2xl tracking-tight">
-                        {feature.key}
-                      </code>
-                    </div>
-                    {feature.description && (
-                      <p className="text-slate-400 text-base leading-relaxed max-w-3xl font-medium">
-                        {feature.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-3 shrink-0 relative z-20">
-                    <button
-                      onClick={() => startEditingFeature(feature)}
-                      className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 text-slate-500 hover:text-white hover:bg-white/10 border border-white/5 transition-all shadow-inner"
-                      title="Edit feature flag"
-                    >
-                      <Icon name="Edit" size={20} />
-                    </button>
-                    <button
-                      onClick={() => deleteFeature(feature.id)}
-                      className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 border border-white/5 transition-all shadow-inner"
-                      title="Delete feature flag"
-                    >
-                      <Icon name="Trash" size={20} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Environment Toggles */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-10 border-t border-white/5 relative z-10">
-                  {feature.environments.map((envConfig) => {
-                    const env = environments.find(
-                      (e) => e.id === envConfig.environmentId,
-                    );
-                    if (!env) return null;
-
-                    return (
-                      <div
-                        key={envConfig.environmentId}
-                        className="bg-white/[0.03] border border-white/5 rounded-3xl p-6 flex items-center justify-between transition-all duration-300 hover:bg-white/[0.06] hover:border-white/10 group/toggle"
-                      >
-                        <div className="flex-1 min-w-0 mr-4">
-                          <div className="flex items-center gap-2 mb-1.5">
-                            <span className="text-lg">
-                              {getEnvironmentEmoji(env.type)}
-                            </span>
-                            <p className="font-bold text-white text-xs tracking-tight truncate">
-                              {env.name}
-                            </p>
-                          </div>
-                          <p
-                            className={`text-[9px] font-black uppercase tracking-[0.2em] ${envConfig.enabled ? "text-cyan-400" : "text-slate-600"}`}
-                          >
-                            {envConfig.enabled ? "Active" : "Disabled"}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() =>
-                            toggleEnvironmentFlag(
-                              feature.id,
-                              envConfig.environmentId,
-                            )
-                          }
-                          className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 ${
-                            envConfig.enabled
-                              ? "bg-cyan-500 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-                              : "bg-slate-800"
-                          }`}
-                        >
-                          <span
-                            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-xl transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${
-                              envConfig.enabled
-                                ? "translate-x-6 scale-110"
-                                : "translate-x-1"
-                            }`}
-                          />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Card Footer */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-10 pt-8 border-t border-white/5 relative z-10">
-                  <div className="flex items-center gap-3 text-slate-500 text-[10px] font-black uppercase tracking-[0.25em]">
-                    <Icon name="Clock" size={12} />
-                    Created{" "}
-                    {new Date(feature.created_at).toLocaleDateString(
-                      undefined,
-                      { month: "short", day: "numeric", year: "numeric" },
-                    )}
-                  </div>
-                  <a
-                    href={`/spaces/${spaceId}/features/${feature.id}`}
-                    className="w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3 bg-white/5 hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/20 rounded-2xl text-cyan-400 text-xs font-black uppercase tracking-widest group/link transition-all"
-                  >
-                    Advanced Config
-                    <Icon
-                      name="ArrowRight"
-                      size={14}
-                      className="group-hover/link:translate-x-1 transition-transform"
-                    />
-                  </a>
-                </div>
-              </div>
-            ))
-          )}
-        </section>
+        </div>
       </div>
 
       {/* Feature Modal */}
@@ -702,6 +722,53 @@ export default function FeaturesView({
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        id="delete-feature-modal"
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setFeatureToDelete(null);
+        }}
+        title="Delete Feature Flag"
+      >
+        <div className="space-y-8 py-4 font-sans text-center">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Icon name="AlertTriangle" size={40} className="text-red-500" />
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold text-white">Are you sure?</h3>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-xs mx-auto">
+              You are about to permanently delete the flag{" "}
+              <span className="text-white font-mono bg-white/5 px-2 py-1 rounded">
+                {featureToDelete?.key}
+              </span>
+              . This action cannot be undone.
+            </p>
+          </div>
+
+          <div className="flex gap-4 pt-6 mt-4 border-t border-white/5">
+            <button
+              type="button"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setFeatureToDelete(null);
+              }}
+              className="flex-1 py-4 text-slate-500 font-black uppercase tracking-[0.3em] text-[10px] hover:text-white transition-colors border border-transparent hover:bg-white/5 rounded-2xl"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={deleteFeature}
+              className="flex-[1.5] py-4 rounded-2xl font-black uppercase tracking-[0.3em] text-[10px] text-white bg-red-500 hover:bg-red-600 shadow-2xl shadow-red-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            >
+              Delete Permanently
+            </button>
+          </div>
+        </div>
       </Modal>
     </PageContainer>
   );

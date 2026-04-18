@@ -439,6 +439,11 @@ export const es = {
     modalDescLabel: "Propósito / Descripción",
     modalDescPlaceholder: "Describe el alcance de este espacio de trabajo...",
     deploying: "Desplegando...",
+    editSpace: "Editar Espacio",
+    deleteSpace: "Eliminar Espacio",
+    confirmDeleteTitle: "Confirmar Eliminación",
+    deleteConfirmDesc: 'Estás a punto de eliminar permanentemente el espacio de trabajo "{name}". Esta acción no se puede deshacer.',
+    updating: "Actualizando...",
     loadingDetails: "Cargando Detalles",
     notFoundTitle: "Espacio Perdido en Órbita",
     notFoundDesc:

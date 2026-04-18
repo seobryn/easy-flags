@@ -84,8 +84,8 @@ export async function initializeDatabase(): Promise<void> {
       user_id INTEGER NOT NULL,
       role_id INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
-      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (role_id) REFERENCES roles(id),
       UNIQUE(space_id, user_id)
     );
@@ -99,7 +99,7 @@ export async function initializeDatabase(): Promise<void> {
       type TEXT DEFAULT 'other',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
       UNIQUE(space_id, name),
       UNIQUE(space_id, slug)
     );
@@ -114,7 +114,7 @@ export async function initializeDatabase(): Promise<void> {
       default_value TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
       UNIQUE(space_id, key)
     );
 
@@ -127,8 +127,8 @@ export async function initializeDatabase(): Promise<void> {
       value TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (feature_id) REFERENCES features(id),
-      FOREIGN KEY (environment_id) REFERENCES environments(id),
+      FOREIGN KEY (feature_id) REFERENCES features(id) ON DELETE CASCADE,
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE,
       UNIQUE(feature_id, environment_id)
     );
 
@@ -140,7 +140,7 @@ export async function initializeDatabase(): Promise<void> {
       overridden_value TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (environment_id) REFERENCES environments(id),
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE,
       UNIQUE(environment_id, key)
     );
 
@@ -150,7 +150,7 @@ export async function initializeDatabase(): Promise<void> {
       key TEXT UNIQUE NOT NULL,
       last_used DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (environment_id) REFERENCES environments(id)
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS user_api_keys (
@@ -186,7 +186,7 @@ export async function initializeDatabase(): Promise<void> {
       schedule_end_time TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id),
+      FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id) ON DELETE CASCADE,
       UNIQUE(feature_flag_id)
     );
 
@@ -197,7 +197,7 @@ export async function initializeDatabase(): Promise<void> {
       rule_value TEXT NOT NULL,
       operator TEXT DEFAULT 'equals',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id)
+      FOREIGN KEY (feature_flag_id) REFERENCES feature_flags(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS feature_permissions (
@@ -221,9 +221,9 @@ export async function initializeDatabase(): Promise<void> {
       error_message TEXT,
       context_data TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
-      FOREIGN KEY (environment_id) REFERENCES environments(id),
-      FOREIGN KEY (feature_id) REFERENCES features(id)
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE,
+      FOREIGN KEY (feature_id) REFERENCES features(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS flag_usage_metrics (
@@ -241,9 +241,9 @@ export async function initializeDatabase(): Promise<void> {
       max_evaluation_time_ms INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
-      FOREIGN KEY (environment_id) REFERENCES environments(id),
-      FOREIGN KEY (feature_id) REFERENCES features(id),
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE,
+      FOREIGN KEY (feature_id) REFERENCES features(id) ON DELETE CASCADE,
       UNIQUE(space_id, environment_id, feature_id, metric_date)
     );
 
@@ -255,8 +255,8 @@ export async function initializeDatabase(): Promise<void> {
       endpoint TEXT,
       environment_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (space_id) REFERENCES spaces(id),
-      FOREIGN KEY (environment_id) REFERENCES environments(id)
+      FOREIGN KEY (space_id) REFERENCES spaces(id) ON DELETE CASCADE,
+      FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS pricing_plans (

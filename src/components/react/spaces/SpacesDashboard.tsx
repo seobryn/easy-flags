@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
+import { Modal } from "@/components/react/shared/Modals";
 
 interface Space {
   id: number;
@@ -27,6 +28,15 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
   const [newSpaceDescription, setNewSpaceDescription] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Edit & Delete State
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [activeSpace, setActiveSpace] = useState<Space | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   useEffect(() => {
     fetchSpaces();
@@ -72,6 +82,72 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleUpdateSpace = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeSpace) return;
+    setIsUpdating(true);
+
+    try {
+      const response = await fetch(`/api/spaces/${activeSpace.slug}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: editName,
+          description: editDescription,
+        }),
+      });
+
+      if (response.ok) {
+        setShowEditModal(false);
+        setActiveSpace(null);
+        await fetchSpaces();
+      }
+    } catch (error) {
+      console.error("Failed to update space:", error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDeleteSpace = async () => {
+    if (!activeSpace) return;
+    setIsDeleting(true);
+
+    try {
+      const response = await fetch(`/api/spaces/${activeSpace.slug}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setShowDeleteModal(false);
+        setActiveSpace(null);
+        await fetchSpaces();
+      }
+    } catch (error) {
+      console.error("Failed to delete space:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const openEditModal = (e: React.MouseEvent, space: Space) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveSpace(space);
+    setEditName(space.name);
+    setEditDescription(space.description || "");
+    setShowEditModal(true);
+  };
+
+  const openDeleteModal = (e: React.MouseEvent, space: Space) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveSpace(space);
+    setShowDeleteModal(true);
   };
 
   if (isLoading) {
@@ -196,8 +272,24 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
               {/* Hover Glow Effect */}
               <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 blur-[60px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
-              <div className="absolute top-8 right-8 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                 <Icon name="ChevronRight" size={16} />
+              <div className="absolute top-8 right-8 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0 z-30">
+                 <button
+                   onClick={(e) => openEditModal(e, space)}
+                   className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                   title={t('common.edit')}
+                 >
+                    <Icon name="Edit" size={16} />
+                 </button>
+                 <button
+                   onClick={(e) => openDeleteModal(e, space)}
+                   className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                   title={t('common.delete')}
+                 >
+                    <Icon name="Trash2" size={16} />
+                 </button>
+                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-slate-500">
+                    <Icon name="ChevronRight" size={16} />
+                 </div>
               </div>
  
                <div className="mb-8">
@@ -318,6 +410,97 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
           </div>
         </div>
       )}
+
+      {/* Edit Space Modal */}
+      <Modal
+        id="edit-space-modal"
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={t('spaces.editSpace')}
+        initialLocale={initialLocale}
+      >
+        <form onSubmit={handleUpdateSpace} className="space-y-6">
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 px-1">
+              {t('spaces.modalNameLabel')}
+            </label>
+            <input
+              type="text"
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              required
+              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all font-medium"
+              placeholder={t('spaces.modalNamePlaceholder')}
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-2 px-1">
+              {t('spaces.modalDescLabel')}
+            </label>
+            <textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all h-28 resize-none text-sm"
+              placeholder={t('spaces.modalDescPlaceholder')}
+            />
+          </div>
+
+          <div className="flex gap-4 justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => setShowEditModal(false)}
+              className="flex-1 py-3 text-slate-500 font-bold uppercase tracking-widest text-xs hover:text-white transition-colors"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={isUpdating}
+              className="flex-1 btn-primary py-3! shadow-lg shadow-cyan-500/20"
+            >
+              {isUpdating ? t('spaces.updating') : t('common.save')}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Space Modal */}
+      <Modal
+        id="delete-space-modal"
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title={t('spaces.confirmDeleteTitle')}
+        initialLocale={initialLocale}
+      >
+        <div className="space-y-8">
+          <div className="flex items-center gap-4 p-4 rounded-2xl bg-red-500/5 border border-red-500/10">
+            <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 shrink-0">
+              <Icon name="AlertTriangle" size={24} />
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              {t('spaces.deleteConfirmDesc', { name: activeSpace?.name || '' })}
+            </p>
+          </div>
+
+          <div className="flex gap-4 justify-end">
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(false)}
+              className="flex-1 py-3 text-slate-500 font-bold uppercase tracking-widest text-xs hover:text-white transition-colors"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              onClick={handleDeleteSpace}
+              disabled={isDeleting}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white font-black uppercase tracking-widest text-[10px] py-3 rounded-xl transition-all shadow-lg shadow-red-500/20 disabled:opacity-50"
+            >
+              {isDeleting ? t('common.loading') : t('common.delete')}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

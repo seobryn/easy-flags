@@ -264,6 +264,91 @@ export class LibSqlSpaceRepository implements SpaceRepository {
 
   async delete(id: number): Promise<void> {
     const db = await this.getDb();
+    
+    // Explicit manual cascading delete for robust cleanup
+    // 1. Delete Space Members
+    await db.execute({
+      sql: "DELETE FROM space_members WHERE space_id = ?",
+      args: [id],
+    });
+
+    // 2. Cleanup feature flags and their complex configurations
+    // This subquery approach is efficient and cleanup targeting rules and advanced configs
+    await db.execute({
+      sql: `DELETE FROM targeting_rules WHERE feature_flag_id IN (
+        SELECT ff.id FROM feature_flags ff 
+        JOIN features f ON ff.feature_id = f.id 
+        WHERE f.space_id = ?
+      )`,
+      args: [id],
+    });
+
+    await db.execute({
+      sql: `DELETE FROM advanced_configurations WHERE feature_flag_id IN (
+        SELECT ff.id FROM feature_flags ff 
+        JOIN features f ON ff.feature_id = f.id 
+        WHERE f.space_id = ?
+      )`,
+      args: [id],
+    });
+
+    // 3. Delete Feature Flags
+    await db.execute({
+      sql: `DELETE FROM feature_flags WHERE feature_id IN (SELECT id FROM features WHERE space_id = ?)`,
+      args: [id],
+    });
+
+    // 4. Cleanup Environment specific data
+    await db.execute({
+      sql: `DELETE FROM api_keys WHERE environment_id IN (SELECT id FROM environments WHERE space_id = ?)`,
+      args: [id],
+    });
+
+    await db.execute({
+      sql: `DELETE FROM environment_configs WHERE environment_id IN (SELECT id FROM environments WHERE space_id = ?)`,
+      args: [id],
+    });
+
+    // 5. Delete Environments and Features
+    await db.execute({
+      sql: "DELETE FROM environments WHERE space_id = ?",
+      args: [id],
+    });
+
+    await db.execute({
+      sql: "DELETE FROM features WHERE space_id = ?",
+      args: [id],
+    });
+
+    // 6. Delete Analytics and Metrics
+    await db.execute({
+      sql: "DELETE FROM flag_evaluations WHERE space_id = ?",
+      args: [id],
+    });
+
+    await db.execute({
+      sql: "DELETE FROM flag_usage_metrics WHERE space_id = ?",
+      args: [id],
+    });
+
+    await db.execute({
+      sql: "DELETE FROM performance_metrics WHERE space_id = ?",
+      args: [id],
+    });
+
+    // 7. Delete Audit Logs and Subscriptions
+    // Optional: We might want to keep audit logs, but the request implies "TODA la configuración"
+    await db.execute({
+      sql: "DELETE FROM audit_logs WHERE space_id = ?",
+      args: [id],
+    });
+
+    await db.execute({
+      sql: "DELETE FROM space_subscriptions WHERE space_id = ?",
+      args: [id],
+    });
+
+    // Finally delete the space itself
     await db.execute({
       sql: "DELETE FROM spaces WHERE id = ?",
       args: [id],
