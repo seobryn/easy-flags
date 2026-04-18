@@ -1,0 +1,27 @@
+name: Sync Payments
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Se ejecuta cada 15 minutos
+  workflow_dispatch: # Permite ejecución manual para pruebas
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Sync Script
+        run: npx tsx scripts/sync-payments.mjs
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_AUTH_TOKEN: ${{ secrets.DATABASE_AUTH_TOKEN }}
+          PUBLIC_WOMPI_PUBLIC_KEY: ${{ secrets.PUBLIC_WOMPI_PUBLIC_KEY }}
+          WOMPI_INTEGRITY_SECRET: ${{ secrets.WOMPI_INTEGRITY_SECRET }}
+          WOMPI_PRIVATE_KEY: ${{ secrets.WOMPI_PRIVATE_KEY }}
+          WOMPI_EVENT_SECRET: ${{ secrets.WOMPI_EVENT_SECRET }}

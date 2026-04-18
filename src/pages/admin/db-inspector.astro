@@ -15,9 +15,11 @@ if (!requireAuth(Astro)) {
   return Astro.redirect(getLoginUrl(Astro));
 }
 
+import { EnvManager } from "@/lib/env";
+
 // Get user and check permissions
 const user = getUserFromContext(Astro);
-const isDevelopment = !import.meta.env.PROD;
+const isDevelopment = EnvManager.get("PROD") !== "true";
 
 // Allow access if in development OR if the user is a super user
 if (!isDevelopment && (!user || !isSuperUser(user))) {

@@ -1,12 +1,13 @@
 import { createClient, type Client } from "@libsql/client";
+import { EnvManager } from "./env";
 
 let db: Client | null = null;
 let dbInitialized = false;
 
 export async function getDatabase(): Promise<Client> {
   if (!db) {
-    const url = import.meta.env.DATABASE_URL || "file:./data.db";
-    const authToken = import.meta.env.DATABASE_AUTH_TOKEN;
+    const url = EnvManager.get("DATABASE_URL") || "file:./data.db";
+    const authToken = EnvManager.get("DATABASE_AUTH_TOKEN");
 
     db = createClient({
       url,
@@ -441,9 +442,9 @@ export async function seedDatabase(): Promise<void> {
 
     // Insert default super user (role_id: 1)
     const adminUser = {
-      username: import.meta.env.ADMIN_USER || "admin",
+      username: EnvManager.get("ADMIN_USER") || "admin",
       email: "admin@example.com",
-      password_hash: import.meta.env.ADMIN_PASS || "password",
+      password_hash: EnvManager.get("ADMIN_PASS") || "password",
       role_id: 1,
     };
 

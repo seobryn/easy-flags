@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import type { APIContext } from "astro";
 import { getUserById } from "@/lib/auth-service";
+import { EnvManager } from "@/lib/env";
 
-const JWT_SECRET = import.meta.env.JWT_SECRET || "your-secret-key";
+const JWT_SECRET = EnvManager.get("JWT_SECRET") || "your-secret-key";
 
 export interface UserPayload {
   id: number;
@@ -104,7 +105,7 @@ export function setAuthCookie(
   token: string,
   maxAge: number = 86400,
 ): void {
-  const isProduction = import.meta.env.NODE_ENV === "production";
+  const isProduction = EnvManager.get("NODE_ENV") === "production";
   context.cookies.set("ff_token", token, {
     httpOnly: true,
     secure: isProduction,
@@ -117,7 +118,7 @@ export function setAuthCookie(
 export function clearAuthCookie(context: APIContext): void {
   context.cookies.set("ff_token", "", {
     httpOnly: true,
-    secure: import.meta.env.NODE_ENV === "production",
+    secure: EnvManager.get("NODE_ENV") === "production",
     sameSite: "lax",
     maxAge: 0,
     path: "/",

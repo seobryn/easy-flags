@@ -564,6 +564,7 @@ export class LibSqlUserSubscriptionRepository implements UserSubscriptionReposit
 
   async create(dto: CreateUserSubscriptionDTO): Promise<UserSubscription> {
     const db = await this.getDb();
+    console.log("Creating user subscription with DTO:", JSON.stringify(dto));
     const result = await db.execute({
       sql: `INSERT INTO user_subscriptions (user_id, pricing_plan_id, status, trial_start_date, trial_end_date)
             VALUES (?, ?, ?, ?, ?)`,
@@ -575,8 +576,11 @@ export class LibSqlUserSubscriptionRepository implements UserSubscriptionReposit
         dto.trial_end_date || null,
       ],
     });
+    console.log("DB execute result for create:", JSON.stringify(result));
+    console.log("Last insert row ID:", result.lastInsertRowid);
 
     const newSubscription = await this.findById(Number(result.lastInsertRowid));
+    console.log("Subscription found after create:", JSON.stringify(newSubscription));
     if (!newSubscription)
       throw new Error("Failed to create user subscription");
     return newSubscription;

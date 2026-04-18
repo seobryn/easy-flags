@@ -23,13 +23,15 @@ interface InspectorRequest {
   primaryKey?: string;
 }
 
+import { EnvManager } from "@/lib/env";
+
 export const POST: APIRoute = async (context) => {
   // Check authentication
   const user = getUserFromContext(context);
   
   // Rule: Allow in DEVELOPMENT environment for any authenticated user
   // OR Allow in any environment if the user is a SUPER USER
-  const isDevelopment = !import.meta.env.PROD;
+  const isDevelopment = EnvManager.get("PROD") !== "true";
   const isUserSuperUser = isSuperUser(user);
 
   if (!user) {

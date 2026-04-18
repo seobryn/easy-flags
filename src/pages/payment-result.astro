@@ -1,89 +1,133 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { Icon } from "../components/react/shared/Icon";
+import { getDatabase } from "@/lib/db";
 
-const status = Astro.url.searchParams.get("status") || "pending";
+export const prerender = false;
+
 const reference = Astro.url.searchParams.get("id") || "";
+let status = "pending";
+
+if (reference) {
+  try {
+    const db = await getDatabase();
+    const res = await db.execute({
+      sql: "SELECT status FROM payments WHERE external_id = ? OR reference = ?",
+      args: [reference, reference],
+    });
+
+    if (res.rows.length > 0) {
+      const dbStatus = (res.rows[0].status as string).toLowerCase();
+      if (dbStatus === "approved") {
+        status = "success";
+      } else if (
+        dbStatus === "declined" ||
+        dbStatus === "error" ||
+        dbStatus === "voided"
+      ) {
+        status = "error";
+      } else {
+        status = "pending";
+      }
+    }
+  } catch (e) {
+    console.error("Error fetching payment status:", e);
+  }
+}
 
 const statusConfig = {
   success: {
     title: "¡Pago Exitoso!",
-    message: "Tu suscripción ha sido activada correctamente. Ahora puedes disfrutar de todas las funcionalidades premium.",
-    icon: "CheckCircle",
+    message:
+      "Tu suscripción ha sido activada correctamente. Ahora puedes disfrutar de todas las funcionalidades premium.",
+    icon: "Check",
     color: "text-emerald-500",
     bg: "bg-emerald-500/10",
     buttonText: "Ir a mi Dashboard",
-    buttonHref: "/spaces"
+    buttonHref: "/spaces",
   },
   pending: {
     title: "Pago en Proceso",
-    message: "Estamos verificando tu transacción. Esto puede tomar unos minutos dependiendo de tu entidad financiera.",
+    message:
+      "Estamos verificando tu transacción. Esto puede tomar unos minutos dependiendo de tu entidad financiera.",
     icon: "Clock",
     color: "text-amber-500",
     bg: "bg-amber-500/10",
     buttonText: "Ver mis Facturas",
-    buttonHref: "/settings"
+    buttonHref: "/settings",
   },
   error: {
     title: "Pago Rechazado",
-    message: "No pudimos procesar tu pago. Por favor verifica los datos de tu tarjeta o intenta con otro medio de pago.",
+    message:
+      "No pudimos procesar tu pago. Por favor verifica los datos de tu tarjeta o intenta con otro medio de pago.",
     icon: "XCircle",
     color: "text-rose-500",
     bg: "bg-rose-500/10",
     buttonText: "Reintentar Pago",
-    buttonHref: "/billing"
-  }
+    buttonHref: "/billing",
+  },
 };
 
-const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+const config =
+  statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
 ---
 
 <BaseLayout title={config.title}>
   <div class="min-h-[80vh] flex items-center justify-center p-4">
-    <div class="max-w-md w-full bg-[#0b0e14]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 text-center shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-500">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[2px] bg-linear-to-r from-transparent via-cyan-500/50 to-transparent"></div>
-      
-      <div class={`w-20 h-20 ${config.bg} rounded-3xl flex items-center justify-center mx-auto mb-8 relative`}>
+    <div
+      class="max-w-md w-full bg-[#0b0e14]/80 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-10 text-center shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-500"
+    >
+      <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[2px] bg-linear-to-r from-transparent via-cyan-500/50 to-transparent"
+      >
+      </div>
+
+      <div
+        class={`w-20 h-20 ${config.bg} rounded-3xl flex items-center justify-center mx-auto mb-8 relative`}
+      >
         <div class={`absolute inset-0 ${config.bg} blur-xl rounded-full`}></div>
         <div class={config.color}>
-            {/* @ts-ignore - Astro dynamic component */}
-            <Icon name={config.icon} size={40} strokeWidth={2.5} />
+          <Icon name={config.icon} size={40} strokeWidth={2.5} />
         </div>
       </div>
 
       <h1 class="text-3xl font-bold text-white mb-4 tracking-tight">
         {config.title}
       </h1>
-      
+
       <p class="text-slate-400 mb-8 leading-relaxed">
         {config.message}
       </p>
 
-      {reference && (
-        <div class="bg-slate-950/40 rounded-2xl p-4 mb-8 border border-white/5">
-          <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-            Referencia de Pago
-          </p>
-          <code class="text-cyan-500 font-mono text-sm">{reference}</code>
-        </div>
-      )}
+      {
+        reference && (
+          <div class="bg-slate-950/40 rounded-2xl p-4 mb-8 border border-white/5">
+            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+              Referencia de Pago
+            </p>
+            <code class="text-cyan-500 font-mono text-sm">{reference}</code>
+          </div>
+        )
+      }
 
       <div class="space-y-3">
-        <a 
+        <a
           href={config.buttonHref}
           class="block w-full bg-linear-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white font-bold uppercase tracking-widest text-xs py-4 rounded-2xl transition shadow-lg shadow-cyan-500/20"
         >
           {config.buttonText}
         </a>
-        
-        {status !== 'success' && (
-          <a 
-            href="/contact"
-            class="block w-full py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-white transition-colors"
-          >
-            ¿Necesitas ayuda? Contactar soporte
-          </a>
-        )}
+
+        {
+          status !== "success" && (
+            <a
+              href="/contact"
+              class="block w-full py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-white transition-colors"
+            >
+              ¿Necesitas ayuda? Contactar soporte
+            </a>
+          )
+        }
       </div>
     </div>
   </div>
@@ -92,9 +136,9 @@ const config = statusConfig[status as keyof typeof statusConfig] || statusConfig
 <script>
   // Automatic refresh if pending
   const urlParams = new URLSearchParams(window.location.search);
-  const status = urlParams.get('status');
-  
-  if (status === 'pending') {
+  const status = urlParams.get("status");
+
+  if (status === "pending") {
     setTimeout(() => {
       window.location.reload();
     }, 10000); // Poll every 10 seconds

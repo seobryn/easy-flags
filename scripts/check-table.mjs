@@ -1,3 +1,4 @@
+import { EnvManager } from "@/lib/env";
 import { createClient } from "@libsql/client";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -9,14 +10,16 @@ async function checkTable() {
     return;
   }
 
-  const url = process.env.DATABASE_URL;
-  const authToken = process.env.DATABASE_AUTH_TOKEN;
+  const url = EnvManager.get("DATABASE_URL");
+  const authToken = EnvManager.get("DATABASE_AUTH_TOKEN");
   const client = createClient({ url, authToken });
 
   try {
-    const result = await client.execute(`SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`);
+    const result = await client.execute(
+      `SELECT name FROM sqlite_master WHERE type='table' AND name='${tableName}'`,
+    );
     console.log(`Table '${tableName}' check:`, result.rows);
-    
+
     if (result.rows.length > 0) {
       const columns = await client.execute(`PRAGMA table_info(${tableName})`);
       console.log("Columns:", columns.rows);

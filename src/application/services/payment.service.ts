@@ -121,6 +121,40 @@ export class PaymentService {
     };
   }
 
+  /**
+   * Updates a payment status and triggers plan assignment if approved
+   */
+  async updatePaymentStatus(transactionId: number, status: PaymentStatus): Promise<void> {
+    const registry = getRepositoryRegistry();
+    const paymentRepo = registry.getPaymentRepository();
+    const planRepo = registry.getPricingPlanRepository();
+    const subRepo = registry.getUserSubscriptionRepository();
+
+    // 1. Update status
+    await paymentRepo.update(transactionId, { status });
+
+    // 2. If approved, assign plan (ensure idempotency)
+    if (status === "APPROVED") {
+      const tx = await paymentRepo.findById(transactionId);
+      if (tx && tx.status === "APPROVED") {
+        const plan = await planRepo.findById(tx.pricing_plan_id);
+        if (plan) {
+          await PricingService.getInstance().assignPlanToUser(tx.user_id, plan.slug);
+        }
+      }
+    } else if (status === "VOIDED") {
+      // If payment is voided, ensure any existing subscription for this user is cancelled
+      const tx = await paymentRepo.findById(transactionId);
+      if (tx) {
+        const subscription = await subRepo.findByUserId(tx.user_id);
+        if (subscription) {
+          await subRepo.update(subscription.id, { status: "canceled" });
+          console.log(`Subscription ${subscription.id} cancelled due to payment ${transactionId} being voided.`);
+        }
+      }
+    }
+  }
+
   async processPayment(
     userId: number,
     paymentData: {
@@ -183,19 +217,9 @@ export class PaymentService {
     // Update transaction with external ID
     await paymentRepo.update(transaction.id, {
       external_id: wompiTx.id,
-      status: paymentStatus,
     });
-
-    // If payment is approved, assign the plan to the user immediately
-    if (paymentStatus === "APPROVED") {
-      const plan = await registry.getPricingPlanRepository().findById(transaction.pricing_plan_id);
-      if (plan) {
-        await PricingService.getInstance().assignPlanToUser(
-          transaction.user_id,
-          plan.slug
-        );
-      }
-    }
+    
+    await this.updatePaymentStatus(transaction.id, paymentStatus);
 
     return wompiTx;
   }
@@ -237,7 +261,6 @@ export class PaymentService {
 
     const registry = getRepositoryRegistry();
     const paymentRepo = registry.getPaymentRepository();
-    const planRepo = registry.getPricingPlanRepository();
 
     const transaction = await paymentRepo.findByReference(reference);
     if (!transaction) {
@@ -247,24 +270,15 @@ export class PaymentService {
     const paymentStatus = this.mapWompiStatus(status);
 
     await paymentRepo.update(transaction.id, {
-      status: paymentStatus,
       external_id: externalId,
     });
 
-    if (paymentStatus === "APPROVED") {
-      const plan = await planRepo.findById(transaction.pricing_plan_id);
-      if (plan) {
-        await PricingService.getInstance().assignPlanToUser(
-          transaction.user_id,
-          plan.slug
-        );
-      }
-    }
+    await this.updatePaymentStatus(transaction.id, paymentStatus);
 
     return true;
   }
 
-  private mapWompiStatus(wompiStatus: string): PaymentStatus {
+  public mapWompiStatus(wompiStatus: string): PaymentStatus {
     switch (wompiStatus) {
       case "APPROVED":
         return "APPROVED";

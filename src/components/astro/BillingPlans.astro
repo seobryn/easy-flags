@@ -51,6 +51,7 @@ try {
     : Promise.resolve(null);
 
   const [allPlans, sub] = await Promise.all([allPlansPromise, userSubPromise]);
+
   plans = allPlans;
   userSubscription = sub;
 } catch (error) {
@@ -71,9 +72,7 @@ const currentPlanPrice = userSubscription?.plan?.price_usd ?? -1;
         <Icon name="AlertTriangle" size={16} className="inline mr-1" />
         {loadingError}
       </p>
-      <p class="text-red-400 text-sm mt-2">
-        {t("billing.persistenceNotice")}
-      </p>
+      <p class="text-red-400 text-sm mt-2">{t("billing.persistenceNotice")}</p>
     </div>
   ) : plans.length === 0 ? (
     <div class="bg-slate-800/50 border border-slate-700 rounded-lg p-8 my-12 text-center">
@@ -81,18 +80,21 @@ const currentPlanPrice = userSubscription?.plan?.price_usd ?? -1;
         <Icon name="FileText" size={16} className="inline mr-1" />
         {t("billing.noPricingPlans")}
       </p>
-      <p class="text-slate-400 text-sm mt-2">
-        {t("billing.contactSupport")}
-      </p>
+      <p class="text-slate-400 text-sm mt-2">{t("billing.contactSupport")}</p>
     </div>
   ) : (
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto my-16 md:my-24 px-4">
       {plans.map((plan) => {
         const isCurrentPlan = plan.id === currentPlanId;
+
         const isUpgrade =
-          userSubscription && !isCurrentPlan && plan.price_usd > currentPlanPrice;
+          userSubscription &&
+          !isCurrentPlan &&
+          plan.price_usd > currentPlanPrice;
         const isDowngrade =
-          userSubscription && !isCurrentPlan && plan.price_usd < currentPlanPrice;
+          userSubscription &&
+          !isCurrentPlan &&
+          plan.price_usd < currentPlanPrice;
 
         let action: "checkout" | "upgrade" | "downgrade" | "current" | "login" =
           "checkout";
@@ -131,7 +133,8 @@ const currentPlanPrice = userSubscription?.plan?.price_usd ?? -1;
                 {t(`billing.plans.${plan.slug}.name`) || plan.name}
               </h3>
               <p class="text-slate-400 text-sm leading-relaxed">
-                {t(`billing.plans.${plan.slug}.description`) || plan.description}
+                {t(`billing.plans.${plan.slug}.description`) ||
+                  plan.description}
               </p>
             </div>
 
@@ -140,12 +143,12 @@ const currentPlanPrice = userSubscription?.plan?.price_usd ?? -1;
                 {plan.price_usd === 0
                   ? t("billing.free")
                   : isColombia
-                  ? `${new Intl.NumberFormat("es-CO", {
-                      style: "currency",
-                      currency: "COP",
-                      maximumFractionDigits: 0,
-                    }).format(plan.price_cop)}`
-                  : `$${plan.price_usd}`}
+                    ? `${new Intl.NumberFormat("es-CO", {
+                        style: "currency",
+                        currency: "COP",
+                        maximumFractionDigits: 0,
+                      }).format(plan.price_cop)}`
+                    : `$${plan.price_usd}`}
               </span>
               <span class="text-slate-500 font-medium">
                 {t("billing.perMonth")}

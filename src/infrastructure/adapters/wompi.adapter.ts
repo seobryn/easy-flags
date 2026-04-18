@@ -30,6 +30,8 @@ export interface WompiWidgetConfig {
   };
 }
 
+import { EnvManager } from "@/lib/env";
+
 export class WompiPaymentGateway implements PaymentGateway {
   private readonly publicKey: string;
   private readonly privateKey: string;
@@ -38,10 +40,10 @@ export class WompiPaymentGateway implements PaymentGateway {
   private readonly baseUrl: string;
 
   constructor() {
-    this.publicKey = import.meta.env.PUBLIC_WOMPI_PUBLIC_KEY || "";
-    this.privateKey = import.meta.env.WOMPI_PRIVATE_KEY || "";
-    this.integritySecret = import.meta.env.WOMPI_INTEGRITY_SECRET || "";
-    this.eventSecret = import.meta.env.WOMPI_EVENT_SECRET || "";
+    this.publicKey = EnvManager.get("PUBLIC_WOMPI_PUBLIC_KEY");
+    this.privateKey = EnvManager.get("WOMPI_PRIVATE_KEY");
+    this.integritySecret = EnvManager.get("WOMPI_INTEGRITY_SECRET");
+    this.eventSecret = EnvManager.get("WOMPI_EVENT_SECRET");
 
     // Determine base URL (sandbox or production)
     const isProd = !this.publicKey.startsWith("pub_test_");
@@ -56,6 +58,30 @@ export class WompiPaymentGateway implements PaymentGateway {
 
   getPublicKey(): string {
     return this.publicKey;
+  }
+
+  /**
+   * Retrieves a transaction status by ID.
+   * GET /transactions/:id
+   */
+  async getTransactionStatus(transactionId: string): Promise<any> {
+    const authHeader = this.privateKey 
+      ? `Bearer ${this.privateKey}` 
+      : `Bearer ${this.publicKey}`;
+
+    const response = await fetch(`${this.baseUrl}/transactions/${transactionId}`, {
+      method: "GET",
+      headers: {
+        "Authorization": authHeader,
+      },
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(`Wompi Get Transaction Error: ${JSON.stringify(result.error || result)}`);
+    }
+
+    return result.data;
   }
 
   /**

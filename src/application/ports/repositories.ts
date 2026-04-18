@@ -425,6 +425,7 @@ export interface PaymentGateway {
   getPublicKey(): string;
   getMerchantInfo(): Promise<any>;
   createTransaction(payload: any): Promise<any>;
+  getTransactionStatus(transactionId: string): Promise<any>;
   generateIntegritySignature(
     reference: string,
     amountInCents: number,
@@ -458,5 +459,6 @@ export interface RepositoryRegistry {
   getPricingPlanRepository(): PricingPlanRepository;
   getPricingPlanFeatureRepository(): PricingPlanFeatureRepository;
   getPricingPlanLimitRepository(): PricingPlanLimitRepository;
+  getUserSubscriptionRepository(): UserSubscriptionRepository;
   getPaymentRepository(): PaymentRepository;
 }
