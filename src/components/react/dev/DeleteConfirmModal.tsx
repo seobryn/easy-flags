@@ -88,6 +88,5 @@ export function DeleteConfirmModal({
         </div>
       </div>
     </div>
-    </div>
   );
 }
