@@ -4,9 +4,9 @@ import DatabaseInspector from "@/components/react/DatabaseInspector";
 import { requireAuth, getLoginUrl } from "@/utils/auth-redirect";
 import { isSuperUser } from "@/utils/permissions";
 import { getUserFromContext } from "@/utils/auth";
-import { getTranslator } from "@/infrastructure/i18n/astro";
+import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
-const { t } = getTranslator(Astro.request);
+const { t, lang } = getTranslator(Astro.request);
 
 export const prerender = false;
 
@@ -23,7 +23,7 @@ const isDevelopment = EnvManager.get("PROD") !== "true";
 
 // Allow access if in development OR if the user is a super user
 if (!isDevelopment && (!user || !isSuperUser(user))) {
-  return Astro.redirect("/forbidden");
+  return Astro.redirect(getLocalizedPath("/forbidden", lang as any));
 }
 ---
 

@@ -52,17 +52,19 @@ const StatusBadge: React.FC<{ status: string, t: (key: string) => string }> = ({
   );
 };
 
+interface AuditLogsViewProps {
+  filters: AnalyticsFilters;
+  userId: string;
+  isAdmin?: boolean;
+  initialLocale?: AvailableLanguages;
+}
+
 export default function AuditLogsView({
   filters,
   userId,
   isAdmin = false,
   initialLocale,
-}: AuditLogsViewProps {
-  filters: AnalyticsFilters;
-  userId: string;
-  isAdmin?: boolean;
-  initialLocale?: AvailableLanguages;
-}) {
+}: AuditLogsViewProps) {
   const t = useTranslate(initialLocale);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);

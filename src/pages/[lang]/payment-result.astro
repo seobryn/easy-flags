@@ -2,8 +2,11 @@
 import { Icon, type IconName } from "@/components/react/shared/Icon";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { getDatabase } from "@/lib/db";
+import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
 export const prerender = false;
+
+const { t, lang } = getTranslator(Astro.request);
 
 const reference = Astro.url.searchParams.get("id") || "";
 let status = "pending";
@@ -37,34 +40,31 @@ if (reference) {
 
 const statusConfig = {
   success: {
-    title: "¡Pago Exitoso!",
-    message:
-      "Tu suscripción ha sido activada correctamente. Ahora puedes disfrutar de todas las funcionalidades premium.",
+    title: t('billing.paymentResult.successTitle'),
+    message: t('billing.paymentResult.successMessage'),
     icon: "Check",
     color: "text-emerald-500",
     bg: "bg-emerald-500/10",
-    buttonText: "Ir a mi Dashboard",
-    buttonHref: "/spaces",
+    buttonText: t('billing.paymentResult.dashboardButton'),
+    buttonHref: getLocalizedPath("/spaces", lang as any),
   },
   pending: {
-    title: "Pago en Proceso",
-    message:
-      "Estamos verificando tu transacción. Esto puede tomar unos minutos dependiendo de tu entidad financiera.",
+    title: t('billing.paymentResult.pendingTitle'),
+    message: t('billing.paymentResult.pendingMessage'),
     icon: "Clock",
     color: "text-amber-500",
     bg: "bg-amber-500/10",
-    buttonText: "Ver mis Facturas",
-    buttonHref: "/settings",
+    buttonText: t('billing.paymentResult.settingsButton'),
+    buttonHref: getLocalizedPath("/settings", lang as any),
   },
   error: {
-    title: "Pago Rechazado",
-    message:
-      "No pudimos procesar tu pago. Por favor verifica los datos de tu tarjeta o intenta con otro medio de pago.",
+    title: t('billing.paymentResult.errorTitle'),
+    message: t('billing.paymentResult.errorMessage'),
     icon: "XCircle",
     color: "text-rose-500",
     bg: "bg-rose-500/10",
-    buttonText: "Reintentar Pago",
-    buttonHref: "/billing",
+    buttonText: t('billing.paymentResult.retryButton'),
+    buttonHref: getLocalizedPath("/billing", lang as any),
   },
 };
 
@@ -103,7 +103,7 @@ const config =
         reference && (
           <div class="bg-slate-950/40 rounded-2xl p-4 mb-8 border border-white/5">
             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-              Referencia de Pago
+              {t('billing.paymentResult.referenceLabel')}
             </p>
             <code class="text-cyan-500 font-mono text-sm">{reference}</code>
           </div>
@@ -121,10 +121,10 @@ const config =
         {
           status !== "success" && (
             <a
-              href="/contact"
+              href={getLocalizedPath("/contact", lang as any)}
               class="block w-full py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-white transition-colors"
             >
-              ¿Necesitas ayuda? Contactar soporte
+              {t('billing.paymentResult.needHelp')}
             </a>
           )
         }

@@ -21,7 +21,7 @@ const { spaceId: spaceSlug } = Astro.params;
 const spaceService = new SpaceService();
 const space = await spaceService.getSpaceBySlug(spaceSlug as string);
 if (!checkResourceExists(space, Astro, "Space")) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 ---
 

@@ -8,7 +8,7 @@ import PermissionsManagementView from "@/components/react/spaces/PermissionsMana
 import { SpaceService } from "@application/services";
 import { getTranslator, getLocale } from "@/infrastructure/i18n/astro";
 
-const { t } = getTranslator(Astro.request);
+const { t, lang } = getTranslator(Astro.request);
 const initialLocale = getLocale(Astro.request);
 
 export const prerender = false;
@@ -25,7 +25,7 @@ const spaceService = new SpaceService();
 const space = await spaceService.getSpaceBySlug(spaceId as string);
 
 if (!checkResourceExists(space, Astro, "Space")) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 
 // Check if user is super user

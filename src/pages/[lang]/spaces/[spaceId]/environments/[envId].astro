@@ -23,7 +23,7 @@ const { spaceId: spaceSlug, envId: envSlug } = Astro.params;
 const spaceService = new SpaceService();
 const space = (await spaceService.getSpaceBySlug(spaceSlug as string))!;
 if (!checkResourceExists(space, Astro, "Space")) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 
 // Verify environment exists and belongs to the space (lookup by slug)
@@ -33,7 +33,7 @@ const env = (await environmentService.getEnvironmentBySlug(
   envSlug as string,
 ))!;
 if (!env) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 
 const initialLocale = getLocale(Astro.request);

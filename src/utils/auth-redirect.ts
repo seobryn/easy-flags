@@ -33,12 +33,27 @@ export function requireAuth(astroContext: AstroGlobal): boolean {
   return true;
 }
 
+import { getLocalizedPath } from "@/infrastructure/i18n/translator";
+import { translations } from "@/infrastructure/i18n/locales";
+
+/**
+ * Helper to get current locale from URL
+ */
+function getCurrentLocale(url: URL): string {
+  const parts = url.pathname.split("/");
+  const firstPart = parts[1];
+  const supportedLocales = Object.keys(translations);
+  return supportedLocales.includes(firstPart) ? firstPart : "en";
+}
+
 /**
  * Get login URL with redirect parameter
  */
 export function getLoginUrl(astroContext: AstroGlobal): string {
   const currentUrl = astroContext.url.pathname + astroContext.url.search;
-  return `/login?redirect=${encodeURIComponent(currentUrl)}`;
+  const locale = getCurrentLocale(astroContext.url);
+  const localizedLogin = getLocalizedPath("/login", locale, Object.keys(translations));
+  return `${localizedLogin}?redirect=${encodeURIComponent(currentUrl)}`;
 }
 
 /**
@@ -49,7 +64,8 @@ export function getLoginUrl(astroContext: AstroGlobal): string {
  * ---
  * import { redirectIfAuthenticated } from "@/utils/auth-redirect";
  * if (redirectIfAuthenticated(Astro)) {
- *   return Astro.redirect("/spaces");
+ *   const locale = "en"; // detect it
+ *   return Astro.redirect(getLocalizedPath("/spaces", locale));
  * }
  * ---
  * ```

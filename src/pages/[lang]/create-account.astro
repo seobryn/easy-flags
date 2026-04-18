@@ -2,15 +2,15 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { redirectIfAuthenticated } from "@/utils/auth-redirect";
 import RegisterForm from "@/components/react/auth/RegisterForm";
-import { getTranslator } from "@/infrastructure/i18n/astro";
+import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
-const { t } = getTranslator(Astro.request);
+const { t, lang } = getTranslator(Astro.request);
 
 export const prerender = false;
 
 // Redirect authenticated users to spaces
 if (redirectIfAuthenticated(Astro)) {
-  return Astro.redirect("/spaces");
+  return Astro.redirect(getLocalizedPath("/spaces", lang as any));
 }
 ---
 

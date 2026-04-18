@@ -22,14 +22,14 @@ const featureIdNum = parseInt(featureId as string);
 const spaceService = new SpaceService();
 const space = (await spaceService.getSpaceBySlug(spaceSlug as string))!;
 if (!checkResourceExists(space, Astro, "Space")) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 
 // Verify feature exists and belongs to the space
 const featureService = new FeatureService();
 const feature = (await featureService.getFeature(featureIdNum))!;
 if (!validateNestedResource(feature, "space_id", space.id, Astro, "Feature")) {
-  return Astro.redirect("/404");
+  return Astro.redirect(getLocalizedPath("/404", lang as any));
 }
 
 const title = `${feature.name} - Advanced Configuration`;

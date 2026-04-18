@@ -2,20 +2,20 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { redirectIfAuthenticated } from "@/utils/auth-redirect";
 import LoginForm from "@/components/react/auth/LoginForm";
-import { getTranslator } from "@/infrastructure/i18n/astro";
+import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
-const { t } = getTranslator(Astro.request);
+const { t, lang } = getTranslator(Astro.request);
 
 export const prerender = false;
 
 // Redirect authenticated users to spaces (or where they were going)
 if (redirectIfAuthenticated(Astro)) {
-  const redirectUrl = Astro.url.searchParams.get("redirect") || "/spaces";
+  const redirectUrl = Astro.url.searchParams.get("redirect") || getLocalizedPath("/spaces", lang as any);
   return Astro.redirect(redirectUrl);
 }
 
 // Get redirect URL from query params (where user was trying to go)
-const redirectUrl = Astro.url.searchParams.get("redirect") || "/spaces";
+const redirectUrl = Astro.url.searchParams.get("redirect") || getLocalizedPath("/spaces", lang as any);
 ---
 
 <BaseLayout seoKey="login" includeHeader={false}>

@@ -8,6 +8,7 @@ import {
   getLoginUrl,
 } from "@/utils/auth-redirect";
 import { hasFeatureAccess, FEATURES, isGlobalAdmin } from "@/utils/permissions";
+import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
 export const prerender = false;
 
@@ -18,9 +19,11 @@ if (!requireAuth(Astro)) {
 
 // Get user and check feature access
 const user = getUserFromAstroContext(Astro);
+const { t, lang } = getTranslator(Astro.request);
+
 const hasAccess = user && hasFeatureAccess(user, FEATURES.FEATURE_FLAGS);
 if (!hasAccess) {
-  return Astro.redirect("/forbidden");
+  return Astro.redirect(getLocalizedPath("/forbidden", lang as any));
 }
 
 const isAdmin = user && isGlobalAdmin(user);
