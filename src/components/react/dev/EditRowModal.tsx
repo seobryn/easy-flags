@@ -39,11 +39,11 @@ export function EditRowModal({
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-500"
         onClick={onClose}
       />
-      
+
       {/* Modal Container */}
       <div className="relative bg-[#0b0e14]/80 backdrop-blur-2xl border border-white/10 rounded-[40px] shadow-3xl max-w-2xl w-full max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-500 overflow-hidden">
         {/* Internal Aurora Effects */}
@@ -52,15 +52,19 @@ export function EditRowModal({
 
         {/* Header Highlight */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[40%] h-[2px] bg-linear-to-r from-transparent via-blue-500/50 to-transparent"></div>
-        
+
         <div className="shrink-0 p-12 flex justify-between items-start">
           <div className="space-y-1">
             <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-4">
-              Update <span className="bg-linear-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Record</span>
+              Update{" "}
+              <span className="bg-linear-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                Record
+              </span>
             </h2>
             <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/5 text-slate-400 text-[9px] font-black uppercase tracking-[0.2em]">
-               <div className="w-1 h-1 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse"></div>
-               EDITING / <span className="text-white font-mono">{selectedTable}</span>
+              <div className="w-1 h-1 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse"></div>
+              EDITING /{" "}
+              <span className="text-white font-mono">{selectedTable}</span>
             </div>
           </div>
           <button
@@ -68,7 +72,7 @@ export function EditRowModal({
             className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white transition-all hover:bg-white/10 active:scale-95 border border-white/5"
             aria-label="Close"
           >
-             <Icon name="X" size={20} />
+            <Icon name="X" size={20} />
           </button>
         </div>
 
@@ -76,16 +80,25 @@ export function EditRowModal({
           {schema
             .filter((col) => !col.pk)
             .map((col) => {
-              const isPasswordField = col.name.toLowerCase().includes("password");
+              const isPasswordField = col.name
+                .toLowerCase()
+                .includes("password");
 
               return (
-                <div key={col.name} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div
+                  key={col.name}
+                  className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+                >
                   <div className="flex items-center justify-between mb-3 px-1">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">
                       {col.name}
-                      {!!col.notnull && <span className="text-rose-500 ml-1.5">*</span>}
+                      {!!col.notnull && (
+                        <span className="text-rose-500 ml-1.5">*</span>
+                      )}
                     </label>
-                    <span className="text-[9px] font-black text-slate-600 bg-white/5 px-2.5 py-1 rounded-lg uppercase border border-white/5 tracking-widest leading-none">{col.type}</span>
+                    <span className="text-[9px] font-black text-slate-600 bg-white/5 px-2.5 py-1 rounded-lg uppercase border border-white/5 tracking-widest leading-none">
+                      {col.type}
+                    </span>
                   </div>
 
                   {isPasswordField ? (
@@ -100,9 +113,13 @@ export function EditRowModal({
                       </div>
                       <div className="relative">
                         <input
-                          type={visiblePasswords[col.name] ? "text" : "password"}
+                          type={
+                            visiblePasswords[col.name] ? "text" : "password"
+                          }
                           value={formData[col.name] || ""}
-                          onChange={(e) => onFormChange(col.name, e.target.value)}
+                          onChange={(e) =>
+                            onFormChange(col.name, e.target.value)
+                          }
                           placeholder="Leave empty to keep existing password..."
                           className="w-full px-6 py-4.5 pr-14 bg-slate-950/60 border border-blue-500/20 rounded-2xl text-white placeholder-blue-950/30 focus:outline-none focus:border-blue-500/50 transition-all font-mono text-xs shadow-2xl"
                         />
@@ -119,7 +136,8 @@ export function EditRowModal({
                         </button>
                       </div>
                     </div>
-                  ) : col.type.toLowerCase().includes("text") || col.type.toLowerCase().includes("varchar") ? (
+                  ) : col.type.toLowerCase().includes("text") ||
+                    col.type.toLowerCase().includes("varchar") ? (
                     <textarea
                       value={formData[col.name] || ""}
                       onChange={(e) => onFormChange(col.name, e.target.value)}
@@ -128,8 +146,17 @@ export function EditRowModal({
                     />
                   ) : (
                     <input
-                      type={ col.type.toLowerCase().includes("int") || col.type.toLowerCase().includes("real") ? "number" : "text" }
-                      step={ col.type.toLowerCase().includes("real") ? "0.01" : undefined }
+                      type={
+                        col.type.toLowerCase().includes("int") ||
+                        col.type.toLowerCase().includes("real")
+                          ? "number"
+                          : "text"
+                      }
+                      step={
+                        col.type.toLowerCase().includes("real")
+                          ? "0.01"
+                          : undefined
+                      }
                       value={formData[col.name] || ""}
                       onChange={(e) => onFormChange(col.name, e.target.value)}
                       placeholder={`New val: ${col.name.toLowerCase()}...`}
@@ -156,14 +183,14 @@ export function EditRowModal({
           >
             {loading ? (
               <span className="flex items-center justify-center gap-3">
-                 <div className="w-3.5 h-3.5 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin"></div>
-                 Pushing Changes...
+                <div className="w-3.5 h-3.5 border-2 border-slate-950/20 border-t-slate-950 rounded-full animate-spin"></div>
+                Pushing Changes...
               </span>
-            ) : "Save Changes"}
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
-      </div>
-    </div>
       </div>
     </div>
   );

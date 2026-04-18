@@ -6,6 +6,8 @@ import ComplianceReportsView from "./views/ComplianceReportsView";
 import ComparisonView from "./views/ComparisonView";
 import AdvancedFilters from "./filters/AdvancedFilters";
 import { exportToCSV, exportToJSON } from "@lib/analytics-export";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 type TabType = "flags" | "audit" | "performance" | "compliance" | "comparison";
 
@@ -27,6 +29,7 @@ interface AnalyticsManagerProps {
   userId: string;
   isAdmin?: boolean;
   spaceId?: string;
+  initialLocale?: AvailableLanguages;
 }
 
 const TabButton: React.FC<{
@@ -52,7 +55,9 @@ export default function AnalyticsManager({
   userId,
   isAdmin = false,
   spaceId: defaultSpaceId,
+  initialLocale,
 }: AnalyticsManagerProps) {
+  const t = useTranslate(initialLocale);
   const [activeTab, setActiveTab] = useState<TabType>("flags");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<AnalyticsFilters>({
@@ -75,13 +80,13 @@ export default function AnalyticsManager({
       (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    if (diffDays === 0) return "Today";
-    if (diffDays === 1) return "Last 2 days";
-    if (diffDays === 6) return "Last 7 days";
-    if (diffDays === 29) return "Last 30 days";
-    if (diffDays === 89) return "Last 90 days";
-    return `${diffDays + 1} days`;
-  }, [filters.dateRange]);
+    if (diffDays === 0) return t('analytics.today');
+    if (diffDays === 1) return t('analytics.lastXDays', { count: 2 });
+    if (diffDays === 6) return t('analytics.lastXDays', { count: 7 });
+    if (diffDays === 29) return t('analytics.lastXDays', { count: 30 });
+    if (diffDays === 89) return t('analytics.lastXDays', { count: 90 });
+    return t('analytics.lastXDays', { count: diffDays + 1 });
+  }, [filters.dateRange, t]);
 
   const handleSetDatePreset = (days: number) => {
     const endDate = new Date();
@@ -138,10 +143,10 @@ export default function AnalyticsManager({
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">
-                📊 Analytics Manager
+                📊 {t('analytics.analyticsManager')}
               </h1>
               <p className="text-slate-400">
-                Comprehensive analytics and compliance monitoring
+                {t('analytics.analyticsManagerDesc')}
               </p>
             </div>
             <div className="flex gap-4 items-center">
@@ -161,7 +166,7 @@ export default function AnalyticsManager({
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
                   <span>⬇️</span>
-                  {exporting ? "Exporting..." : "Export"}
+                  {exporting ? t('analytics.exporting') : t('analytics.export')}
                 </button>
 
                 {showExportMenu && (
@@ -173,7 +178,7 @@ export default function AnalyticsManager({
                       }}
                       className="block w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 transition-colors"
                     >
-                      Export as CSV
+                      {t('analytics.exportCSV')}
                     </button>
                     <button
                       onClick={() => {
@@ -182,7 +187,7 @@ export default function AnalyticsManager({
                       }}
                       className="block w-full text-left px-4 py-2 text-slate-300 hover:bg-slate-700 transition-colors border-t border-slate-700"
                     >
-                      Export as JSON
+                      {t('analytics.exportJSON')}
                     </button>
                   </div>
                 )}
@@ -198,7 +203,7 @@ export default function AnalyticsManager({
                 }`}
               >
                 <span>🔍</span>
-                Filters
+                {t('analytics.filters')}
               </button>
             </div>
           </div>
@@ -206,10 +211,10 @@ export default function AnalyticsManager({
           {/* Quick date presets */}
           <div className="flex gap-2 flex-wrap">
             {[
-              { label: "Today", days: 0 },
-              { label: "Last 7 days", days: 7 },
-              { label: "Last 30 days", days: 30 },
-              { label: "Last 90 days", days: 90 },
+              { label: t('analytics.today'), days: 0 },
+              { label: t('analytics.lastXDays', { count: 7 }), days: 7 },
+              { label: t('analytics.lastXDays', { count: 30 }), days: 30 },
+              { label: t('analytics.lastXDays', { count: 90 }), days: 90 },
             ].map(({ label, days }) => (
               <button
                 key={label}
@@ -244,32 +249,32 @@ export default function AnalyticsManager({
             active={activeTab === "flags"}
             onClick={() => setActiveTab("flags")}
             icon="📊"
-            label="Flag Metrics"
+            label={t('analytics.flagMetrics')}
           />
           <TabButton
             active={activeTab === "audit"}
             onClick={() => setActiveTab("audit")}
             icon="📈"
-            label="Audit Logs"
+            label={t('analytics.auditLogs')}
           />
           <TabButton
             active={activeTab === "performance"}
             onClick={() => setActiveTab("performance")}
             icon="📊"
-            label="Performance"
+            label={t('analytics.performance')}
           />
           <TabButton
             active={activeTab === "compliance"}
             onClick={() => setActiveTab("compliance")}
             icon="📈"
-            label="Compliance"
+            label={t('analytics.compliance')}
           />
           {isAdmin && (
             <TabButton
               active={activeTab === "comparison"}
               onClick={() => setActiveTab("comparison")}
               icon="📊"
-              label="Comparison"
+              label={t('analytics.comparisonTab')}
             />
           )}
         </div>
@@ -278,27 +283,29 @@ export default function AnalyticsManager({
       {/* Content */}
       <div className="p-6">
         {activeTab === "flags" && (
-          <FlagMetricsView filters={filters} userId={userId} />
+          <FlagMetricsView filters={filters} userId={userId} initialLocale={initialLocale} />
         )}
         {activeTab === "audit" && (
           <AuditLogsView
             filters={filters}
             userId={userId}
             isAdmin={isAdmin}
+            initialLocale={initialLocale}
           />
         )}
         {activeTab === "performance" && (
-          <PerformanceMetricsView filters={filters} userId={userId} />
+          <PerformanceMetricsView filters={filters} userId={userId} initialLocale={initialLocale} />
         )}
         {activeTab === "compliance" && (
           <ComplianceReportsView
             filters={filters}
             userId={userId}
             isAdmin={isAdmin}
+            initialLocale={initialLocale}
           />
         )}
         {activeTab === "comparison" && isAdmin && (
-          <ComparisonView filters={filters} />
+          <ComparisonView filters={filters} initialLocale={initialLocale} />
         )}
       </div>
     </div>

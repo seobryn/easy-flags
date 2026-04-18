@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { AnalyticsFilters } from "../AnalyticsManager";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface AuditLog {
   id: string;
@@ -19,12 +21,6 @@ interface AuditLog {
   createdAt: string;
 }
 
-interface AuditLogsViewProps {
-  filters: AnalyticsFilters;
-  userId: string;
-  isAdmin?: boolean;
-}
-
 const SeverityBadge: React.FC<{ severity: string }> = ({ severity }) => {
   const colors = {
     info: "bg-blue-500/20 text-blue-300 border-blue-500/30",
@@ -42,7 +38,7 @@ const SeverityBadge: React.FC<{ severity: string }> = ({ severity }) => {
   );
 };
 
-const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+const StatusBadge: React.FC<{ status: string, t: (key: string) => string }> = ({ status, t }) => {
   return (
     <span
       className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${
@@ -51,7 +47,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
           : "bg-red-500/20 text-red-300 border-red-500/30"
       }`}
     >
-      {status === "success" ? "✓ Success" : "✗ Failed"}
+      {status === "success" ? `✓ ${t('analytics.success')}` : `✗ ${t('analytics.failed')}`}
     </span>
   );
 };
@@ -60,7 +56,14 @@ export default function AuditLogsView({
   filters,
   userId,
   isAdmin = false,
-}: AuditLogsViewProps) {
+  initialLocale,
+}: AuditLogsViewProps {
+  filters: AnalyticsFilters;
+  userId: string;
+  isAdmin?: boolean;
+  initialLocale?: AvailableLanguages;
+}) {
+  const t = useTranslate(initialLocale);
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -93,14 +96,14 @@ export default function AuditLogsView({
           ? `/api/audit/logs?${params}`
           : `/api/audit/logs/user?${params}`
       );
-      if (!response.ok) throw new Error("Failed to fetch audit logs");
+      if (!response.ok) throw new Error(t('analytics.failedFetchLogs'));
 
       const data = await response.json();
       setLogs(data.logs || []);
       setTotalCount(data.count || 0);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t('common.error'));
       setLogs([]);
     } finally {
       setLoading(false);
@@ -114,7 +117,7 @@ export default function AuditLogsView({
       <div className="flex justify-center items-center py-20">
         <div className="text-slate-400 flex items-center gap-2">
           <div className="animate-spin">⏳</div>
-          Loading audit logs...
+          {t('analytics.loadingLogs')}
         </div>
       </div>
     );
@@ -125,7 +128,7 @@ export default function AuditLogsView({
       {/* Summary */}
       <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
         <p className="text-slate-400 text-sm">
-          Total Audit Entries: <span className="text-white font-semibold">{totalCount.toLocaleString()}</span>
+          {t('analytics.totalAuditEntries', { count: totalCount.toLocaleString() })}
         </p>
       </div>
 
@@ -140,9 +143,9 @@ export default function AuditLogsView({
       {/* Logs Table */}
       {logs.length === 0 ? (
         <div className="bg-slate-800 rounded-lg p-12 border border-slate-700 text-center">
-          <p className="text-slate-400 mb-2">No audit logs found</p>
+          <p className="text-slate-400 mb-2">{t('analytics.noAuditLogs')}</p>
           <p className="text-slate-500 text-sm">
-            Try adjusting your filters or date range
+            {t('analytics.adjustFilters')}
           </p>
         </div>
       ) : (
@@ -153,22 +156,22 @@ export default function AuditLogsView({
                 <thead>
                   <tr className="bg-slate-800 border-b border-slate-700">
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-300">
-                      Timestamp
+                      {t('analytics.timestamp')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-300">
-                      Action
+                      {t('analytics.action')}
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-300">
-                      Resource
+                      {t('analytics.resource')}
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-slate-300">
-                      Severity
+                      {t('analytics.severity')}
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-slate-300">
-                      Status
+                      {t('analytics.statusLabel')}
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-semibold text-slate-300">
-                      Details
+                      {t('analytics.details')}
                     </th>
                   </tr>
                 </thead>
@@ -202,14 +205,14 @@ export default function AuditLogsView({
                           <SeverityBadge severity={log.severity} />
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <StatusBadge status={log.status} />
+                          <StatusBadge status={log.status} t={t} />
                         </td>
                         <td className="px-4 py-3 text-center">
                           <button
                             onClick={() =>
-                              setExpandedRowId(
-                                expandedRowId === log.id ? null : log.id
-                              )
+                                setExpandedRowId(
+                                  expandedRowId === log.id ? null : log.id
+                                )
                             }
                             className="text-blue-400 hover:text-blue-300 inline-flex items-center gap-1"
                           >
@@ -230,7 +233,7 @@ export default function AuditLogsView({
                               {log.metadata && (
                                 <div>
                                   <h4 className="text-sm font-semibold text-white mb-2">
-                                    Metadata
+                                    {t('analytics.metadata')}
                                   </h4>
                                   <pre className="bg-slate-800 rounded p-3 text-xs text-slate-300 overflow-x-auto">
                                     {JSON.stringify(log.metadata, null, 2)}
@@ -242,17 +245,17 @@ export default function AuditLogsView({
                               {log.changesBefore && log.changesAfter && (
                                 <div>
                                   <h4 className="text-sm font-semibold text-white mb-2">
-                                    Changes
+                                    {t('analytics.changes')}
                                   </h4>
                                   <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                      <p className="text-xs text-slate-400 mb-1">Before</p>
+                                      <p className="text-xs text-slate-400 mb-1">{t('analytics.before')}</p>
                                       <pre className="bg-slate-800 rounded p-3 text-xs text-slate-300 overflow-x-auto">
                                         {JSON.stringify(log.changesBefore, null, 2)}
                                       </pre>
                                     </div>
                                     <div>
-                                      <p className="text-xs text-slate-400 mb-1">After</p>
+                                      <p className="text-xs text-slate-400 mb-1">{t('analytics.after')}</p>
                                       <pre className="bg-slate-800 rounded p-3 text-xs text-slate-300 overflow-x-auto">
                                         {JSON.stringify(log.changesAfter, null, 2)}
                                       </pre>
@@ -265,7 +268,7 @@ export default function AuditLogsView({
                               {log.errorMessage && (
                                 <div>
                                   <h4 className="text-sm font-semibold text-red-400 mb-2">
-                                    Error
+                                    {t('analytics.errorLabel')}
                                   </h4>
                                   <p className="text-sm text-slate-300 bg-slate-800 rounded p-3">
                                     {log.errorMessage}
@@ -276,14 +279,11 @@ export default function AuditLogsView({
                               {/* Connection Details */}
                               <div className="border-t border-slate-700 pt-4">
                                 <p className="text-xs text-slate-400">
-                                  IP: <span className="text-slate-300">{log.ipAddress}</span>
+                                  {t('analytics.ip', { ip: log.ipAddress })}
                                 </p>
                                 {log.userAgent && (
                                   <p className="text-xs text-slate-400 mt-1">
-                                    User Agent:{" "}
-                                    <span className="text-slate-300 break-all">
-                                      {log.userAgent}
-                                    </span>
+                                    {t('analytics.userAgent', { ua: log.userAgent })}
                                   </p>
                                 )}
                               </div>
@@ -301,8 +301,11 @@ export default function AuditLogsView({
           {/* Pagination */}
           <div className="flex items-center justify-between">
             <div className="text-sm text-slate-400">
-              Page {currentPage + 1} of {Math.max(1, totalPages)} (
-              {pageSize} per page)
+              {t('analytics.pageInfo', {
+                current: currentPage + 1,
+                total: Math.max(1, totalPages),
+                size: pageSize
+              })}
             </div>
             <div className="flex gap-2">
               <button
@@ -310,7 +313,7 @@ export default function AuditLogsView({
                 disabled={currentPage === 0}
                 className="px-3 py-1 bg-slate-700 text-slate-300 rounded text-sm font-medium hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Previous
+                {t('analytics.previous')}
               </button>
               <button
                 onClick={() =>
@@ -319,7 +322,7 @@ export default function AuditLogsView({
                 disabled={currentPage >= totalPages - 1}
                 className="px-3 py-1 bg-slate-700 text-slate-300 rounded text-sm font-medium hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next
+                {t('analytics.next')}
               </button>
             </div>
           </div>

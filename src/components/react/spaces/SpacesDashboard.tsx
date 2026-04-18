@@ -172,7 +172,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
         <div className="max-w-2xl relative">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-            Overview
+            {t('common.overview')}
           </div>
           <h1 className="text-4xl md:text-7xl font-extrabold text-white mb-6 tracking-tight leading-[1.05]">
             {(() => {

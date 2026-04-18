@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import type { AnalyticsFilters } from "../AnalyticsManager";
+import { Activity, TrendingUp, AlertCircle } from "lucide-react";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface PerformanceData {
   timestamp: string;
@@ -28,12 +31,15 @@ interface EnvironmentPerformance {
 interface PerformanceMetricsViewProps {
   filters: AnalyticsFilters;
   userId: string;
+  initialLocale?: AvailableLanguages;
 }
 
 export default function PerformanceMetricsView({
   filters,
   userId,
+  initialLocale,
 }: PerformanceMetricsViewProps) {
+  const t = useTranslate(initialLocale);
   const [envMetrics, setEnvMetrics] = useState<EnvironmentPerformance[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<PerformanceData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,14 +60,14 @@ export default function PerformanceMetricsView({
       });
 
       const response = await fetch(`/api/analytics/performance?${params}`);
-      if (!response.ok) throw new Error("Failed to fetch performance metrics");
+      if (!response.ok) throw new Error(t('analytics.failedFetchPerformance'));
 
       const data = await response.json();
       setEnvMetrics(data.environments || []);
       setTimeSeriesData(data.timeSeries || []);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -110,7 +116,7 @@ export default function PerformanceMetricsView({
       <div className="flex justify-center items-center py-20">
         <div className="text-slate-400 flex items-center gap-2">
           <div className="animate-spin">⏳</div>
-          Loading performance metrics...
+          {t('analytics.loadingPerformance')}
         </div>
       </div>
     );
@@ -122,7 +128,7 @@ export default function PerformanceMetricsView({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-slate-400 text-sm">Avg Response Time</p>
+            <p className="text-slate-400 text-sm">{t('analytics.avgResponseTime')}</p>
             <Activity className="w-4 h-4 text-blue-400" />
           </div>
           <p className="text-2xl font-bold text-white">
@@ -131,7 +137,7 @@ export default function PerformanceMetricsView({
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-slate-400 text-sm">Total Requests</p>
+            <p className="text-slate-400 text-sm">{t('analytics.totalRequests')}</p>
             <TrendingUp className="w-4 h-4 text-green-400" />
           </div>
           <p className="text-2xl font-bold text-white">
@@ -140,7 +146,7 @@ export default function PerformanceMetricsView({
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-slate-400 text-sm">Avg Error Rate</p>
+            <p className="text-slate-400 text-sm">{t('analytics.avgErrorRate')}</p>
             <AlertCircle className="w-4 h-4 text-red-400" />
           </div>
           <p className="text-2xl font-bold text-white">
@@ -148,7 +154,7 @@ export default function PerformanceMetricsView({
           </p>
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm mb-2">Environments</p>
+          <p className="text-slate-400 text-sm mb-2">{t('analytics.environments')}</p>
           <p className="text-2xl font-bold text-white">{envMetrics.length}</p>
         </div>
       </div>
@@ -171,7 +177,7 @@ export default function PerformanceMetricsView({
               : "bg-slate-700 text-slate-300 hover:bg-slate-600"
           }`}
         >
-          Environment Overview
+          {t('analytics.envOverview')}
         </button>
         <button
           onClick={() => setViewType("timeseries")}
@@ -181,7 +187,7 @@ export default function PerformanceMetricsView({
               : "bg-slate-700 text-slate-300 hover:bg-slate-600"
           }`}
         >
-          Time Series
+          {t('analytics.timeSeries')}
         </button>
       </div>
 
@@ -190,9 +196,9 @@ export default function PerformanceMetricsView({
         <>
           {envMetrics.length === 0 ? (
             <div className="bg-slate-800 rounded-lg p-12 border border-slate-700 text-center">
-              <p className="text-slate-400 mb-2">No performance data available</p>
+              <p className="text-slate-400 mb-2">{t('analytics.noPerformanceData')}</p>
               <p className="text-slate-500 text-sm">
-                Performance metrics will appear here as your system processes requests
+                {t('analytics.performanceMetricsDesc')}
               </p>
             </div>
           ) : (
@@ -215,31 +221,31 @@ export default function PerformanceMetricsView({
                           : "bg-red-500/20 text-red-300"
                       }`}
                     >
-                      {env.errorRate.toFixed(2)}% errors
+                      {t('analytics.errorsPercent', { count: env.errorRate.toFixed(2) })}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-slate-700/50 rounded p-3">
-                      <p className="text-xs text-slate-400 mb-1">Avg Response</p>
+                      <p className="text-xs text-slate-400 mb-1">{t('analytics.avgResponse')}</p>
                       <p className="text-lg font-bold text-white">
                         {env.avgResponseTime.toFixed(2)}ms
                       </p>
                     </div>
                     <div className="bg-slate-700/50 rounded p-3">
-                      <p className="text-xs text-slate-400 mb-1">Max Response</p>
+                      <p className="text-xs text-slate-400 mb-1">{t('analytics.maxResponse')}</p>
                       <p className="text-lg font-bold text-white">
                         {env.maxResponseTime.toFixed(2)}ms
                       </p>
                     </div>
                     <div className="bg-slate-700/50 rounded p-3">
-                      <p className="text-xs text-slate-400 mb-1">Min Response</p>
+                      <p className="text-xs text-slate-400 mb-1">{t('analytics.minResponse')}</p>
                       <p className="text-lg font-bold text-white">
                         {env.minResponseTime.toFixed(2)}ms
                       </p>
                     </div>
                     <div className="bg-slate-700/50 rounded p-3">
-                      <p className="text-xs text-slate-400 mb-1">Total Requests</p>
+                      <p className="text-xs text-slate-400 mb-1">{t('analytics.totalRequests')}</p>
                       <p className="text-lg font-bold text-white">
                         {env.requestCount.toLocaleString()}
                       </p>
@@ -247,7 +253,7 @@ export default function PerformanceMetricsView({
                   </div>
 
                   <div className="mt-3 text-xs text-slate-500">
-                    Last Updated: {new Date(env.lastUpdated).toLocaleString()}
+                    {t('analytics.lastUpdated', { date: new Date(env.lastUpdated).toLocaleString() })}
                   </div>
                 </div>
               ))}
@@ -259,9 +265,9 @@ export default function PerformanceMetricsView({
           {/* Time Series Data */}
           {timeSeriesData.length === 0 ? (
             <div className="bg-slate-800 rounded-lg p-12 border border-slate-700 text-center">
-              <p className="text-slate-400 mb-2">No time series data</p>
+              <p className="text-slate-400 mb-2">{t('analytics.noTimeSeries')}</p>
               <p className="text-slate-500 text-sm">
-                Try selecting a longer date range
+                {t('analytics.tryLongerRange')}
               </p>
             </div>
           ) : (
@@ -270,10 +276,10 @@ export default function PerformanceMetricsView({
                 <thead>
                   <tr className="bg-slate-800 border-b border-slate-700">
                     <th className="px-4 py-3 text-left text-xs font-semibold text-slate-300">
-                      Timestamp
+                      {t('analytics.timestamp')}
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-300">
-                      Avg Response
+                      {t('analytics.avgResponse')}
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-300">
                       P50
@@ -285,13 +291,13 @@ export default function PerformanceMetricsView({
                       P99
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-300">
-                      RPS
+                      {t('analytics.rps')}
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-300">
-                      Error Rate
+                      {t('analytics.errorRate')}
                     </th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-300">
-                      Cache Hits
+                      {t('analytics.cacheHits')}
                     </th>
                   </tr>
                 </thead>

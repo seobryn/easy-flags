@@ -3,7 +3,7 @@ import { getUserFromContext } from "@/utils/auth";
 import { isSuperUser } from "@/utils/permissions";
 import HeaderDropdown from "@/components/react/shared/HeaderDropdown";
 import LanguageSelector from "@/components/react/shared/LanguageSelector";
-import { getTranslator, getLocale } from "@/infrastructure/i18n/astro";
+import { getTranslator, getLocale, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
 const lang = getLocale(Astro.request);
 const { t } = getTranslator(Astro.request);
@@ -20,37 +20,39 @@ try {
 
 const isActive = (path: string) => {
   if (!currentPath) return false; // Don't highlight links in prerendered pages
-  return currentPath === path;
+  // We need to compare against the localized path
+  const localizedPath = getLocalizedPath(path, lang);
+  return currentPath.startsWith(localizedPath);
 };
 
 const navItems = {
   pricing: {
-    href: "/billing",
+    href: getLocalizedPath("/billing", lang),
     label: t('navigation.pricing') || "Pricing",
     showFor: !user,
   },
   spaces: {
-    href: "/spaces",
+    href: getLocalizedPath("/spaces", lang),
     label: t('navigation.spaces') || "Spaces",
     showFor: !!user,
   },
   metrics: {
-    href: "/metrics",
+    href: getLocalizedPath("/metrics", lang),
     label: t('navigation.metrics') || "Metrics",
     showFor: !!user,
   },
   docs: {
-    href: "/docs",
+    href: getLocalizedPath("/docs", lang),
     label: t('navigation.docs') || "Docs",
     showFor: true,
   },
   apiReference: {
-    href: "/api-reference",
+    href: getLocalizedPath("/api-reference", lang),
     label: t('navigation.apiReference') || "API Reference",
     showFor: true,
   },
   login: {
-    href: "/login",
+    href: getLocalizedPath("/login", lang),
     label: t('auth.login') || "Login",
     showFor: !user,
   },
@@ -77,7 +79,7 @@ const getNavLinkClass = (href: string) => {
 <header id="main-header" class="sticky top-0 z-50 w-full border-b border-white/5 bg-[#06080f]/70 backdrop-blur-2xl transition-all duration-500">
   <nav class="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 h-24 flex items-center justify-between">
     <div class="flex items-center gap-2">
-      <a href="/" class="flex items-center gap-4 group">
+      <a href={getLocalizedPath("/", lang)} class="flex items-center gap-4 group">
         <div class="relative">
           <div class="absolute inset-0 bg-cyan-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <img src="/logo.svg" alt="Easy Flags" class="w-12 h-12 relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-2xl shadow-cyan-500/20 rounded-xl border border-white/10" />
@@ -172,7 +174,7 @@ const getNavLinkClass = (href: string) => {
               >
                 {navItems.login.label}
               </a>
-              <a href="/create-account" class="btn-primary text-[10px] px-8! py-3.5! uppercase tracking-widest shadow-2xl shadow-cyan-500/20">
+              <a href={getLocalizedPath("/create-account", lang)} class="btn-primary text-[10px] px-8! py-3.5! uppercase tracking-widest shadow-2xl shadow-cyan-500/20">
                 {t('auth.getStarted') || "Get Started"}
               </a>
             </div>
@@ -291,14 +293,14 @@ const getNavLinkClass = (href: string) => {
 
           <div class="flex flex-col items-center gap-4 mt-2">
             {isSuperUser(user) && (
-              <a href="/admin/db-inspector" class="px-8 py-3 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 font-bold uppercase tracking-widest text-sm hover:bg-cyan-500 hover:text-white transition-all">
+              <a href={getLocalizedPath("/admin/db-inspector", lang)} class="px-8 py-3 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 font-bold uppercase tracking-widest text-sm hover:bg-cyan-500 hover:text-white transition-all">
                 Inspector
               </a>
             )}
             
-            <a href="/billing" class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Billing</a>
+            <a href={getLocalizedPath("/billing", lang)} class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Billing</a>
 
-            <a href="/settings" class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Settings</a>
+            <a href={getLocalizedPath("/settings", lang)} class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Settings</a>
             
             <form action="/api/auth/logout" method="POST">
               <button type="submit" class="text-red-500/60 hover:text-red-500 transition-colors uppercase tracking-widest text-xs font-bold">
@@ -335,7 +337,7 @@ const getNavLinkClass = (href: string) => {
           <a href={navItems.login.href} class="text-xl font-bold text-white uppercase tracking-widest hover:text-cyan-400 transition-colors">
             {navItems.login.label}
           </a>
-          <a href="/create-account" class="w-full btn-primary text-center py-5 rounded-2xl shadow-none">
+          <a href={getLocalizedPath("/create-account", lang)} class="w-full btn-primary text-center py-5 rounded-2xl shadow-none">
             {t('auth.getStarted') || "Get Started"}
           </a>
         </div>

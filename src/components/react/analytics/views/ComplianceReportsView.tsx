@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import type { AnalyticsFilters } from "../AnalyticsManager";
+import { Zap, AlertCircle, RefreshCw, Activity, TrendingUp, AlertTriangle } from "lucide-react";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface ComplianceReport {
   id: string;
@@ -27,6 +30,7 @@ interface ComplianceReportsViewProps {
   filters: AnalyticsFilters;
   userId: string;
   isAdmin?: boolean;
+  initialLocale?: AvailableLanguages;
 }
 
 const ReportTypeColor: Record<string, string> = {
@@ -41,7 +45,9 @@ export default function ComplianceReportsView({
   filters,
   userId,
   isAdmin = false,
+  initialLocale,
 }: ComplianceReportsViewProps) {
+  const t = useTranslate(initialLocale);
   const [reports, setReports] = useState<ComplianceReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -69,13 +75,13 @@ export default function ComplianceReportsView({
           ? `/api/audit/reports?${params}`
           : `/api/audit/reports/user?${params}`
       );
-      if (!response.ok) throw new Error("Failed to fetch compliance reports");
+      if (!response.ok) throw new Error(t('analytics.failedFetchReports'));
 
       const data = await response.json();
       setReports(data.reports || []);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t('common.error'));
       setReports([]);
     } finally {
       setLoading(false);
@@ -98,15 +104,26 @@ export default function ComplianceReportsView({
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Failed to generate report");
+      if (!response.ok) throw new Error(t('analytics.failedGenerateReport'));
 
       const newReport = await response.json();
       setReports([newReport.report, ...reports]);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t('common.error'));
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const getReportTypeLabel = (type: string) => {
+    switch (type) {
+      case 'GENERAL': return t('analytics.generalAudit');
+      case 'SOC2': return t('analytics.soc2Compliance');
+      case 'GDPR': return t('analytics.gdprDataProtection');
+      case 'HIPAA': return t('analytics.hipaaHealthcare');
+      case 'PCI-DSS': return t('analytics.pciDssPaymentCard');
+      default: return type;
     }
   };
 
@@ -115,7 +132,7 @@ export default function ComplianceReportsView({
       <div className="flex justify-center items-center py-20">
         <div className="text-slate-400 flex items-center gap-2">
           <div className="animate-spin">⏳</div>
-          Loading compliance reports...
+          {t('analytics.loadingReports')}
         </div>
       </div>
     );
@@ -126,11 +143,11 @@ export default function ComplianceReportsView({
       {/* Generate Report Section */}
       <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
         <h3 className="text-lg font-semibold text-white mb-4">
-          Generate Compliance Report
+          {t('analytics.generateReport')}
         </h3>
         <div className="flex gap-4 items-end flex-wrap">
           <div>
-            <label className="block text-sm text-slate-400 mb-2">Report Type</label>
+            <label className="block text-sm text-slate-400 mb-2">{t('analytics.reportType')}</label>
             <select
               value={selectedReportType}
               onChange={(e) =>
@@ -145,11 +162,11 @@ export default function ComplianceReportsView({
               }
               className="bg-slate-700 text-white rounded px-3 py-2 border border-slate-600 focus:outline-none focus:border-blue-500"
             >
-              <option value="GENERAL">General Audit Report</option>
-              <option value="SOC2">SOC 2 Compliance</option>
-              <option value="GDPR">GDPR Data Protection</option>
-              <option value="HIPAA">HIPAA Healthcare</option>
-              <option value="PCI-DSS">PCI-DSS Payment Card</option>
+              <option value="GENERAL">{t('analytics.generalAudit')}</option>
+              <option value="SOC2">{t('analytics.soc2Compliance')}</option>
+              <option value="GDPR">{t('analytics.gdprDataProtection')}</option>
+              <option value="HIPAA">{t('analytics.hipaaHealthcare')}</option>
+              <option value="PCI-DSS">{t('analytics.pciDssPaymentCard')}</option>
             </select>
           </div>
           <button
@@ -158,7 +175,7 @@ export default function ComplianceReportsView({
             className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Zap className="w-4 h-4" />
-            {generating ? "Generating..." : "Generate"}
+            {generating ? t('analytics.generating') : t('analytics.generate')}
           </button>
         </div>
       </div>
@@ -174,9 +191,9 @@ export default function ComplianceReportsView({
       {/* Reports List */}
       {reports.length === 0 ? (
         <div className="bg-slate-800 rounded-lg p-12 border border-slate-700 text-center">
-          <p className="text-slate-400 mb-2">No compliance reports yet</p>
+          <p className="text-slate-400 mb-2">{t('analytics.noComplianceReports')}</p>
           <p className="text-slate-500 text-sm">
-            Generate your first compliance report using the form above
+            {t('analytics.generateFirstReport')}
           </p>
         </div>
       ) : (
@@ -196,7 +213,7 @@ export default function ComplianceReportsView({
                     <RefreshCw className="w-5 h-5 text-slate-400" />
                     <div>
                       <h4 className="text-white font-semibold">
-                        {report.reportType} Report
+                        {t('analytics.reportTitle', { type: report.reportType })}
                       </h4>
                       <p className="text-slate-400 text-sm">
                         {new Date(report.periodStart).toLocaleDateString()} -{" "}
@@ -222,7 +239,7 @@ export default function ComplianceReportsView({
                           : "bg-yellow-500/20 text-yellow-300"
                       }`}
                     >
-                      {report.status}
+                      {t(`analytics.status.${report.status}`)}
                     </span>
                   </div>
                 </div>
@@ -230,25 +247,25 @@ export default function ComplianceReportsView({
                 {/* Summary Stats */}
                 <div className="grid grid-cols-4 gap-2 text-sm">
                   <div className="bg-slate-700/50 rounded p-2">
-                    <p className="text-slate-400 text-xs">Total Actions</p>
+                    <p className="text-slate-400 text-xs">{t('analytics.totalActions')}</p>
                     <p className="text-white font-semibold">
                       {report.totalActions.toLocaleString()}
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded p-2">
-                    <p className="text-slate-400 text-xs">Critical</p>
+                    <p className="text-slate-400 text-xs">{t('analytics.critical')}</p>
                     <p className="text-red-400 font-semibold">
                       {report.criticalActions}
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded p-2">
-                    <p className="text-slate-400 text-xs">Failed</p>
+                    <p className="text-slate-400 text-xs">{t('analytics.failedLabel')}</p>
                     <p className="text-yellow-400 font-semibold">
                       {report.failedActions}
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded p-2">
-                    <p className="text-slate-400 text-xs">Unique Users</p>
+                    <p className="text-slate-400 text-xs">{t('analytics.uniqueUsers')}</p>
                     <p className="text-blue-400 font-semibold">
                       {report.uniqueUsers}
                     </p>
@@ -261,37 +278,37 @@ export default function ComplianceReportsView({
                 <div className="bg-slate-900 border-t border-slate-700 p-4 space-y-4">
                   <div>
                     <h5 className="text-white font-semibold mb-3">
-                      Event Breakdown
+                      {t('analytics.eventBreakdown')}
                     </h5>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {[
                         {
-                          label: "Access Events",
+                          label: t('analytics.accessEvents'),
                           value: report.data.accessEvents,
                           color: "text-blue-400",
                         },
                         {
-                          label: "Data Modifications",
+                          label: t('analytics.dataModifications'),
                           value: report.data.dataModifications,
                           color: "text-yellow-400",
                         },
                         {
-                          label: "Deletion Events",
+                          label: t('analytics.deletionEvents'),
                           value: report.data.deletionEvents,
                           color: "text-red-400",
                         },
                         {
-                          label: "Security Events",
+                          label: t('analytics.securityEvents'),
                           value: report.data.securityEvents,
                           color: "text-purple-400",
                         },
                         {
-                          label: "Failed Auth",
+                          label: t('analytics.failedAuth'),
                           value: report.data.failedAuthAttempts,
                           color: "text-orange-400",
                         },
                         {
-                          label: "Permission Changes",
+                          label: t('analytics.permissionChanges'),
                           value: report.data.permissionChanges,
                           color: "text-green-400",
                         },
@@ -311,7 +328,7 @@ export default function ComplianceReportsView({
                   {/* Compliance Summary */}
                   <div className="bg-slate-800 rounded p-4 border border-slate-700">
                     <h5 className="text-white font-semibold mb-2">
-                      Compliance Summary for {report.reportType}
+                      {t('analytics.complianceSummary', { type: report.reportType })}
                     </h5>
                     <ul className="space-y-1 text-sm text-slate-300">
                       {report.reportType === "SOC2" && (
@@ -357,15 +374,15 @@ export default function ComplianceReportsView({
 
                   <div className="flex gap-2">
                     <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors">
-                      📥 Download PDF
+                      📥 {t('analytics.downloadPdf')}
                     </button>
                     <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg font-medium text-sm transition-colors">
-                      📊 Export Data
+                      📊 {t('analytics.exportData')}
                     </button>
                   </div>
 
                   <p className="text-xs text-slate-500">
-                    Generated: {new Date(report.createdAt).toLocaleString()}
+                    {t('analytics.generatedAt', { date: new Date(report.createdAt).toLocaleString() })}
                   </p>
                 </div>
               )}

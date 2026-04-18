@@ -1,4 +1,7 @@
-import { createTranslator } from "./translator";
+import { 
+  createTranslator, 
+  getLocalizedPath as sharedGetLocalizedPath 
+} from "./translator";
 import {
   translations,
   DEFAULT_LANGUAGE,
@@ -7,22 +10,27 @@ import {
 
 /**
  * Gets the current locale from an Astro request.
- * For now it just returns the default or what's in the cookies.
- * In the future, this can be more sophisticated (detect from URL or Header)
  */
 export function getLocale(request: Request): AvailableLanguages {
-  // 1. Check URL query params first
-  try {
-    const url = new URL(request.url);
-    const langParam = url.searchParams.get("lang");
-    if (langParam && translations[langParam]) {
-      return langParam as AvailableLanguages;
-    }
-  } catch (e) {
-    // URL might be invalid in some contexts
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+
+  // 1. Check URL path prefix (e.g., /es/...)
+  const pathParts = pathname.split("/");
+  const firstPart = pathParts[1]; // pathParts[0] is empty because path starts with /
+  if (firstPart && translations[firstPart as AvailableLanguages]) {
+    return firstPart as AvailableLanguages;
   }
 
-  // 2. Check for a 'lang' cookie
+  // 2. Fallback to URL query params
+  try {
+    const langParam = url.searchParams.get("lang");
+    if (langParam && translations[langParam as AvailableLanguages]) {
+      return langParam as AvailableLanguages;
+    }
+  } catch (e) {}
+
+  // 3. Check for a 'lang' cookie
   const cookieHeader = request.headers.get("cookie");
   if (cookieHeader) {
     const cookies = Object.fromEntries(
@@ -31,13 +39,21 @@ export function getLocale(request: Request): AvailableLanguages {
         return [key, v.join("=")];
       }),
     );
-    if (cookies.lang && translations[cookies.lang]) {
+    if (cookies.lang && translations[cookies.lang as AvailableLanguages]) {
       return cookies.lang as AvailableLanguages;
     }
   }
 
-  // Fallback to English for now
   return DEFAULT_LANGUAGE;
+}
+
+/**
+ * Returns a path prefixed with the given locale.
+ * It removes any existing locale prefix if present.
+ */
+export function getLocalizedPath(path: string, locale: AvailableLanguages): string {
+  const supportedLocales = Object.keys(translations);
+  return sharedGetLocalizedPath(path, locale as string, supportedLocales);
 }
 
 /**
@@ -52,5 +68,8 @@ export function getTranslator(request: Request) {
       DEFAULT_LANGUAGE as string,
     ),
     lang,
+    getLocalizedPath: (path: string, targetLang: string = lang) => 
+      getLocalizedPath(path, targetLang as AvailableLanguages),
   };
 }
+

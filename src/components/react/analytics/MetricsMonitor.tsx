@@ -144,10 +144,17 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-black uppercase tracking-widest mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-              Live Telemetry
+              {t('metrics.liveTelemetry')}
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-              {t('metrics.title').split(" Dashboard")[0]} <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">{t('metrics.title').includes("Dashboard") ? "Dashboard" : "Tablero"}</span>
+              {t('metrics.title').includes("Dashboard") || t('metrics.title').includes("Tableau") || t('metrics.title').includes("Tablero") ? (
+                <>
+                  {t('metrics.title').split(/ Dashboard| Tableau| Tablero/)[0]}{" "}
+                  <span className="bg-linear-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    {t('metrics.title').match(/Dashboard|Tableau|Tablero/)?.[0]}
+                  </span>
+                </>
+              ) : t('metrics.title')}
             </h1>
             <p className="text-slate-400 text-lg md:text-xl leading-relaxed font-medium">
               {t('metrics.description')}
@@ -181,28 +188,28 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
           value={totalEvaluations.toLocaleString(initialLocale || "en-US")}
           icon="Activity"
           color="cyan"
-          subtext="Total system load"
+          subtext={t('metrics.totalSystemLoad')}
         />
         <SummaryCard
           title={t('metrics.spacesMonitored')}
           value={metrics.length.toString()}
           icon="Layers"
           color="blue"
-          subtext="Attached namespaces"
+          subtext={t('metrics.attachedNamespaces')}
         />
         <SummaryCard
           title={t('metrics.errorRate')}
           value={`${(totalErrors / Math.max(totalEvaluations, 1)).toFixed(2)}%`}
           icon="AlertCircle"
           color={totalErrors > 0 ? "red" : "emerald"}
-          subtext="Critical failures"
+          subtext={t('metrics.criticalFailures')}
         />
         <SummaryCard
           title={t('metrics.avgResponseTime')}
           value={`${avgResponseTime}ms`}
           icon="Clock"
           color="purple"
-          subtext="Evaluation latency"
+          subtext={t('metrics.evaluationLatency')}
         />
       </div>
 
@@ -213,7 +220,7 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
             <Icon name="AlertTriangle" size={24} />
           </div>
           <div>
-            <p className="text-red-400 font-black text-[10px] uppercase tracking-widest mb-1">DATA_FETCH_FAILURE</p>
+            <p className="text-red-400 font-black text-[10px] uppercase tracking-widest mb-1">{t('metrics.dataFetchFailure')}</p>
             <p className="text-white font-bold">{error}</p>
           </div>
         </div>
@@ -231,7 +238,7 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
           <div className="flex items-center justify-between px-4">
              <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">{t('metrics.monitoredSpaces')}</h2>
-             <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">ACTIVE NODES: {metrics.length}</span>
+             <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest bg-white/5 border border-white/10 px-4 py-1.5 rounded-full">{t('metrics.activeNodes', { count: metrics.length })}</span>
           </div>
           <div className="space-y-6">
             {metrics.map((space) => (
@@ -366,7 +373,7 @@ function SpaceMetricsCard({ space, isSelected, onSelect, initialLocale }: SpaceM
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
             <div>
                <h4 className="text-xl font-extrabold text-white tracking-tight mb-2">{t('metrics.topPerformingFlags')}</h4>
-               <p className="text-slate-500 text-xs font-medium">Evaluation distribution across your core feature set</p>
+               <p className="text-slate-500 text-xs font-medium">{t('metrics.evaluationDistribution')}</p>
             </div>
             <div className="px-5 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black text-slate-600 uppercase tracking-widest">{t('metrics.usageDistribution')}</div>
           </div>

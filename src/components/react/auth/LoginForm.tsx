@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { Icon } from "@/components/react/shared/Icon";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface LoginFormProps {
   redirectUrl?: string;
+  initialLocale?: AvailableLanguages;
 }
 
-export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
+export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: LoginFormProps) {
+  const t = useTranslate(initialLocale);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -16,7 +20,7 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
     setError("");
 
     if (!username.trim() || !password.trim()) {
-      setError("Credentials required to establish secure session");
+      setError(t('auth.credentialsRequired'));
       return;
     }
 
@@ -36,19 +40,19 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
       try {
         data = JSON.parse(text);
       } catch {
-        setError("Network desynchronization. Please retry.");
+        setError(t('auth.networkDesync'));
         return;
       }
 
       if (!response.ok) {
-        setError(data.error || data.message || "Authentication failed");
+        setError(data.error || data.message || t('auth.authenticationFailed'));
         return;
       }
 
       const finalRedirectUrl = data.data?.redirectUrl || redirectUrl;
       window.location.href = finalRedirectUrl;
     } catch (err) {
-      setError("Terminal link lost. Check your connection.");
+      setError(t('auth.terminalLinkLost'));
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +81,7 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
               htmlFor="username"
               className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-3 px-1 group-focus-within/input:text-cyan-400 transition-colors"
             >
-              Identity Hash
+              {t('auth.identityHash')}
             </label>
             <div className="relative">
               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-cyan-400 transition-colors">
@@ -90,7 +94,7 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="w-full bg-slate-950/40 border border-white/5 border-b-white/10 rounded-2xl pl-14 pr-6 py-4 text-white font-medium placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all shadow-inner"
-                placeholder="network-identifier"
+                placeholder={t('auth.networkIdentifier')}
               />
             </div>
           </div>
@@ -100,7 +104,7 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
               htmlFor="password"
               className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-3 px-1 group-focus-within/input:text-purple-400 transition-colors"
             >
-              Access Cryptogram
+              {t('auth.accessCryptogram')}
             </label>
             <div className="relative">
               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-purple-400 transition-colors">
@@ -128,7 +132,7 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
-              <span className="font-black text-xs uppercase tracking-widest">Authorize Access</span>
+              <span className="font-black text-xs uppercase tracking-widest">{t('auth.authorizeAccess')}</span>
               <Icon name="ArrowRight" size={16} />
             </>
           )}
@@ -136,17 +140,17 @@ export default function LoginForm({ redirectUrl = "/spaces" }: LoginFormProps) {
 
         <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-4">
           <p className="text-slate-500 text-xs font-medium">
-            New operative?{" "}
+            {t('auth.newOperative')}{" "}
             <a
               href="/create-account"
               className="text-cyan-400 font-bold hover:text-white transition-colors underline underline-offset-4 decoration-cyan-500/30"
             >
-              Initialize Profile
+              {t('auth.initializeProfile')}
             </a>
           </p>
           <div className="flex gap-6">
-            <a href="#" className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">Protocol_Reset</a>
-            <a href="#" className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">System_Status</a>
+            <a href="#" className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">{t('auth.protocolReset')}</a>
+            <a href="#" className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">{t('auth.systemStatus')}</a>
           </div>
         </div>
       </form>

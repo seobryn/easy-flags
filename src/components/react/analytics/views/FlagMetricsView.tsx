@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import type { AnalyticsFilters } from "../AnalyticsManager";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface FlagMetric {
   flagId: string;
@@ -16,12 +18,15 @@ interface FlagMetric {
 interface FlagMetricsViewProps {
   filters: AnalyticsFilters;
   userId: string;
+  initialLocale?: AvailableLanguages;
 }
 
 export default function FlagMetricsView({
   filters,
   userId,
+  initialLocale,
 }: FlagMetricsViewProps) {
+  const t = useTranslate(initialLocale);
   const [metrics, setMetrics] = useState<FlagMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,14 +49,14 @@ export default function FlagMetricsView({
       });
 
       const response = await fetch(`/api/analytics/metrics?${params}`);
-      if (!response.ok) throw new Error("Failed to fetch metrics");
+      if (!response.ok) throw new Error(t('analytics.failedFetchMetrics'));
 
       const data = await response.json();
       const sortedData = sortMetrics(data || [], sortBy);
       setMetrics(sortedData);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : t('common.error'));
       setMetrics([]);
     } finally {
       setLoading(false);
@@ -110,7 +115,7 @@ export default function FlagMetricsView({
       <div className="flex justify-center items-center py-20">
         <div className="text-slate-400 flex items-center gap-2">
           <div className="animate-spin">⏳</div>
-          Loading metrics...
+          {t('analytics.loadingMetrics')}
         </div>
       </div>
     );
@@ -121,25 +126,25 @@ export default function FlagMetricsView({
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm">Total Evaluations</p>
+          <p className="text-slate-400 text-sm">{t('analytics.totalEvaluations')}</p>
           <p className="text-2xl font-bold text-white mt-1">
             {stats.totalEvaluations.toLocaleString()}
           </p>
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm">Error Rate</p>
+          <p className="text-slate-400 text-sm">{t('analytics.errorRateLabel')}</p>
           <p className="text-2xl font-bold text-white mt-1">
             {stats.avgErrorRate}%
           </p>
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm">Avg Response Time</p>
+          <p className="text-slate-400 text-sm">{t('analytics.avgResponseTime')}</p>
           <p className="text-2xl font-bold text-white mt-1">
             {stats.avgResponseTime}ms
           </p>
         </div>
         <div className="bg-slate-800 rounded-lg p-4 border border-slate-700">
-          <p className="text-slate-400 text-sm">Active Flags</p>
+          <p className="text-slate-400 text-sm">{t('analytics.activeFlagsLabel')}</p>
           <p className="text-2xl font-bold text-white mt-1">{metrics.length}</p>
         </div>
       </div>
@@ -163,7 +168,7 @@ export default function FlagMetricsView({
                 : "bg-slate-700 text-slate-300 hover:bg-slate-600"
             }`}
           >
-            Sort by Evaluations
+            {t('analytics.sortByEvaluations')}
           </button>
           <button
             onClick={() => handleSortChange("errors")}
@@ -173,7 +178,7 @@ export default function FlagMetricsView({
                 : "bg-slate-700 text-slate-300 hover:bg-slate-600"
             }`}
           >
-            Sort by Errors
+            {t('analytics.sortByErrors')}
           </button>
           <button
             onClick={() => handleSortChange("responseTime")}
@@ -183,7 +188,7 @@ export default function FlagMetricsView({
                 : "bg-slate-700 text-slate-300 hover:bg-slate-600"
             }`}
           >
-            Sort by Response Time
+            {t('analytics.sortByResponse')}
           </button>
         </div>
 
@@ -196,7 +201,7 @@ export default function FlagMetricsView({
                 : "bg-slate-700 text-slate-300"
             }`}
           >
-            Table
+            {t('analytics.tableView')}
           </button>
           <button
             onClick={() => setViewType("cards")}
@@ -206,7 +211,7 @@ export default function FlagMetricsView({
                 : "bg-slate-700 text-slate-300"
             }`}
           >
-            Cards
+            {t('analytics.cardsView')}
           </button>
         </div>
       </div>
@@ -214,9 +219,9 @@ export default function FlagMetricsView({
       {/* Metrics Display */}
       {metrics.length === 0 ? (
         <div className="bg-slate-800 rounded-lg p-12 border border-slate-700 text-center">
-          <p className="text-slate-400 mb-2">No metrics data available</p>
+          <p className="text-slate-400 mb-2">{t('analytics.noMetricsAvailable')}</p>
           <p className="text-slate-500 text-sm">
-            Start evaluating feature flags to see metrics appear here
+            {t('analytics.startEvaluating')}
           </p>
         </div>
       ) : viewType === "table" ? (
@@ -225,22 +230,22 @@ export default function FlagMetricsView({
             <thead>
               <tr className="bg-slate-800 border-b border-slate-700">
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">
-                  Flag Name
+                  {t('analytics.flagName')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-300">
-                  Environment
+                  {t('analytics.environment')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-slate-300">
-                  Evaluations
+                  {t('analytics.evaluations')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-slate-300">
-                  Enabled/Disabled
+                  {t('analytics.enabledDisabled')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-slate-300">
-                  Errors
+                  {t('analytics.errorsLabel')}
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-slate-300">
-                  Avg Response
+                  {t('analytics.avgResponse')}
                 </th>
               </tr>
             </thead>
@@ -294,13 +299,13 @@ export default function FlagMetricsView({
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-400 text-sm">Evaluations:</span>
+                  <span className="text-slate-400 text-sm">{t('analytics.evaluations')}:</span>
                   <span className="text-blue-400 font-semibold">
                     {metric.totalEvaluations.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400 text-sm">Enabled:</span>
+                  <span className="text-slate-400 text-sm">{t('analytics.enabledLabel')}:</span>
                   <span className="text-green-400">
                     {metric.enabledCount} (
                     {((metric.enabledCount / metric.totalEvaluations) * 100).toFixed(
@@ -310,7 +315,7 @@ export default function FlagMetricsView({
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-400 text-sm">Disabled:</span>
+                  <span className="text-slate-400 text-sm">{t('analytics.disabledLabel')}:</span>
                   <span className="text-red-400">
                     {metric.disabledCount} (
                     {((metric.disabledCount / metric.totalEvaluations) * 100).toFixed(
@@ -321,14 +326,14 @@ export default function FlagMetricsView({
                 </div>
                 {metric.errorCount > 0 && (
                   <div className="flex justify-between pt-2 border-t border-slate-700">
-                    <span className="text-slate-400 text-sm">Errors:</span>
+                    <span className="text-slate-400 text-sm">{t('analytics.errorsLabel')}:</span>
                     <span className="text-red-500 font-semibold">
                       {metric.errorCount}
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between pt-2 border-t border-slate-700">
-                  <span className="text-slate-400 text-sm">Avg Response:</span>
+                  <span className="text-slate-400 text-sm">{t('analytics.avgResponse')}:</span>
                   <span className="text-slate-300">
                     {metric.averageResponseTime.toFixed(2)}ms
                   </span>
@@ -336,7 +341,7 @@ export default function FlagMetricsView({
               </div>
 
               <div className="mt-4 text-xs text-slate-500">
-                Updated: {new Date(metric.lastUpdated).toLocaleDateString()}
+                {t('analytics.updatedAt', { date: new Date(metric.lastUpdated).toLocaleDateString() })}
               </div>
             </div>
           ))}

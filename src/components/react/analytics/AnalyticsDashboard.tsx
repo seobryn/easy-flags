@@ -5,10 +5,13 @@ import type {
   FlagImpactAnalysis,
 } from "@domain/entities";
 import { Icon } from "@/components/react/shared/Icon";
+import { useTranslate } from "@/infrastructure/i18n/context";
+import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface AnalyticsDashboardProps {
   spaceId: string | undefined;
   environmentId?: string | undefined;
+  initialLocale?: AvailableLanguages;
 }
 
 interface MetricsData {
@@ -22,7 +25,9 @@ interface MetricsData {
 export default function AnalyticsDashboard({
   spaceId,
   environmentId,
+  initialLocale,
 }: AnalyticsDashboardProps) {
+  const t = useTranslate(initialLocale);
   const [metricsData, setMetricsData] = useState<MetricsData>({
     usageMetrics: [],
     performanceMetrics: [],
@@ -56,7 +61,7 @@ export default function AnalyticsDashboard({
 
         const response = await fetch(`/api/analytics/metrics?${params}`);
         if (!response.ok) {
-          throw new Error("Failed to fetch metrics");
+          throw new Error(t('analytics.failedFetch'));
         }
 
         const usageMetrics = await response.json();
@@ -69,14 +74,14 @@ export default function AnalyticsDashboard({
       } catch (error) {
         setMetricsData((prev) => ({
           ...prev,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: error instanceof Error ? error.message : t('common.error'),
           loading: false,
         }));
       }
     };
 
     fetchMetrics();
-  }, [spaceId, environmentId, dateRange]);
+  }, [spaceId, environmentId, dateRange, t]);
 
   const calculateTotalStats = () => {
     if (metricsData.usageMetrics.length === 0) {
@@ -126,14 +131,13 @@ export default function AnalyticsDashboard({
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-              Pulse Engine
+              {t('analytics.pulseEngine')}
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight leading-tight">
-              Enterprise Analytics
+              {t('analytics.enterpriseAnalytics')}
             </h1>
             <p className="text-slate-400 text-lg font-medium max-w-2xl leading-relaxed">
-              Real-time visualization of your feature flag performance, error
-              rates, and latencies across your stack.
+              {t('analytics.heroDescription')}
             </p>
           </div>
 
@@ -141,7 +145,7 @@ export default function AnalyticsDashboard({
           <div className="flex flex-col sm:flex-row gap-4 p-2 bg-slate-950/40 border border-white/5 rounded-[32px] shadow-inner">
             <div className="relative group/date">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 uppercase tracking-widest pointer-events-none group-hover/date:text-purple-400 transition-colors">
-                FROM
+                {t('analytics.from')}
               </span>
               <input
                 type="date"
@@ -155,7 +159,7 @@ export default function AnalyticsDashboard({
             <div className="w-px h-8 bg-white/5 self-center hidden sm:block"></div>
             <div className="relative group/date">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 uppercase tracking-widest pointer-events-none group-hover/date:text-purple-400 transition-colors">
-                TO
+                {t('analytics.to')}
               </span>
               <input
                 type="date"
@@ -177,7 +181,7 @@ export default function AnalyticsDashboard({
             <Icon name="AlertTriangle" size={20} />
           </div>
           <p className="text-red-400 font-bold text-sm">
-            Critical Error: {metricsData.error}
+            {t('analytics.criticalError', { error: metricsData.error })}
           </p>
         </div>
       )}
@@ -185,34 +189,38 @@ export default function AnalyticsDashboard({
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
         <StatCard
-          title="Total Evaluations"
+          title={t('analytics.totalEvaluations')}
           value={metricsData.usageMetrics
             .reduce((sum, m) => sum + m.total_evaluations, 0)
             .toLocaleString()}
-          subtext="Total system calls"
+          subtext={t('analytics.totalSystemCalls')}
           icon="Activity"
           color="blue"
+          t={t}
         />
         <StatCard
-          title="Enabled %"
+          title={t('analytics.enabledPercentage')}
           value={`${stats.enabledPercentage}%`}
-          subtext="Flag success ratio"
+          subtext={t('analytics.flagSuccessRatio')}
           icon="Check"
           color="emerald"
+          t={t}
         />
         <StatCard
-          title="Avg Latency"
+          title={t('analytics.avgLatency')}
           value={`${stats.avgResponseTime}ms`}
-          subtext="Execution time"
+          subtext={t('analytics.executionTime')}
           icon="Zap"
           color="amber"
+          t={t}
         />
         <StatCard
-          title="Error Rate"
+          title={t('analytics.errorRate')}
           value={`${stats.errorRate}%`}
-          subtext="Stability metric"
+          subtext={t('analytics.stabilityMetric')}
           icon="AlertTriangle"
           color="red"
+          t={t}
         />
       </div>
 
@@ -221,7 +229,7 @@ export default function AnalyticsDashboard({
         <div className="bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] p-24 text-center group">
           <div className="w-16 h-16 rounded-full border-4 border-purple-500/10 border-t-purple-500 border-l-purple-500 animate-spin mx-auto mb-6"></div>
           <p className="text-slate-500 font-black text-[10px] uppercase tracking-[0.3em]">
-            Synchronizing telemetry data...
+            {t('analytics.syncingTelemetry')}
           </p>
         </div>
       )}
@@ -231,10 +239,10 @@ export default function AnalyticsDashboard({
         <div className="bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-[40px] overflow-hidden shadow-2xl transition-all hover:bg-white/[0.03] animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
           <div className="px-10 py-8 border-b border-white/5 bg-slate-950/20 flex justify-between items-center">
             <h2 className="text-xl font-extrabold text-white tracking-tight">
-              Usage by Temporal Window
+              {t('analytics.usageTemporalWindow')}
             </h2>
             <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">
-              LATEST 20 ENTRIES
+              {t('analytics.latestEntries', { count: 20 })}
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -242,22 +250,22 @@ export default function AnalyticsDashboard({
               <thead>
                 <tr className="bg-slate-950/20">
                   <th className="pl-10 pr-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    METRIC WINDOW
+                    {t('analytics.metricWindow')}
                   </th>
                   <th className="px-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    TOTAL EVALS
+                    {t('analytics.totalEvals')}
                   </th>
                   <th className="px-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    ENABLED
+                    {t('analytics.enabled')}
                   </th>
                   <th className="px-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    DISABLED
+                    {t('analytics.disabled')}
                   </th>
                   <th className="px-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    ERRORS
+                    {t('analytics.errors')}
                   </th>
                   <th className="px-6 py-5 text-left text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-white/5">
-                    LATENCY
+                    {t('analytics.latency')}
                   </th>
                 </tr>
               </thead>
@@ -323,11 +331,10 @@ export default function AnalyticsDashboard({
             <Icon name="Activity" size={32} className="text-slate-600" />
           </div>
           <p className="text-white font-extrabold text-xl mb-3 tracking-tight">
-            No telemetry detected
+            {t('analytics.noTelemetry')}
           </p>
           <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed font-medium">
-            Start using feature flags in your application to see performance
-            metrics and usage analytics appear here in real-time.
+            {t('analytics.noTelemetryDesc')}
           </p>
         </div>
       )}
@@ -341,9 +348,10 @@ interface StatCardProps {
   subtext: string;
   icon: string;
   color: "blue" | "emerald" | "amber" | "red" | "purple";
+  t: (key: string, params?: any) => string;
 }
 
-function StatCard({ title, value, subtext, icon, color }: StatCardProps) {
+function StatCard({ title, value, subtext, icon, color, t }: StatCardProps) {
   const colorMap = {
     blue: "bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-blue-500/5",
     emerald:

@@ -3,7 +3,11 @@ import "@/styles/globals.css";
 import Header from "@/components/astro/Header.astro";
 import Modals from "@/components/react/shared/Modals";
 import { I18nProvider } from "@/infrastructure/i18n/context";
-import { getLocale, getTranslator } from "@/infrastructure/i18n/astro";
+import {
+  getLocale,
+  getTranslator,
+  getLocalizedPath,
+} from "@/infrastructure/i18n/astro";
 
 interface Props {
   title?: string;
@@ -82,22 +86,22 @@ const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
     <link
       rel="alternate"
       hreflang="en"
-      href={`${siteOrigin}${Astro.url.pathname}?lang=en`}
+      href={`${siteOrigin}${getLocalizedPath(Astro.url.pathname, "en")}`}
     />
     <link
       rel="alternate"
       hreflang="es"
-      href={`${siteOrigin}${Astro.url.pathname}?lang=es`}
+      href={`${siteOrigin}${getLocalizedPath(Astro.url.pathname, "es")}`}
     />
     <link
       rel="alternate"
       hreflang="fr"
-      href={`${siteOrigin}${Astro.url.pathname}?lang=fr`}
+      href={`${siteOrigin}${getLocalizedPath(Astro.url.pathname, "fr")}`}
     />
     <link
       rel="alternate"
       hreflang="x-default"
-      href={`${siteOrigin}${Astro.url.pathname}`}
+      href={`${siteOrigin}${getLocalizedPath(Astro.url.pathname, "en")}`}
     />
 
     <!-- Structured Data (JSON-LD) -->
@@ -149,9 +153,18 @@ const canonicalURL = new URL(Astro.url.pathname, siteOrigin);
     class={`bg-[#06080f] text-slate-100 selection:bg-cyan-500/30 min-h-screen relative overflow-x-hidden`}
   >
     {/* Global Aurora Backgrounds */}
-    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
-    <div class="fixed top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-600/5 blur-[100px] rounded-full pointer-events-none z-0"></div>
+    <div
+      class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none z-0"
+    >
+    </div>
+    <div
+      class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none z-0"
+    >
+    </div>
+    <div
+      class="fixed top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-600/5 blur-[100px] rounded-full pointer-events-none z-0"
+    >
+    </div>
 
     <I18nProvider initialLocale={locale}>
       <div class="root flex flex-col min-h-screen relative z-10">

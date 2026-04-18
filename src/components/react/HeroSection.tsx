@@ -1,4 +1,4 @@
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 
@@ -8,6 +8,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ initialLocale }: HeroSectionProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
 
   return (
     <section className="mt-12 mb-20 relative px-4">
@@ -35,7 +36,7 @@ export default function HeroSection({ initialLocale }: HeroSectionProps) {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a
-              href="/create-account"
+              href={l("/create-account")}
               className="btn-primary group"
               aria-label={t('hero.getStarted')}
             >
@@ -46,7 +47,7 @@ export default function HeroSection({ initialLocale }: HeroSectionProps) {
                 className="ml-2 group-hover:translate-x-1 transition-transform" 
               />
             </a>
-            <a href="/docs" className="btn-secondary" aria-label={t('hero.documentation')}>
+            <a href={l("/docs")} className="btn-secondary" aria-label={t('hero.documentation')}>
               {t('hero.documentation')}
             </a>
           </div>

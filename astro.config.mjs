@@ -23,5 +23,13 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   integrations: [react(), sitemap(), robotsTxt()],
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "es", "fr"],
+    routing: {
+      prefixDefaultLocale: true,
+      strategy: "pathname",
+    },
+  },
   adapter: isProduction ? vercel() : node({ mode: "standalone" }),
 });

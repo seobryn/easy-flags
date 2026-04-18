@@ -4,7 +4,7 @@ import React, {
   type ReactNode,
   useMemo,
 } from "react";
-import { createTranslator } from "./translator";
+import { createTranslator, getLocalizedPath as sharedGetLocalizedPath } from "./translator";
 import {
   translations,
   DEFAULT_LANGUAGE,
@@ -14,6 +14,7 @@ import {
 interface I18nContextType {
   locale: AvailableLanguages;
   t: (key: string, variables?: Record<string, string | number>) => string;
+  getLocalizedPath: (path: string, locale?: AvailableLanguages) => string;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -37,8 +38,16 @@ export function I18nProvider({
     [initialLocale],
   );
 
+  const getLocalizedPath = useMemo(
+    () => (path: string, locale: AvailableLanguages = initialLocale) => {
+      const supportedLocales = Object.keys(translations);
+      return sharedGetLocalizedPath(path, locale, supportedLocales);
+    },
+    [initialLocale],
+  );
+
   return (
-    <I18nContext.Provider value={{ locale: initialLocale, t }}>
+    <I18nContext.Provider value={{ locale: initialLocale, t, getLocalizedPath }}>
       {children}
     </I18nContext.Provider>
   );
@@ -79,4 +88,21 @@ export function useTranslate(overrideLocale?: AvailableLanguages) {
   );
 
   return t;
+}
+
+/**
+ * Shorthand hook for localized paths
+ */
+export function useLocalizedPath() {
+  const context = useContext(I18nContext);
+  
+  if (context) {
+    return context.getLocalizedPath;
+  }
+
+  // Fallback if no context
+  return (path: string, locale: AvailableLanguages = DEFAULT_LANGUAGE) => {
+    const supportedLocales = Object.keys(translations);
+    return sharedGetLocalizedPath(path, locale, supportedLocales);
+  };
 }

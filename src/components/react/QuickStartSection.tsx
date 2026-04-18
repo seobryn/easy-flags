@@ -1,4 +1,4 @@
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 
@@ -8,25 +8,26 @@ interface QuickStartSectionProps {
 
 export default function QuickStartSection({ initialLocale }: QuickStartSectionProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
 
   const resources = [
     {
       icon: <Icon name="FileText" size={24} />,
       title: t('quickstart.documentation'),
       description: t('quickstart.documentationDesc'),
-      href: "/docs",
+      href: l("/docs"),
     },
     {
       icon: <Icon name="Zap" size={24} />,
       title: t('quickstart.apiReference'),
       description: t('quickstart.apiReferenceDesc'),
-      href: "/api-reference",
+      href: l("/api-reference"),
     },
     {
       icon: <Icon name="MessageSquare" size={24} />,
       title: t('quickstart.support'),
       description: t('quickstart.supportDesc'),
-      href: "/contact",
+      href: l("/contact"),
     },
   ];
 

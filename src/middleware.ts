@@ -3,32 +3,37 @@ import { getLocale } from "./infrastructure/i18n/astro";
 
 export const onRequest = defineMiddleware((context, next) => {
   const { url, request, redirect, cookies } = context;
-  
 
   // Skip middleware for API, internal Astro routes, and static assets
-  const isApi = url.pathname.startsWith('/api/');
-  const isInternal = url.pathname.startsWith('/_');
-  const isStatic = url.pathname.includes('.');
-  
+  const isApi = url.pathname.startsWith("/api/");
+  const isInternal = url.pathname.startsWith("/_");
+  const isStatic = url.pathname.includes(".");
+
   if (isApi || isInternal || isStatic) {
     return next();
   }
 
-  const localeFromUrl = url.searchParams.get("lang");
-  const localeFromCookie = cookies.get("lang")?.value;
-  
-  // Prefer URL, then cookie, then default 'en'
-  const finalLocale = localeFromUrl || localeFromCookie || "en";
+  const pathParts = url.pathname.split("/");
+  const firstPart = pathParts[1];
+  const supportedLocales = ["en", "es", "fr"];
+  const isSupportedLocale = supportedLocales.includes(firstPart);
 
-
-  // Only redirect if:
-  // 1. Final locale is not English (we want to preserve ?lang=xx for non-default)
-  // 2. The URL doesn't already have the correct lang param
-  if (finalLocale !== "en" && localeFromUrl !== finalLocale) {
-    const newUrl = new URL(url.toString());
-    newUrl.searchParams.set("lang", finalLocale);
-    return redirect(newUrl.pathname + newUrl.search + newUrl.hash);
+  // If already has a supported locale prefix, we are good
+  if (isSupportedLocale) {
+    // Optional: Sync cookie with URL prefix
+    cookies.set("lang", firstPart, { path: "/", maxAge: 60 * 60 * 24 * 30 });
+    return next();
   }
 
-  return next();
+  // No localized prefix found, decide where to redirect
+  const localeFromCookie = cookies.get("lang")?.value;
+  const finalLocale =
+    localeFromCookie && supportedLocales.includes(localeFromCookie)
+      ? localeFromCookie
+      : "en";
+
+  // Redirect to the prefixed version
+  // e.g., /billing -> /en/billing
+  const newPathname = `/${finalLocale}${url.pathname === "/" ? "" : url.pathname}`;
+  return redirect(newPathname + url.search + url.hash);
 });

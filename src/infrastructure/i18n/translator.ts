@@ -65,3 +65,34 @@ export function createTranslator(
     }, value);
   };
 }
+
+/**
+ * Returns a path prefixed with the given locale.
+ * It removes any existing locale prefix if present.
+ */
+export function getLocalizedPath(
+  path: string, 
+  locale: string, 
+  supportedLocales: string[]
+): string {
+  // Ensure path starts with /
+  let cleanPath = path.startsWith("/") ? path : `/${path}`;
+  
+  // Split path to check for existing locale
+  const parts = cleanPath.split("/");
+  // parts[0] is empty, parts[1] is the potential locale
+  
+  if (parts[1] && supportedLocales.includes(parts[1])) {
+    // Remove the existing locale
+    parts.splice(1, 1);
+    cleanPath = parts.join("/") || "/";
+  }
+
+  // Add the new locale prefix
+  // If cleanPath is just "/", return /locale
+  if (cleanPath === "/") {
+    return `/${locale}`;
+  }
+  
+  return `/${locale}${cleanPath.startsWith("/") ? "" : "/"}${cleanPath}`;
+}
