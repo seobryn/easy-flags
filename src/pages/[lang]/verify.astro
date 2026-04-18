@@ -1,0 +1,91 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getTranslator } from "@/infrastructure/i18n/astro";
+import { Icon } from "@/components/react/shared/Icon";
+
+const { t, lang } = getTranslator(Astro.request);
+const token = Astro.url.searchParams.get("token");
+
+export const prerender = false;
+---
+
+<BaseLayout seoKey="verifyAccount" includeHeader={false}>
+  <div class="min-h-screen w-full relative overflow-x-hidden flex items-center justify-center py-20">
+    <div class="fixed top-1/4 -right-20 w-[600px] h-[600px] bg-purple-500/10 blur-[150px] rounded-full animate-pulse pointer-events-none"></div>
+    <div class="fixed bottom-1/4 -left-20 w-[600px] h-[600px] bg-cyan-500/10 blur-[150px] rounded-full animate-pulse delay-1000 pointer-events-none"></div>
+
+    <div class="w-full max-w-xl px-4 relative z-10 text-center">
+      <div id="verification-status" class="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[40px] p-10 md:p-14 shadow-2xl relative overflow-hidden group">
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/5 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 group-hover:bg-purple-500/10 transition-colors duration-1000"></div>
+        
+        <div id="loading" class="space-y-6">
+          <div class="w-20 h-20 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin mx-auto"></div>
+          <h2 class="text-2xl font-bold text-white uppercase tracking-tighter">Initializing Verification</h2>
+          <p class="text-slate-400">Please wait while we establish a secure uplink to verify your identity...</p>
+        </div>
+
+        <div id="success" class="hidden space-y-8 animate-in fade-in zoom-in duration-700">
+          <div class="w-20 h-20 bg-linear-to-r from-emerald-500 to-teal-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/20">
+             <div class="text-white">
+                <Icon name="Check" size={40} client:load />
+             </div>
+          </div>
+          <div>
+            <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-4">Identity Verified</h2>
+            <p class="text-slate-400 text-lg">Your account has been cleared for access. Welcome to the Nexus, operator.</p>
+          </div>
+          <a href={`/${lang}/login`} class="inline-flex items-center gap-3 bg-linear-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-purple-500/25">
+            Proceed to Login <Icon name="ArrowRight" size={16} client:load />
+          </a>
+        </div>
+
+        <div id="error" class="hidden space-y-8 animate-in fade-in zoom-in duration-700">
+          <div class="w-20 h-20 bg-linear-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-red-500/20">
+             <div class="text-white">
+                <Icon name="X" size={40} client:load />
+             </div>
+          </div>
+          <div>
+            <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-4">Verification Failed</h2>
+            <p id="error-message" class="text-slate-400 text-lg">The link is invalid or has expired.</p>
+          </div>
+          <div class="flex flex-col gap-4">
+            <a href={`/${lang}/create-account`} class="inline-flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white transition-all border border-white/5">
+              Back to Registration
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script is:inline define:vars={{ token }}>
+  const loading = document.getElementById('loading');
+  const success = document.getElementById('success');
+  const errorDiv = document.getElementById('error');
+  const errorMessage = document.getElementById('error-message');
+
+  if (!token) {
+    loading.classList.add('hidden');
+    errorDiv.classList.remove('hidden');
+    errorMessage.textContent = 'Operational failure: Verification token missing in payload.';
+  } else {
+    fetch(`/api/auth/verify?token=${token}`)
+      .then(res => res.json())
+      .then(data => {
+        loading.classList.add('hidden');
+        if (data.success) {
+          success.classList.remove('hidden');
+        } else {
+          errorDiv.classList.remove('hidden');
+          errorMessage.textContent = data.message || 'The secure link could not be validated.';
+        }
+      })
+      .catch(err => {
+        loading.classList.add('hidden');
+        errorDiv.classList.remove('hidden');
+        errorMessage.textContent = 'Network uplink failure. Please retry verification.';
+      });
+  }
+</script>

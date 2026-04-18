@@ -45,7 +45,11 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
       }
 
       if (!response.ok) {
-        setError(data.error || data.message || t('auth.authenticationFailed'));
+        if (response.status === 403) {
+           setError("IDENTITY NOT CLEARED: Account verification required. Please check your secure mailbox.");
+        } else {
+           setError(data.error || data.message || t('auth.authenticationFailed'));
+        }
         return;
       }
 

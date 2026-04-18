@@ -19,6 +19,8 @@ export interface User {
   email: string;
   role_id: number;
   is_active: boolean;
+  is_verified: boolean;
+  verification_token?: string;
   created_at: string;
   updated_at: string;
 }

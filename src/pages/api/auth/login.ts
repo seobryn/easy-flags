@@ -109,11 +109,15 @@ export const POST: APIRoute = async (context) => {
       { status: 200, headers: { "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("Login error:", error);
-    console.error(
-      "Error details:",
-      error instanceof Error ? error.message : String(error),
-    );
+    const errorMessage = error instanceof Error ? error.message : "Login failed";
+    
+    if (errorMessage === "ACCOUNT_NOT_VERIFIED") {
+      return new Response(
+        JSON.stringify(badRequestResponse("Account verification required. Please check your email.", "ACCOUNT_NOT_VERIFIED")),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
       JSON.stringify(
         badRequestResponse(

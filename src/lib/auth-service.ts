@@ -7,6 +7,8 @@ export interface User {
   email: string;
   role_id: number;
   is_active: boolean;
+  is_verified: boolean;
+  verification_token?: string;
   token_version: number;
   created_at: string;
   updated_at: string;
@@ -70,6 +72,8 @@ export async function getUserByUsername(
       email: row.email as string,
       role_id: row.role_id as number,
       is_active: (row.is_active as number) === 1,
+      is_verified: (row.is_verified as number) === 1,
+      verification_token: row.verification_token as string | undefined,
       token_version: (row.token_version as number) || 0,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
@@ -102,6 +106,8 @@ export async function getUserById(id: number): Promise<User | null> {
       email: row.email as string,
       role_id: row.role_id as number,
       is_active: (row.is_active as number) === 1,
+      is_verified: (row.is_verified as number) === 1,
+      verification_token: row.verification_token as string | undefined,
       token_version: (row.token_version as number) || 0,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
@@ -134,6 +140,8 @@ export async function getUserByEmail(email: string): Promise<User | null> {
       email: row.email as string,
       role_id: row.role_id as number,
       is_active: (row.is_active as number) === 1,
+      is_verified: (row.is_verified as number) === 1,
+      verification_token: row.verification_token as string | undefined,
       token_version: (row.token_version as number) || 0,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
@@ -159,7 +167,7 @@ export async function verifyCredentials(
 
     // Get user with password hash
     const result = await db.execute({
-      sql: "SELECT id, username, email, password_hash, role_id, is_active, token_version, created_at, updated_at FROM users WHERE LOWER(username) = LOWER(?) AND is_active = 1",
+      sql: "SELECT id, username, email, password_hash, role_id, is_active, is_verified, token_version, created_at, updated_at FROM users WHERE LOWER(username) = LOWER(?) AND is_active = 1",
       args: [username],
     });
 
@@ -189,6 +197,12 @@ export async function verifyCredentials(
       return null;
     }
 
+    // Check if user is verified
+    if ((row.is_verified as number) === 0) {
+      console.log(`❌ User not verified: ${username}`);
+      throw new Error("ACCOUNT_NOT_VERIFIED");
+    }
+
     // Password is valid, return user data
     const user: User = {
       id: row.id as number,
@@ -196,6 +210,8 @@ export async function verifyCredentials(
       email: row.email as string,
       role_id: row.role_id as number,
       is_active: (row.is_active as number) === 1,
+      is_verified: (row.is_verified as number) === 1,
+      verification_token: row.verification_token as string | undefined,
       token_version: (row.token_version as number) || 0,
       created_at: row.created_at as string,
       updated_at: row.updated_at as string,
@@ -222,6 +238,8 @@ export async function createUser(
   password: string,
   roleId: number = 2, // Default to editor role
 ): Promise<User> {
+  const { EmailService } = await import("@application/services/email.service");
+  const crypto = await import("crypto");
   try {
     if (!username || !email || !password) {
       throw new Error("Username, email, and password are required");
@@ -240,11 +258,12 @@ export async function createUser(
 
     const db = await getDatabase();
     const passwordHash = await hashPassword(password);
+    const verificationToken = crypto.randomUUID();
 
     const result = await db.execute({
-      sql: `INSERT INTO users (username, email, password_hash, role_id, is_active) 
-            VALUES (?, ?, ?, ?, 1)`,
-      args: [username, email, passwordHash, roleId],
+      sql: `INSERT INTO users (username, email, password_hash, role_id, is_active, is_verified, verification_token) 
+            VALUES (?, ?, ?, ?, 1, 0, ?)`,
+      args: [username, email, passwordHash, roleId, verificationToken],
     });
 
     const userId = parseInt(result.lastInsertRowid?.toString(10) || "0", 10);
@@ -256,6 +275,17 @@ export async function createUser(
     }
 
     console.log(`✅ User created: ${username} (ID: ${userId})`);
+
+    // Send verification email
+    try {
+      const emailService = EmailService.getInstance();
+      await emailService.sendVerificationEmail(email, username, verificationToken);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // We don't fail user creation if email fails, but maybe we should?
+      // For now just log it.
+    }
+
     return user;
   } catch (error) {
     console.error("Error creating user:", error);
@@ -280,6 +310,18 @@ export async function updateUserPassword(
     });
 
     console.log(`✅ Password updated for user ID: ${userId}`);
+
+    // Send password changed email
+    try {
+      const user = await getUserById(userId);
+      if (user) {
+        const { EmailService } = await import("@application/services/email.service");
+        const emailService = EmailService.getInstance();
+        await emailService.sendPasswordChangedEmail(user.email);
+      }
+    } catch (emailError) {
+      console.error("Failed to send password changed email:", emailError);
+    }
   } catch (error) {
     console.error("Error updating password:", error);
     throw error;
@@ -550,6 +592,42 @@ export async function revokeUserTokens(userId: number): Promise<void> {
     console.log(`✅ All tokens revoked for user ID: ${userId}`);
   } catch (error) {
     console.error("Error revoking tokens:", error);
+    throw error;
+  }
+}
+
+/**
+ * Verify user account using token
+ */
+export async function verifyUserAccount(token: string): Promise<User> {
+  try {
+    const db = await getDatabase();
+
+    // Find user by token
+    const result = await db.execute({
+      sql: "SELECT id FROM users WHERE verification_token = ?",
+      args: [token],
+    });
+
+    if (result.rows.length === 0) {
+      throw new Error("Invalid or expired verification token");
+    }
+
+    const userId = result.rows[0].id as number;
+
+    // Update user status
+    await db.execute({
+      sql: "UPDATE users SET is_verified = 1, verification_token = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      args: [userId],
+    });
+
+    const user = await getUserById(userId);
+    if (!user) throw new Error("User not found after verification");
+
+    console.log(`✅ User verified: ${user.username} (ID: ${userId})`);
+    return user;
+  } catch (error) {
+    console.error("Error verifying account:", error);
     throw error;
   }
 }

@@ -10,6 +10,7 @@ export default function RegisterForm() {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
@@ -55,13 +56,35 @@ export default function RegisterForm() {
         return;
       }
 
-      window.location.href = "/spaces";
+      setIsSuccess(true);
     } catch (err) {
       setError("Network uplink failure.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (isSuccess) {
+    return (
+      <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[40px] p-10 md:p-14 shadow-2xl relative overflow-hidden group text-center space-y-8 animate-in zoom-in duration-500">
+        <div className="w-24 h-24 bg-linear-to-r from-purple-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-purple-500/20">
+          <Icon name="Mail" size={40} className="text-white" />
+        </div>
+        <div>
+          <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">Uplink Established</h2>
+          <p className="text-slate-400 text-lg">We've sent a verification protocol to <span className="text-white font-bold">{formData.email}</span>. Please authorize your access via the secure link.</p>
+        </div>
+        <div className="pt-8 border-t border-white/5">
+          <a
+            href="/login"
+            className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white transition-all border border-white/5"
+          >
+            Return to Login <Icon name="ArrowRight" size={16} />
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/[0.02] backdrop-blur-3xl border border-white/5 rounded-[40px] p-10 md:p-14 shadow-2xl relative overflow-hidden group">

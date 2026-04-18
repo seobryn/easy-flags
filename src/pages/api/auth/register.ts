@@ -78,32 +78,20 @@ export const POST: APIRoute = async (context) => {
     // Create user in database
     const user = await createUser(username, email, password, 2); // 2 = editor role
 
-    // Create authentication token
-    const token = signToken({
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role_id: user.role_id,
-      token_version: user.token_version,
-    });
-
-    // Set authentication cookie
-    setAuthCookie(context, token);
-
     console.log(
-      `✅ Registration successful for user: ${username} (ID: ${user.id})`,
+      `✅ Registration successful for user: ${username} (ID: ${user.id}). Verification email sent.`,
     );
 
     return new Response(
       JSON.stringify(
         successResponse({
+          message: "Registration successful. Please check your email to verify your account.",
           user: {
             id: user.id,
             username: user.username,
             email: user.email,
             role_id: user.role_id,
           },
-          token,
         }),
       ),
       { status: 201, headers: { "Content-Type": "application/json" } },

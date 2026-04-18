@@ -65,12 +65,29 @@ export class LibSqlUserRepository implements UserRepository {
     return (result.rows[0] as never as User) || null;
   }
 
+  async findByVerificationToken(token: string): Promise<User | null> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM users WHERE verification_token = ?",
+      args: [token],
+    });
+    return (result.rows[0] as never as User) || null;
+  }
+
   async create(user: Partial<User>): Promise<User> {
     const db = await this.getDb();
     const result = await db.execute({
-      sql: `INSERT INTO users (username, email, password_hash, role_id, is_active) 
-            VALUES (?, ?, ?, ?, ?)`,
-      args: [user.username!, user.email!, "", user.role_id || 2, 1],
+      sql: `INSERT INTO users (username, email, password_hash, role_id, is_active, is_verified, verification_token) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        user.username!,
+        user.email!,
+        "",
+        user.role_id || 2,
+        1,
+        user.is_verified ? 1 : 0,
+        user.verification_token || null,
+      ],
     });
     const newUser = await this.findById(Number(result.lastInsertRowid));
     if (!newUser) throw new Error("Failed to create user");
@@ -97,6 +114,14 @@ export class LibSqlUserRepository implements UserRepository {
     if (updates.is_active !== undefined) {
       fields.push("is_active = ?");
       args.push(updates.is_active ? 1 : 0);
+    }
+    if (updates.is_verified !== undefined) {
+      fields.push("is_verified = ?");
+      args.push(updates.is_verified ? 1 : 0);
+    }
+    if (updates.verification_token !== undefined) {
+      fields.push("verification_token = ?");
+      args.push(updates.verification_token || null);
     }
 
     fields.push("updated_at = CURRENT_TIMESTAMP");

@@ -129,23 +129,39 @@ export class PaymentService {
     const paymentRepo = registry.getPaymentRepository();
     const planRepo = registry.getPricingPlanRepository();
     const subRepo = registry.getUserSubscriptionRepository();
+    const userRepo = registry.getUserRepository();
 
     // 1. Update status
     await paymentRepo.update(transactionId, { status });
 
-    // 2. If approved, assign plan (ensure idempotency)
-    if (status === "APPROVED") {
-      const tx = await paymentRepo.findById(transactionId);
-      if (tx && tx.status === "APPROVED") {
-        const plan = await planRepo.findById(tx.pricing_plan_id);
+    // 2. Get transaction and user details for email
+    const tx = await paymentRepo.findById(transactionId);
+    if (tx) {
+      const user = await userRepo.findById(tx.user_id);
+      const plan = await planRepo.findById(tx.pricing_plan_id);
+      
+      if (user && plan) {
+        try {
+          const { EmailService } = await import("./email.service");
+          await EmailService.getInstance().sendPurchaseConfirmationEmail(
+            user.email,
+            plan.name,
+            tx.amount,
+            tx.currency,
+            status
+          );
+        } catch (emailError) {
+          console.error("Failed to send payment update email:", emailError);
+        }
+      }
+
+      // 3. If approved, assign plan (ensure idempotency)
+      if (status === "APPROVED") {
         if (plan) {
           await PricingService.getInstance().assignPlanToUser(tx.user_id, plan.slug);
         }
-      }
-    } else if (status === "VOIDED") {
-      // If payment is voided, ensure any existing subscription for this user is cancelled
-      const tx = await paymentRepo.findById(transactionId);
-      if (tx) {
+      } else if (status === "VOIDED") {
+        // If payment is voided, ensure any existing subscription for this user is cancelled
         const subscription = await subRepo.findByUserId(tx.user_id);
         if (subscription) {
           await subRepo.update(subscription.id, { status: "canceled" });

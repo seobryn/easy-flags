@@ -14,7 +14,8 @@
         "db:migrate": "node scripts/init.mjs migrate",
         "migration:create": "node scripts/create-migration.mjs",
         "test": "vitest run",
-        "test:watch": "vitest"
+        "test:watch": "vitest",
+        "user:delete": "node scripts/delete-user.mjs"
     },
     "dependencies": {
         "@astrojs/node": "^10.0.3",
