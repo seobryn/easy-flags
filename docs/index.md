@@ -8,6 +8,8 @@ Welcome to the **Easy Flags** documentation. This portal helps you understand, i
 - **[Quick Start](intro.md#quick-start)** - Get the project running in minutes.
 
 ## 🛠 Features & Guides
+- **📦 SDK & Integration**
+  - **[Introduction](intro.md#sdk)** - Official TypeScript SDK setup and usage.
 - **📊 Analytics & Observability**
   - **[Overview](features/analytics/overview.md)** - How analytics work in Easy Flags.
   - **[Middleware Implementation](features/analytics/middleware.md)** - Technical details of the analytics layer.

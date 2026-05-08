@@ -314,7 +314,49 @@ EXPOSE 3000
 CMD ["pnpm", "run", "start"]
 ```
 
-## Related Documentation
+## SDK
+
+Easy Flags provides an official TypeScript SDK for client-side evaluation:
+
+```bash
+npm install @orange-ember/easy-flags-sdk
+```
+
+```typescript
+import { EasyFlagsClient } from "@orange-ember/easy-flags-sdk";
+
+const client = new EasyFlagsClient({
+  apiKey: "your-api-key",
+  spaceId: 1,
+  environmentId: 1,
+});
+
+// Single flag evaluation
+const isEnabled = await client.evaluate("new-ui-v2", {
+  defaultValue: false,
+  userId: "user-123",
+  context: { country: "US" },
+});
+
+// Batch evaluation with typed keys
+const flags = {
+  showBanner: "banner-feature",
+  newCheckout: "checkout-v2",
+} as const;
+const results = await client.evaluateAll(flags, {
+  keys: ["showBanner", "newCheckout"],
+  defaultValue: false,
+});
+// results.showBanner is typed as boolean | undefined
+```
+
+The SDK includes:
+- **In-memory caching** (30s TTL, disable via `cache: { enabled: false }`)
+- **Typed evaluations** for full type safety
+- **Silent fail** - Returns `defaultValue` on errors
+- **Batch evaluation** via `evaluateAll()` for parallel fetches
+
+See [Analytics Overview](features/analytics/overview.md) for tracking integration.
 
 - [Main Migration Guide](../ASTRO_MIGRATION.md) - Detailed migration information
 - [Astro Docs](https://docs.astro.build) - Official Astro documentation

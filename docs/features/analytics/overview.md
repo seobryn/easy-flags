@@ -238,31 +238,40 @@ await analyticsService.trackFlagEvaluation({
 
 ### 2. Client-Side Reporting (Optional)
 
-Clients can also send tracking data directly:
+Clients can also send tracking data directly using the SDK:
 
-```javascript
-// JavaScript SDK usage
-const client = new EasyFlagsClient({ apiKey, spaceId });
+```typescript
+import { EasyFlagsClient } from "@orange-ember/easy-flags-sdk";
 
-async function evaluateFlag(featureKey) {
+const client = new EasyFlagsClient({
+  apiKey: "YOUR_API_KEY",
+  spaceId: 1,
+  environmentId: 1,
+});
+
+async function evaluateFlag(featureKey: string) {
   const start = performance.now();
-  const result = await client.isEnabled(featureKey, userId);
+  const result = await client.evaluate(featureKey, {
+    defaultValue: false,
+    userId: "user_123",
+    context: { country: "US" },
+  });
   const evaluationTime = performance.now() - start;
 
   // Optionally report to analytics
-  await fetch('/api/analytics/track', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  await fetch("/api/analytics/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      space_id: spaceId,
-      environment_id: environmentId,
-      feature_id: featureId,
-      api_key: apiKey,
-      was_enabled: result,
+      space_id: 1,
+      environment_id: 1,
+      feature_key: featureKey,
+      api_key: "YOUR_API_KEY",
+      was_enabled: result === true,
       evaluation_result: String(result),
       evaluation_time_ms: evaluationTime,
-      context_data: { user_id: userId }
-    })
+      context_data: { user_id: "user_123", country: "US" },
+    }),
   });
 
   return result;
