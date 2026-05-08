@@ -6,6 +6,7 @@ import node from "@astrojs/node";
 import vercel from "@astrojs/vercel";
 import sitemap from "@astrojs/sitemap";
 import robotsTxt from "astro-robots-txt";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -20,7 +21,7 @@ export default defineConfig({
     ssr: {
       external: ["bcryptjs", "jsonwebtoken"],
     },
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), tsconfigPaths()],
   },
   integrations: [react(), sitemap(), robotsTxt()],
   i18n: {

@@ -2,11 +2,35 @@ import type { APIRoute } from "astro";
 import { setAuthCookie, signToken } from "@/utils/auth";
 import { successResponse, badRequestResponse } from "@/utils/api";
 import { createUser } from "@/lib/auth-service";
+import { validateBody, authSchemas, validationErrorResponse } from "@/lib/validation";
+import {
+  checkRateLimit,
+  getRateLimitConfig,
+  getClientIdentifier,
+  getRateLimitHeaders,
+} from "@/lib/rate-limit";
 
 // Prevent static pre-rendering for this API route
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
+  const clientId = getClientIdentifier(context.request, "auth");
+  const config = getRateLimitConfig("auth");
+  const rateLimit = checkRateLimit(clientId, config);
+
+  if (!rateLimit.allowed) {
+    return new Response(
+      JSON.stringify(badRequestResponse("Too many requests. Please try again later.")),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+        },
+      },
+    );
+  }
+
   try {
     console.log("🔍 register.ts - Received request");
     console.log(
@@ -44,35 +68,9 @@ export const POST: APIRoute = async (context) => {
 
     const { username, email, password } = body;
 
-    if (!username || !email || !password) {
-      return new Response(
-        JSON.stringify(
-          badRequestResponse("Username, email, and password are required"),
-        ),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
-    }
-
-    if (
-      username.trim() === "" ||
-      email.trim() === "" ||
-      password.trim() === ""
-    ) {
-      return new Response(
-        JSON.stringify(
-          badRequestResponse("Username, email, and password cannot be empty"),
-        ),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return new Response(
-        JSON.stringify(badRequestResponse("Invalid email format")),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
+    const validation = validateBody(body, authSchemas.register);
+    if (validation) {
+      return validationErrorResponse(validation.errors);
     }
 
     // Create user in database
@@ -94,7 +92,13 @@ export const POST: APIRoute = async (context) => {
           },
         }),
       ),
-      { status: 201, headers: { "Content-Type": "application/json" } },
+      {
+        status: 201,
+        headers: {
+          "Content-Type": "application/json",
+          ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+        },
+      },
     );
   } catch (error) {
     console.error("Registration error:", error);

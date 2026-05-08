@@ -4,8 +4,10 @@
 
 import type { APIRoute } from "astro";
 import { getUserFromContext } from "@/utils/auth";
-import { unauthorizedResponse } from "@/utils/api";
-import { EnvironmentService, SpaceService } from "@application/services";
+import { unauthorizedResponse, badRequestResponse } from "@/utils/api";
+import { EnvironmentService, SpaceService, LimitService } from "@application/services";
+
+const limitService = LimitService.getInstance();
 
 export const prerender = false;
 
@@ -68,6 +70,16 @@ export const POST: APIRoute = async (context) => {
 
     const environmentService = new EnvironmentService();
     const body = await context.request.json();
+
+    // Check limit before creating
+    const limitCheck = await limitService.checkLimit(space.id, "max_environments");
+    if (!limitCheck.allowed) {
+      return new Response(
+        JSON.stringify(badRequestResponse(limitCheck.error || "Environment limit reached")),
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     const environment = await environmentService.createEnvironment(space.id, {
       name: body.name,
       description: body.description,

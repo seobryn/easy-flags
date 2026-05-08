@@ -3,9 +3,10 @@
  */
 
 import type { APIRoute } from "astro";
-import { getUserFromContext } from "@/utils/auth";
-import { unauthorizedResponse } from "@/utils/api";
-import { FeatureService, SpaceService } from "@application/services";
+import { unauthorizedResponse, badRequestResponse } from "@/utils/api";
+import { SpaceService, FeatureService, LimitService } from "@application/services";
+
+const limitService = LimitService.getInstance();
 
 export const prerender = false;
 
@@ -66,6 +67,16 @@ export const POST: APIRoute = async (context) => {
 
     const featureService = new FeatureService();
     const body = await context.request.json();
+
+    // Check limit before creating
+    const limitCheck = await limitService.checkLimit(space.id, "max_flags");
+    if (!limitCheck.allowed) {
+      return new Response(
+        JSON.stringify(badRequestResponse(limitCheck.error || "Flag limit reached")),
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      );
+    }
+
     const feature = await featureService.createFeature(space.id, {
       key: body.key,
       name: body.name,

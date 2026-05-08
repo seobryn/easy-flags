@@ -5,7 +5,7 @@ import {
   unauthorizedResponse,
   badRequestResponse,
 } from "@/utils/api";
-import { PricingService } from "@application/services/pricing.service";
+import { PricingService } from "@application/services";
 
 export const prerender = false;
 

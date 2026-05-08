@@ -238,7 +238,7 @@ export async function createUser(
   password: string,
   roleId: number = 2, // Default to editor role
 ): Promise<User> {
-  const { EmailService } = await import("@application/services/email.service");
+  const { EmailService } = await import("@application/services");
   const crypto = await import("crypto");
   try {
     if (!username || !email || !password) {
@@ -315,7 +315,7 @@ export async function updateUserPassword(
     try {
       const user = await getUserById(userId);
       if (user) {
-        const { EmailService } = await import("@application/services/email.service");
+        const { EmailService } = await import("@application/services");
         const emailService = EmailService.getInstance();
         await emailService.sendPasswordChangedEmail(user.email);
       }

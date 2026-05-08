@@ -7,7 +7,10 @@ import { getRepositoryRegistry } from "@infrastructure/registry";
 import { FlagEvaluationService } from "./evaluation.service";
 import { PaymentService } from "./payment.service";
 import { PricingService } from "./pricing.service";
-export { FlagEvaluationService, PaymentService, PricingService };
+import { LimitService } from "./limit.service";
+import { EmailService } from "./email.service";
+
+export { FlagEvaluationService, PaymentService, PricingService, LimitService, EmailService };
 import type {
   Space,
   Feature,

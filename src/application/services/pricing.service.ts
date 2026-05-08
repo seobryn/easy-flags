@@ -93,7 +93,25 @@ export class PricingService {
       pricing_plan_id: labPlan.id,
       limit_name: "api_requests_per_month",
       limit_value: 1000,
-      limit_description: "Rate limit: requests per month",
+      limit_description: "API requests allowed per month",
+    });
+    await limitRepo.create({
+      pricing_plan_id: labPlan.id,
+      limit_name: "max_team_members",
+      limit_value: 1,
+      limit_description: "Maximum team members including owner",
+    });
+    await limitRepo.create({
+      pricing_plan_id: labPlan.id,
+      limit_name: "max_api_keys",
+      limit_value: 1,
+      limit_description: "Maximum API keys per environment",
+    });
+    await limitRepo.create({
+      pricing_plan_id: labPlan.id,
+      limit_name: "max_audit_logs_days",
+      limit_value: 7,
+      limit_description: "Days to keep audit logs",
     });
 
     // CREATE BASIC PLAN
@@ -158,7 +176,25 @@ export class PricingService {
       pricing_plan_id: basicPlan.id,
       limit_name: "api_requests_per_month",
       limit_value: 100000,
-      limit_description: "Rate limit: requests per month",
+      limit_description: "API requests allowed per month",
+    });
+    await limitRepo.create({
+      pricing_plan_id: basicPlan.id,
+      limit_name: "max_team_members",
+      limit_value: 3,
+      limit_description: "Maximum team members including owner",
+    });
+    await limitRepo.create({
+      pricing_plan_id: basicPlan.id,
+      limit_name: "max_api_keys",
+      limit_value: 5,
+      limit_description: "Maximum API keys per environment",
+    });
+    await limitRepo.create({
+      pricing_plan_id: basicPlan.id,
+      limit_name: "max_audit_logs_days",
+      limit_value: 30,
+      limit_description: "Days to keep audit logs",
     });
 
     // CREATE PRO PLAN
@@ -228,7 +264,25 @@ export class PricingService {
       pricing_plan_id: proPlan.id,
       limit_name: "api_requests_per_month",
       limit_value: 1000000,
-      limit_description: "Rate limit: requests per month",
+      limit_description: "API requests allowed per month",
+    });
+    await limitRepo.create({
+      pricing_plan_id: proPlan.id,
+      limit_name: "max_team_members",
+      limit_value: -1,
+      limit_description: "Maximum team members including owner",
+    });
+    await limitRepo.create({
+      pricing_plan_id: proPlan.id,
+      limit_name: "max_api_keys",
+      limit_value: -1,
+      limit_description: "Maximum API keys per environment",
+    });
+    await limitRepo.create({
+      pricing_plan_id: proPlan.id,
+      limit_name: "max_audit_logs_days",
+      limit_value: 90,
+      limit_description: "Days to keep audit logs",
     });
 
     console.log("✓ Default pricing plans initialized");

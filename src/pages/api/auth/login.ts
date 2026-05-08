@@ -3,11 +3,35 @@ import { setAuthCookie, signToken } from "@/utils/auth";
 import { successResponse, badRequestResponse } from "@/utils/api";
 import { getSafeRedirectUrl } from "@/utils/redirect";
 import { verifyCredentials } from "@/lib/auth-service";
+import { validateBody, authSchemas, validationErrorResponse } from "@/lib/validation";
+import {
+  checkRateLimit,
+  getRateLimitConfig,
+  getClientIdentifier,
+  getRateLimitHeaders,
+} from "@/lib/rate-limit";
 
 // Prevent static pre-rendering for this API route
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
+  const clientId = getClientIdentifier(context.request, "auth");
+  const config = getRateLimitConfig("auth");
+  const rateLimit = checkRateLimit(clientId, config);
+
+  if (!rateLimit.allowed) {
+    return new Response(
+      JSON.stringify(badRequestResponse("Too many requests. Please try again later.")),
+      {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json",
+          ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+        },
+      },
+    );
+  }
+
   try {
     console.log("🔍 login.ts - Received request");
     console.log(
@@ -47,22 +71,9 @@ export const POST: APIRoute = async (context) => {
 
     const { username, password, redirectUrl } = body;
 
-    if (!username || !password) {
-      return new Response(
-        JSON.stringify(
-          badRequestResponse("Username and password are required"),
-        ),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
-    }
-
-    if (username.trim() === "" || password.trim() === "") {
-      return new Response(
-        JSON.stringify(
-          badRequestResponse("Username and password cannot be empty"),
-        ),
-        { status: 400, headers: { "Content-Type": "application/json" } },
-      );
+    const validation = validateBody(body, authSchemas.login);
+    if (validation) {
+      return validationErrorResponse(validation.errors);
     }
 
     // Validate and sanitize redirect URL
@@ -75,7 +86,13 @@ export const POST: APIRoute = async (context) => {
       console.warn(`Failed login attempt for username: ${username}`);
       return new Response(
         JSON.stringify(badRequestResponse("Invalid username or password")),
-        { status: 401, headers: { "Content-Type": "application/json" } },
+        {
+          status: 401,
+          headers: {
+            "Content-Type": "application/json",
+            ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+          },
+        },
       );
     }
 
@@ -93,21 +110,27 @@ export const POST: APIRoute = async (context) => {
 
     console.log(`✅ Login successful for user: ${username} (ID: ${user.id})`);
 
-    return new Response(
-      JSON.stringify(
-        successResponse({
-          user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            role_id: user.role_id,
+return new Response(
+        JSON.stringify(
+          successResponse({
+            user: {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              role_id: user.role_id,
+            },
+            token,
+            redirectUrl: sanitizedRedirectUrl,
+          }),
+        ),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
           },
-          token,
-          redirectUrl: sanitizedRedirectUrl,
-        }),
-      ),
-      { status: 200, headers: { "Content-Type": "application/json" } },
-    );
+        },
+      );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Login failed";
     

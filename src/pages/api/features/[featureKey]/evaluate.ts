@@ -10,10 +10,11 @@ import type { APIRoute } from "astro";
 import { getUserFromContext } from "@/utils/auth";
 import { unauthorizedResponse, badRequestResponse } from "@/utils/api";
 import { getAnalyticsMiddleware, type EvaluationContext } from "@/lib/analytics-middleware";
-import { FlagEvaluationService } from "@application/services";
+import { FlagEvaluationService, LimitService } from "@application/services";
 
 const analyticsMiddleware = getAnalyticsMiddleware();
 const evaluationService = new FlagEvaluationService();
+const limitService = LimitService.getInstance();
 
 /**
  * GET /api/features/[featureKey]/evaluate
@@ -79,6 +80,18 @@ export const GET: APIRoute = async (context) => {
       );
     }
 
+    // Check monthly API rate limit
+    const rateLimit = await limitService.checkApiRateLimit(parseInt(spaceId));
+    if (!rateLimit.allowed) {
+      return new Response(
+        JSON.stringify(badRequestResponse(rateLimit.error || "API rate limit exceeded")),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
     // Evaluate using our core service
     const result = await evaluationService.evaluateFlag(featureKey, {
       spaceId: parseInt(spaceId),
@@ -119,6 +132,10 @@ export const GET: APIRoute = async (context) => {
         environment: parseInt(environmentId),
         tracked: !!result.featureId,
         error: result.error,
+        rate_limit: {
+          remaining: rateLimit.remaining,
+          limit: rateLimit.limit,
+        },
       }),
       {
         status: 200,

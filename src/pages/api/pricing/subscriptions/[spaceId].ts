@@ -5,8 +5,7 @@ import {
   unauthorizedResponse,
   badRequestResponse,
 } from "@/utils/api";
-import { PricingService } from "@application/services/pricing.service";
-import { SpaceService } from "@application/services";
+import { PricingService, SpaceService } from "@application/services";
 
 export const prerender = false;
 

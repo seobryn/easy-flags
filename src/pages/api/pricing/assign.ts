@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { PricingService } from '@application/services/pricing.service';
+import { PricingService } from '@application/services';
 import { getUserFromContext } from '@/utils/auth';
 
 export const POST: APIRoute = async ({ request, locals }) => {
