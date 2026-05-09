@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Icon } from "@/components/react/shared/Icon";
+import { useLocalizedPath } from "@/infrastructure/i18n/context";
 
 export default function RegisterForm() {
+  const l = useLocalizedPath();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -76,7 +78,7 @@ export default function RegisterForm() {
         </div>
         <div className="pt-8 border-t border-white/5">
           <a
-            href="/login"
+            href={l("/login")}
             className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white transition-all border border-white/5"
           >
             Return to Login <Icon name="ArrowRight" size={16} />
@@ -220,7 +222,7 @@ export default function RegisterForm() {
           <p className="text-slate-500 text-xs font-medium">
             Existing operator?{" "}
             <a
-              href="/login"
+              href={l("/login")}
               className="text-white font-bold hover:text-cyan-400 transition-colors underline underline-offset-4 decoration-white/20"
             >
               Sign In

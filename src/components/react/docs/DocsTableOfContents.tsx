@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface DocsTableOfContentsProps {
@@ -17,6 +17,7 @@ interface Section {
 
 export default function DocsTableOfContents({ initialLocale }: DocsTableOfContentsProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState("");
 
@@ -149,7 +150,7 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
             {/* API Reference Link */}
             <li className="group mt-4 pt-4 border-t border-white/5">
               <a
-                href="/api-reference"
+                href={l("/api-reference")}
                 className="w-full text-left px-4 py-3 rounded-xl transition-all duration-300 flex items-center gap-3 border bg-transparent border-transparent text-slate-400 hover:text-white hover:bg-white/5"
               >
                 <span className="text-slate-500 group-hover:text-emerald-400 transition-colors">
@@ -171,7 +172,7 @@ export default function DocsTableOfContents({ initialLocale }: DocsTableOfConten
             {t('docs.proSupportDesc') || 'Need custom architecture help? Contact our flags experts.'}
           </p>
           <a
-            href="/contact"
+            href={l("/contact")}
             className="block w-full text-center py-2 rounded-lg bg-cyan-500 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20"
           >
             {t('common.getHelp') || 'Get Help'}

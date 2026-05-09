@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 
@@ -53,6 +53,7 @@ function getDateRange(timeRange: "24h" | "7d" | "30d"): { from: string; to: stri
 
 export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitorProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [metrics, setMetrics] = useState<MetricsData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -268,7 +269,7 @@ export default function MetricsMonitor({ userId, initialLocale }: MetricsMonitor
           <p className="text-slate-500 max-w-sm mx-auto mb-10 leading-relaxed font-medium">
             {t('metrics.noDataDesc')}
           </p>
-          <a href="/docs" className="btn-primary inline-flex items-center gap-3 px-10! py-4!">{t('metrics.learnHowToIntegrate')} <Icon name="ArrowRight" size={16} /></a>
+          <a href={l("/docs")} className="btn-primary inline-flex items-center gap-3 px-10! py-4!">{t('metrics.learnHowToIntegrate')} <Icon name="ArrowRight" size={16} /></a>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
 import { Icon } from "@/components/react/shared/Icon";
+import { useLocalizedPath } from "@/infrastructure/i18n/context";
 
 interface TargetingRule {
   id: string;
@@ -26,6 +27,7 @@ export default function AdvancedConfigurationView({
   featureKey,
   featureType,
 }: AdvancedConfigViewProps) {
+  const l = useLocalizedPath();
   // Rollout Configuration
   const [rolloutPercentage, setRolloutPercentage] = useState(0);
   const [rolloutStartDate, setRolloutStartDate] = useState("");
@@ -367,7 +369,7 @@ export default function AdvancedConfigurationView({
                       <p className="text-white font-extrabold text-lg mb-2">Targeting rules are locked</p>
                       <p className="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">Upgrade your workspace to the Basic or Pro plan to use advanced segment-based targeting engine.</p>
                     </div>
-                    <a href="/billing" className="relative z-10 btn-secondary text-[10px] px-8! py-3.5! font-black uppercase tracking-widest bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/20 text-purple-400">View Comparison</a>
+                    <a href={l("/billing")} className="relative z-10 btn-secondary text-[10px] px-8! py-3.5! font-black uppercase tracking-widest bg-purple-500/10 hover:bg-purple-500/20 border-purple-500/20 text-purple-400">View Comparison</a>
                   </div>
                 ) : (
                   <>
@@ -573,9 +575,9 @@ export default function AdvancedConfigurationView({
                 <div className="bg-amber-500/[0.03] border border-amber-500/10 rounded-[28px] p-6 text-center group/prem relative z-10">
                    <p className="text-amber-500/80 font-black text-[9px] uppercase tracking-[0.25em] mb-2 leading-none">PREMIUM MODULE</p>
                    <p className="text-slate-500 text-[10px] mb-4 leading-relaxed font-bold">Automated deployment scheduling is currently locked.</p>
-                   <a href="/billing" className="inline-flex items-center gap-2 text-[9px] font-black text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-all group-hover/prem:gap-3">
-                     Upgrade Plan <Icon name="ArrowRight" size={10} />
-                   </a>
+<a href={l("/billing")} className="inline-flex items-center gap-2 text-[9px] font-black text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-all group-hover/prem:gap-3">
+                      Upgrade Plan <Icon name="ArrowRight" size={10} />
+                    </a>
                 </div>
               ) : schedulingEnabled ? (
                 <div className="space-y-8 pt-2 animate-in fade-in slide-in-from-top-4 duration-500 relative z-10">
@@ -640,7 +642,7 @@ export default function AdvancedConfigurationView({
                 Commit to Edge
               </button>
               <a
-                href={`/spaces/${spaceId}/features`}
+                href={l(`/spaces/${spaceId}/features`)}
                 className="w-full py-4 text-center text-slate-600 hover:text-white font-black text-[10px] uppercase tracking-[0.25em] transition-all flex items-center justify-center gap-3 group/link"
               >
                 <Icon

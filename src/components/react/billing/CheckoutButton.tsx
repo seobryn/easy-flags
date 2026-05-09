@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import type { PricingPlan } from "@domain/entities";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "../shared/Icon";
 import { BillingInput } from "./BillingInput";
@@ -563,6 +563,7 @@ export default function CheckoutButton({
   action,
 }: CheckoutButtonProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [acceptanceData, setAcceptanceData] = useState<any>(null);

@@ -1,4 +1,4 @@
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface SpaceNavigationWithTabsProps {
@@ -23,6 +23,7 @@ export default function SpaceNavigationWithTabs({
   initialLocale,
 }: SpaceNavigationWithTabsProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   
   const isActive = (tab: string) =>
     currentTab === tab
@@ -40,7 +41,7 @@ export default function SpaceNavigationWithTabs({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <a
-            href="/spaces"
+            href={l("/spaces")}
             className="group flex items-center gap-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4 transition-all"
           >
             <span className="transition-transform group-hover:-translate-x-1">

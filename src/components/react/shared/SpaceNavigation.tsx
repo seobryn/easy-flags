@@ -1,4 +1,4 @@
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "./Icon";
 
@@ -21,6 +21,7 @@ export default function SpaceNavigation({
   initialLocale,
 }: SpaceNavigationProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
 
   const isActive = (tab: string) =>
     currentTab === tab
@@ -32,7 +33,7 @@ export default function SpaceNavigation({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <a
-            href="/spaces"
+            href={l("/spaces")}
             className="group flex items-center gap-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-6 transition-all"
           >
             <Icon
@@ -44,7 +45,7 @@ export default function SpaceNavigation({
           </a>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
-              href={`/spaces/${spaceId}`}
+              href={l(`/spaces/${spaceId}`)}
               className="text-4xl md:text-5xl font-extrabold font-display text-white hover:text-cyan-400 transition-all duration-300 tracking-tight leading-tight"
               title={t("spaces.goOverview")}
             >

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { SettingsSidebar } from "./settings/SettingsSidebar";
 import { ProfileSection } from "./settings/ProfileSection";
@@ -53,6 +53,7 @@ interface SettingsViewProps {
 
 export default function SettingsView({ initialLocale }: SettingsViewProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<UserSubscription | null>(null);
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
@@ -469,6 +470,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                 <BillingSection 
                     subscription={subscription}
                     t={t}
+                    l={l}
                 />
             )}
             {activeTab === "security" && (

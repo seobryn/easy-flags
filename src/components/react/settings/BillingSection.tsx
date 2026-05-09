@@ -16,11 +16,13 @@ interface UserSubscription {
 interface BillingSectionProps {
   subscription: UserSubscription | null;
   t: any;
+  l: (path: string) => string;
 }
 
 export const BillingSection: React.FC<BillingSectionProps> = ({
   subscription,
   t,
+  l,
 }) => {
   const planSlug = subscription?.plan?.slug || "lab";
   
@@ -109,7 +111,7 @@ export const BillingSection: React.FC<BillingSectionProps> = ({
             </div>
             
             <a 
-              href="/billing" 
+              href={l("/billing")} 
               className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white text-sm font-bold transition-all active:scale-95 flex items-center gap-2"
             >
               {t("billing.upgradePlan")}

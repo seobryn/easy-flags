@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
 import { Modal } from "@/components/react/shared/Modals";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 
@@ -26,6 +26,7 @@ export default function EnvironmentDetailView({
   initialLocale,
 }: EnvironmentDetailViewProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [spaceName, setSpaceName] = useState("Space");
@@ -332,7 +333,7 @@ export default function EnvironmentDetailView({
               <p className="text-xs text-cyan-100/60 leading-relaxed mb-8 font-medium relative z-10">
                 {t('environmentDetail.readyIntegrate')}
               </p>
-              <a href="/docs" className="block text-center w-full bg-white text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-cyan-50 transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-cyan-500/20 relative z-10">
+              <a href={l("/docs")} className="block text-center w-full bg-white text-black py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-cyan-50 transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-cyan-500/20 relative z-10">
                 {t('environmentDetail.readIntegrationDocs')}
               </a>
             </div>

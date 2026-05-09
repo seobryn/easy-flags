@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
 import { Modal } from "@/components/react/shared/Modals";
 import { Icon, type IconName } from "@/components/react/shared/Icon";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface FeatureEnvironmentConfig {
@@ -101,6 +101,7 @@ export default function FeaturesView({
   initialLocale,
 }: FeaturesViewProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [features, setFeatures] = useState<Feature[]>([]);
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -559,7 +560,7 @@ export default function FeaturesView({
                         <td className="px-8 py-6 text-right">
                           <div className="flex items-center justify-end gap-2 opacity-0 group-hover/row:opacity-100 transition-all transform translate-x-2 group-hover/row:translate-x-0">
                             <a
-                              href={`/spaces/${spaceId}/features/${feature.id}`}
+                              href={l(`/spaces/${spaceId}/features/${feature.id}`)}
                               className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.05] text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/20 transition-all shadow-inner"
                               title="Advanced Configuration"
                             >

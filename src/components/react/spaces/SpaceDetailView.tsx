@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageContainer from "@/components/react/shared/PageContainer";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 
@@ -32,6 +32,7 @@ interface SpaceDetailViewProps {
 
 export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailViewProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [space, setSpace] = useState<Space | null>(null);
   const [stats, setStats] = useState<SpaceStats>({
     environmentsCount: 0,
@@ -143,7 +144,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
           <div className="text-6xl mb-6">🛰️</div>
           <h2 className="text-2xl font-bold text-white mb-2">{t('spaces.notFoundTitle')}</h2>
           <p className="text-slate-500 mb-8 font-medium">{t('spaces.notFoundDesc')}</p>
-          <a href="/spaces" className="btn-primary px-8!">
+          <a href={l("/spaces")} className="btn-primary px-8!">
             {t('spaces.returnToBase')}
           </a>
         </div>
@@ -244,31 +245,31 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <ActionLink 
-                    href={`/spaces/${spaceId}/environments`}
+                    href={l(`/spaces/${spaceId}/environments`)}
                     title={t('spaces.deployEnv')}
                     description={t('spaces.deployEnvDesc')}
                     icon={<Icon name="Globe" size={24} />}
                 />
                 <ActionLink 
-                    href={`/spaces/${spaceId}/features`}
+                    href={l(`/spaces/${spaceId}/features`)}
                     title={t('spaces.newFlag')}
                     description={t('spaces.newFlagDesc')}
                     icon={<Icon name="Settings" size={24} />}
                 />
                 <ActionLink 
-                    href={`/spaces/${spaceId}/permissions`}
+                    href={l(`/spaces/${spaceId}/permissions`)}
                     title={t('spaces.inviteMembers')}
                     description={t('spaces.inviteMembersDesc')}
                     icon={<Icon name="Users" size={24} />}
                 />
                 <ActionLink 
-                    href={`/docs`}
+                    href={l("/docs")}
                     title={t('spaces.sdkIntegration')}
                     description={t('spaces.sdkIntegrationDesc')}
                     icon={<Icon name="FileText" size={24} />}
                 />
                 <ActionLink 
-                    href={`/api-reference`}
+                    href={l("/api-reference")}
                     title={t('apiReference.title')}
                     description={t('apiReference.shortDesc')}
                     icon={<Icon name="Zap" size={24} />}
@@ -332,7 +333,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
 
                <div className="mt-10 pt-8 border-t border-white/5">
                   <a 
-                    href="/docs" 
+                    href={l("/docs")} 
                     className="flex items-center justify-between group p-4 bg-white/5 rounded-2xl hover:bg-cyan-500/10 border border-white/5 hover:border-cyan-500/20 transition-all font-bold text-xs uppercase tracking-widest text-slate-400 hover:text-cyan-400"
                   >
                     {t('spaces.viewSdkDocs')}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Modal } from "@/components/react/shared/Modals";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import { Icon } from "@/components/react/shared/Icon";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import PageContainer from "../shared/PageContainer";
@@ -77,6 +77,7 @@ export default function EnvironmentsView({
   initialLocale,
 }: EnvironmentsViewProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [environments, setEnvironments] = useState<Environment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -445,7 +446,7 @@ export default function EnvironmentsView({
                       })}
                     </span>
                     <a
-                      href={`/spaces/${spaceId}/environments/${env.slug}`}
+                      href={l(`/spaces/${spaceId}/environments/${env.slug}`)}
                       className={`inline-flex items-center gap-2 text-sm font-bold ${styles.accent} hover:underline underline-offset-4 tracking-tight transition-all`}
                     >
                       {t("environments.connect")}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon } from "@/components/react/shared/Icon";
 import { Modal } from "@/components/react/shared/Modals";
@@ -21,6 +21,7 @@ interface SpacesDashboardProps {
 
 export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -266,7 +267,7 @@ export default function SpacesDashboard({ initialLocale }: SpacesDashboardProps)
           {filteredSpaces.map((space) => (
             <a
               key={space.id}
-              href={`/spaces/${space.slug}`}
+              href={l(`/spaces/${space.slug}`)}
               className="group relative bg-white/[0.02] backdrop-blur-md border border-white/5 rounded-[32px] p-8 transition-all duration-500 hover:bg-white/[0.04] hover:border-cyan-500/30 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(6,182,212,0.1)] flex flex-col h-full overflow-hidden"
             >
               {/* Hover Glow Effect */}

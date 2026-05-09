@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Icon } from "@/components/react/shared/Icon";
-import { useTranslate } from "@/infrastructure/i18n/context";
+import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
 interface LoginFormProps {
@@ -10,6 +10,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: LoginFormProps) {
   const t = useTranslate(initialLocale);
+  const l = useLocalizedPath();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -146,7 +147,7 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
           <p className="text-slate-500 text-xs font-medium">
             {t('auth.newOperative')}{" "}
             <a
-              href="/create-account"
+              href={l("/create-account")}
               className="text-cyan-400 font-bold hover:text-white transition-colors underline underline-offset-4 decoration-cyan-500/30"
             >
               {t('auth.initializeProfile')}
