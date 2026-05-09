@@ -32,6 +32,8 @@ describe("PaymentService", () => {
       update: vi.fn(),
       findByReference: vi.fn()
     };
+    mockPaymentRepo.findById = vi.fn();
+    const mockUserSubscriptionRepo = { findByUserId: vi.fn(), update: vi.fn() };
     mockPaymentGateway = {
       getPublicKey: vi.fn(() => "pub_test_123"),
       getMerchantInfo: vi.fn(),
@@ -47,6 +49,7 @@ describe("PaymentService", () => {
       getUserRepository: () => mockUserRepo,
       getPricingPlanRepository: () => mockPricingPlanRepo,
       getPaymentRepository: () => mockPaymentRepo,
+      getUserSubscriptionRepository: () => mockUserSubscriptionRepo,
     });
 
     (PricingService.getInstance as any).mockReturnValue(mockPricingService);
@@ -202,13 +205,18 @@ describe("PaymentService", () => {
       };
 
       mockPaymentRepo.findByReference.mockResolvedValue(transaction);
+      mockPaymentRepo.findById.mockResolvedValue(transaction);
       mockPaymentGateway.createTransaction.mockResolvedValue({ id: "wompi-123", status: "APPROVED" });
       mockPricingPlanRepo.findById.mockResolvedValue(plan);
 
       await service.processPayment(1, paymentData);
 
+      // The implementation performs two updates: one to set external_id and
+      // another to set the status. Assert both occurred.
       expect(mockPaymentRepo.update).toHaveBeenCalledWith(100, {
         external_id: "wompi-123",
+      });
+      expect(mockPaymentRepo.update).toHaveBeenCalledWith(100, {
         status: "APPROVED",
       });
       expect(mockPricingService.assignPlanToUser).toHaveBeenCalledWith(1, "pro-monthly");
@@ -255,6 +263,7 @@ describe("PaymentService", () => {
       };
       mockPaymentGateway.verifyWebhookSignature.mockReturnValue(true);
       mockPaymentRepo.findByReference.mockResolvedValue(transaction);
+      mockPaymentRepo.findById.mockResolvedValue(transaction);
       mockPricingPlanRepo.findById.mockResolvedValue(plan);
 
       const result = await service.handleWebhook(mockPayload, mockSignature);
@@ -262,9 +271,12 @@ describe("PaymentService", () => {
       expect(result).toBe(true);
       expect(mockPaymentGateway.verifyWebhookSignature).toHaveBeenCalledWith(mockPayload, mockSignature);
       expect(mockPaymentRepo.findByReference).toHaveBeenCalledWith("EF-USR-1-10-123456");
+      // Implementation updates external_id first, then status.
+      expect(mockPaymentRepo.update).toHaveBeenCalledWith(transaction.id, {
+        external_id: "wompi-123",
+      });
       expect(mockPaymentRepo.update).toHaveBeenCalledWith(transaction.id, {
         status: "APPROVED",
-        external_id: "wompi-123"
       });
       expect(mockPricingService.assignPlanToUser).toHaveBeenCalledWith(1, "pro");
     });
@@ -297,8 +309,10 @@ describe("PaymentService", () => {
 
       expect(result).toBe(true);
       expect(mockPaymentRepo.update).toHaveBeenCalledWith(transaction.id, {
+        external_id: "wompi-123",
+      });
+      expect(mockPaymentRepo.update).toHaveBeenCalledWith(transaction.id, {
         status: "DECLINED",
-        external_id: "wompi-123"
       });
       expect(mockPricingService.assignPlanToUser).not.toHaveBeenCalled();
     });

@@ -62,4 +62,18 @@ export class EmailService {
       },
     });
   }
+
+  async sendPasswordResetEmail(email: string, username: string, token: string, lang: string = "en"): Promise<void> {
+    const resetLink = `${this.baseUrl}/${lang}/reset-password/${token}`;
+    
+    await this.gateway.sendEmail({
+      to: email,
+      subject: "Reset your Easy Flags password",
+      template: "password_reset",
+      context: {
+        username,
+        resetLink,
+      },
+    });
+  }
 }

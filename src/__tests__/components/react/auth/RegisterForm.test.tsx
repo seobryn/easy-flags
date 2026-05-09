@@ -11,14 +11,14 @@ describe("RegisterForm", () => {
 
     render(<RegisterForm />);
 
-    await user.type(screen.getByLabelText(/username/i), "jose");
-    await user.type(screen.getByLabelText(/^email$/i), "jose@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "password123");
-    await user.type(screen.getByLabelText(/confirm password/i), "password999");
+    await user.type(screen.getByLabelText(/unique codename/i), "jose");
+    await user.type(screen.getByLabelText(/digital mailbox/i), "jose@example.com");
+    await user.type(screen.getByLabelText(/security key/i), "password123");
+    await user.type(screen.getByLabelText(/verify key/i), "password999");
 
-    await user.click(screen.getByRole("button", { name: /create account/i }));
+    await user.click(screen.getByRole("button", { name: /initialize account/i }));
 
-    expect(screen.getByText("Passwords do not match")).toBeInTheDocument();
+    expect(screen.getByText("Passphrase mismatch detected.")).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -33,12 +33,12 @@ describe("RegisterForm", () => {
 
     render(<RegisterForm />);
 
-    await user.type(screen.getByLabelText(/username/i), "jose");
-    await user.type(screen.getByLabelText(/^email$/i), "jose@example.com");
-    await user.type(screen.getByLabelText(/^password$/i), "password123");
-    await user.type(screen.getByLabelText(/confirm password/i), "password123");
+    await user.type(screen.getByLabelText(/unique codename/i), "jose");
+    await user.type(screen.getByLabelText(/digital mailbox/i), "jose@example.com");
+    await user.type(screen.getByLabelText(/security key/i), "password123");
+    await user.type(screen.getByLabelText(/verify key/i), "password123");
 
-    await user.click(screen.getByRole("button", { name: /create account/i }));
+    await user.click(screen.getByRole("button", { name: /initialize account/i }));
 
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/register", {
       method: "POST",

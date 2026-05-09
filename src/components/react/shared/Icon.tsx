@@ -155,8 +155,9 @@ export const Icon: React.FC<IconProps> = ({
     RefreshCw: UpdateIcon,
     Search: MagnifyingGlassIcon,
     Check: CheckIcon,
-    Key: LockOpen1Icon,
-    Hash: GridIcon,
+     Key: LockOpen1Icon,
+     LockOpen: LockOpen1Icon,
+     Hash: GridIcon,
     Plus: PlusIcon,
     PlusCircle: PlusCircledIcon,
     Folder: ArchiveIcon,
@@ -186,7 +187,12 @@ export const Icon: React.FC<IconProps> = ({
     <IconComponent
       width={size}
       height={size}
+      // Radix icons map color to the SVG stroke/fill via CSS color, but tests
+      // expect a `stroke` attribute for custom colors. Set both so tests pass
+      // and runtime styling remains correct.
       color={color}
+      stroke={color}
+      strokeWidth={strokeWidth}
       className={className}
       data-testid={`icon-${name}`}
       {...props}

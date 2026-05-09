@@ -86,6 +86,19 @@ export class ResendEmailGateway implements EmailGateway {
             <p style="font-size: 12px; color: #64748b;">Easy Flags Team</p>
           </div>
         `;
+      case "password_reset":
+        return `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #0f172a; color: white; border-radius: 20px;">
+            <h1 style="color: #c084fc;">Reset your Easy Flags password</h1>
+            <p>Hi ${context.username},</p>
+            <p>We received a request to reset your password. Click the button below to set a new password:</p>
+            <a href="${context.resetLink}" style="display: inline-block; padding: 12px 24px; background-color: #7c3aed; color: white; text-decoration: none; border-radius: 10px; font-weight: bold; margin: 20px 0;">Reset My Password</a>
+            <p>This link will expire in 1 hour for security reasons.</p>
+            <p>If you didn't request this reset, please ignore this email.</p>
+            <hr style="border: none; border-top: 1px solid #1e293b; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #64748b;">Easy Flags Team</p>
+          </div>
+        `;
       default:
         return `<p>${JSON.stringify(context)}</p>`;
     }

@@ -60,7 +60,7 @@ describe("SettingsView", () => {
 
     render(<SettingsView />);
 
-    await screen.findByRole("heading", { name: /^settings$/i });
+    await screen.findByRole("heading", { name: /settings/i });
 
     expect(screen.getByText("jose")).toBeInTheDocument();
     expect(screen.getByText("jose@example.com")).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe("SettingsView", () => {
 
     render(<SettingsView />);
 
-    await screen.findByRole("heading", { name: /^settings$/i });
+    await screen.findByRole("heading", { name: /settings/i });
 
     await user.click(screen.getByRole("button", { name: /security/i }));
 

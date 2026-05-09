@@ -3,38 +3,49 @@ import { Icon } from "@/components/react/shared/Icon";
 import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 
-interface LoginFormProps {
+interface ResetPasswordFormProps {
+  token: string;
   redirectUrl?: string;
   initialLocale?: AvailableLanguages;
 }
 
-export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: LoginFormProps) {
+export default function ResetPasswordForm({ token, redirectUrl = "/spaces", initialLocale }: ResetPasswordFormProps) {
   const t = useTranslate(initialLocale);
   const l = useLocalizedPath();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
 
-  if (!username.trim() || !password.trim()) {
-      // Tests expect this specific validation message; use it literally
-      setError('Please enter both username and password');
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      setError(t('auth.noResults')); // Reusing for "Please enter both passwords"
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError(t('auth.noMatchPass'));
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError(t('auth.shortPass'));
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const payload = { username, password, redirectUrl };
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ token, newPassword }),
       });
 
       const text = await response.text();
@@ -47,16 +58,16 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
       }
 
       if (!response.ok) {
-        if (response.status === 403) {
-           setError("IDENTITY NOT CLEARED: Account verification required. Please check your secure mailbox.");
-        } else {
-           setError(data.error || data.message || t('auth.authenticationFailed'));
-        }
+        setError(data.error || data.message || t('auth.failedInitialize'));
         return;
       }
 
-      const finalRedirectUrl = data.data?.redirectUrl || redirectUrl;
-      window.location.href = finalRedirectUrl;
+      setSuccess(data.message || t('auth.passwordResetSuccess'));
+
+      // Redirect after a short delay to show success message
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 2000);
     } catch (err) {
       setError(t('auth.terminalLinkLost'));
     } finally {
@@ -80,52 +91,62 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
             </p>
           </div>
         )}
+        {success && (
+          <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex items-center gap-3 animate-in slide-in-from-top-2">
+            <div className="text-green-500 shrink-0">
+               <Icon name="Check" size={18} />
+            </div>
+            <p className="text-green-400 font-bold text-xs tracking-tight">
+              {success}
+            </p>
+          </div>
+        )}
 
         <div className="space-y-6">
           <div className="group/input">
             <label
-              htmlFor="username"
+              htmlFor="newPassword"
               className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-3 px-1 group-focus-within/input:text-cyan-400 transition-colors"
             >
-              {t('auth.identityHash')}
+              {t('auth.newPassword')}
             </label>
             <div className="relative">
               <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-cyan-400 transition-colors">
-                 <Icon name="User" size={18} />
+                 <Icon name="LockOpen" size={18} />
               </div>
               <input
-                type="text"
-                id="username"
-                aria-label="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                type="password"
+                id="newPassword"
+                aria-label="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
                 required
                 className="w-full bg-slate-950/40 border border-white/5 border-b-white/10 rounded-2xl pl-14 pr-6 py-4 text-white font-medium placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all shadow-inner"
-                placeholder={t('auth.networkIdentifier')}
+                placeholder={t('auth.newPasswordPlaceholder')}
               />
             </div>
           </div>
-
+          
           <div className="group/input">
             <label
-              htmlFor="password"
-              className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-3 px-1 group-focus-within/input:text-purple-400 transition-colors"
+              htmlFor="confirmPassword"
+              className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] mb-3 px-1 group-focus-within/input:text-cyan-400 transition-colors"
             >
-              {t('auth.accessCryptogram')}
+              {t('auth.confirmPassword')}
             </label>
             <div className="relative">
-              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-purple-400 transition-colors">
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-cyan-400 transition-colors">
                  <Icon name="Lock" size={18} />
               </div>
               <input
                 type="password"
-                id="password"
-                aria-label="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="confirmPassword"
+                aria-label="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="w-full bg-slate-950/40 border border-white/5 border-b-white/10 rounded-2xl pl-14 pr-6 py-4 text-white font-medium placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500/50 transition-all shadow-inner"
-                placeholder="••••••••••••"
+                className="w-full bg-slate-950/40 border border-white/5 border-b-white/10 rounded-2xl pl-14 pr-6 py-4 text-white font-medium placeholder-slate-700 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all shadow-inner"
+                placeholder={t('auth.confirmPasswordPlaceholder')}
               />
             </div>
           </div>
@@ -134,14 +155,14 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
         <button
           type="submit"
           disabled={isLoading}
-          aria-label="Sign in"
+          aria-label="Reset password"
           className="w-full btn-primary py-5! rounded-2xl flex items-center justify-center gap-3 shadow-2xl shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:grayscale"
         >
           {isLoading ? (
             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
-              <span className="font-black text-xs uppercase tracking-widest">{t('auth.authorizeAccess')}</span>
+              <span className="font-black text-xs uppercase tracking-widest">{t('auth.resetPasswordButton')}</span>
               <Icon name="ArrowRight" size={16} />
             </>
           )}
@@ -149,18 +170,14 @@ export default function LoginForm({ redirectUrl = "/spaces", initialLocale }: Lo
 
         <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-4">
           <p className="text-slate-500 text-xs font-medium">
-            {t('auth.newOperative')}{" "}
+            {t('auth.backToLogin')}{" "}
             <a
-              href={l("/create-account")}
+              href={l("/login")}
               className="text-cyan-400 font-bold hover:text-white transition-colors underline underline-offset-4 decoration-cyan-500/30"
             >
-              {t('auth.initializeProfile')}
+              {t('auth.signIn')}
             </a>
           </p>
-          <div className="flex gap-6">
-            <a href={l("/forgot-password")} className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">{t('auth.protocolReset')}</a>
-            <a href="#" className="text-[9px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-colors">{t('auth.systemStatus')}</a>
-          </div>
         </div>
       </form>
     </div>

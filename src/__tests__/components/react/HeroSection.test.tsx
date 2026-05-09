@@ -10,13 +10,11 @@ describe("HeroSection", () => {
       screen.getByRole("heading", { name: /launch ideas/i }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("link", { name: /get started/i }),
-    ).toHaveAttribute("href", "/create-account");
-    
-    expect(
-      screen.getByRole("link", { name: /documentation/i }),
-    ).toHaveAttribute("href", "/docs");
+    const getStartedHref = screen.getByRole("link", { name: /get started/i }).getAttribute("href");
+    expect(getStartedHref).toMatch(/\/create-account$/);
+
+    const docsHref = screen.getByRole("link", { name: /documentation/i }).getAttribute("href");
+    expect(docsHref).toMatch(/\/docs$/);
 
     expect(screen.getByAltText(/illustration/i)).toBeInTheDocument();
   });

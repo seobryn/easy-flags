@@ -2,20 +2,22 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import { redirectIfAuthenticated } from "@/utils/auth-redirect";
 import LoginForm from "@/components/react/auth/LoginForm";
-import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
+import { getTranslator } from "@/infrastructure/i18n/astro";
 
-const { t, lang } = getTranslator(Astro.request);
+// getTranslator returns a helper `getLocalizedPath` tailored to the current
+// request locale. Destructure it as `l` so templates can call `l(path)`.
+const { t, lang, getLocalizedPath: l } = getTranslator(Astro.request);
 
 export const prerender = false;
 
 // Redirect authenticated users to spaces (or where they were going)
 if (redirectIfAuthenticated(Astro)) {
-  const redirectUrl = Astro.url.searchParams.get("redirect") || getLocalizedPath("/spaces", lang as any);
+  const redirectUrl = Astro.url.searchParams.get("redirect") || l("/spaces");
   return Astro.redirect(redirectUrl);
 }
 
 // Get redirect URL from query params (where user was trying to go)
-const redirectUrl = Astro.url.searchParams.get("redirect") || getLocalizedPath("/spaces", lang as any);
+const redirectUrl = Astro.url.searchParams.get("redirect") || l("/spaces");
 ---
 
 <BaseLayout seoKey="login" includeHeader={false}>
@@ -44,11 +46,19 @@ const redirectUrl = Astro.url.searchParams.get("redirect") || getLocalizedPath("
       
       <LoginForm client:load redirectUrl={redirectUrl} />
       
-      <div class="mt-12 text-center">
-        <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">
-          &copy; 2026 ORANGE EMBER STUDIOS
-        </p>
-      </div>
+        <div class="mt-6 text-center space-y-3">
+          <p class="text-slate-500 text-xs font-medium">
+            <a
+              href={l("/forgot-password")}
+              className="text-cyan-400 font-bold hover:text-white transition-colors underline underline-offset-4 decoration-cyan-500/30"
+            >
+              {t('auth.protocolReset')}
+            </a>
+          </p>
+          <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em]">
+            &copy; 2026 ORANGE EMBER STUDIOS
+          </p>
+        </div>
     </div>
   </div>
 </BaseLayout>
