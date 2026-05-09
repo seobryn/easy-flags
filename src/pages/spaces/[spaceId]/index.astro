@@ -1,0 +1,11 @@
+---
+import { getLocale } from "@/infrastructure/i18n/astro";
+import { getLocalizedPath } from "@/infrastructure/i18n/astro";
+
+export const prerender = false;
+
+const { spaceId: spaceSlug } = Astro.params;
+const locale = getLocale(Astro.request);
+
+return Astro.redirect(getLocalizedPath(`/spaces/${spaceSlug}`, locale as any));
+---
