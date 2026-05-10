@@ -14,44 +14,41 @@ export const prerender = false;
 export const POST: APIRoute = async (context) => {
   try {
     const { email } = await context.request.json();
+    const user = await getUserByEmail(email);
 
     if (!email) {
       return new Response(
-        JSON.stringify(
-          badRequestResponse("Email is required")
-        ),
-        { status: 400 }
+        JSON.stringify(badRequestResponse("Email is required")),
+        { status: 400 },
       );
     }
 
     if (!validateEmail(email)) {
       return new Response(
-        JSON.stringify(badRequestResponse("Invalid email format"))
-      )
-    }
-
-    // Find user by email
-    const user = await getUserByEmail(email);
-    if (!user) {
-      // Don't reveal that the email doesn't exist - return success anyway for security
-      return new Response(
-        JSON.stringify(
-          successResponse({
-            message: "If an account exists with that email, you will receive a password reset link.",
-          })
-        ),
-        { status: 200 }
+        JSON.stringify(badRequestResponse("Invalid email format")),
       );
     }
 
-    // Find user by email
-    const user = await getUserByEmail(email);
     if (!user) {
       // Don't reveal that the email doesn't exist - return success anyway for security
       return new Response(
         JSON.stringify(
           successResponse({
-            message: "If an account exists with that email, you will receive a password reset link.",
+            message:
+              "If an account exists with that email, you will receive a password reset link.",
+          }),
+        ),
+        { status: 200 },
+      );
+    }
+
+    if (!user) {
+      // Don't reveal that the email doesn't exist - return success anyway for security
+      return new Response(
+        JSON.stringify(
+          successResponse({
+            message:
+              "If an account exists with that email, you will receive a password reset link.",
           }),
         ),
         { status: 200 },
@@ -62,7 +59,8 @@ export const POST: APIRoute = async (context) => {
       return new Response(
         JSON.stringify(
           successResponse({
-            message: "If an account exists with that email, you will receive a password reset link.",
+            message:
+              "If an account exists with that email, you will receive a password reset link.",
           }),
         ),
         { status: 200 },
@@ -87,7 +85,11 @@ export const POST: APIRoute = async (context) => {
     // Send email
     try {
       const emailService = EmailService.getInstance();
-      await emailService.sendPasswordResetEmail(user.email, user.username, token);
+      await emailService.sendPasswordResetEmail(
+        user.email,
+        user.username,
+        token,
+      );
     } catch (emailError) {
       console.error("Failed to send password reset email:", emailError);
       // Continue anyway - we don't want to fail the request if email fails
@@ -97,7 +99,8 @@ export const POST: APIRoute = async (context) => {
     return new Response(
       JSON.stringify(
         successResponse({
-          message: "If an account exists with that email, you will receive a password reset link.",
+          message:
+            "If an account exists with that email, you will receive a password reset link.",
         }),
       ),
       { status: 200 },
