@@ -1,7 +1,11 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import AnalyticsDashboard from "@/components/react/analytics/AnalyticsDashboard";
-import { requireAuth, getUserFromAstroContext, getLoginUrl } from "@/utils/auth-redirect";
+import {
+  requireAuth,
+  getUserFromAstroContext,
+  getLoginUrl,
+} from "@/utils/auth-redirect";
 import { hasFeatureAccess, FEATURES } from "@/utils/permissions";
 import { getTranslator, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
@@ -14,7 +18,7 @@ if (!requireAuth(Astro)) {
 
 // Get user and check feature access for analytics
 const user = getUserFromAstroContext(Astro);
-const { t, lang } = getTranslator(Astro.request);
+const { lang } = getTranslator(Astro.request);
 
 const hasAccess = user && hasFeatureAccess(user, FEATURES.FEATURE_FLAGS);
 if (!hasAccess) {
@@ -24,6 +28,6 @@ if (!hasAccess) {
 
 <BaseLayout seoKey="analytics" includeHeader={true}>
   <div class="py-12">
-    <AnalyticsDashboard client:load spaceId={undefined} />
+    <AnalyticsDashboard client:load spaceId={undefined} initialLocale={lang} />
   </div>
 </BaseLayout>

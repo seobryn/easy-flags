@@ -70,7 +70,7 @@ export function useTranslate(overrideLocale?: AvailableLanguages) {
   // Determine locale to use
   const localeToUse = overrideLocale || context?.locale || DEFAULT_LANGUAGE;
 
-  // Use memo to avoid recreative translator on every render if not using context
+  // Use memo to avoid recreating translator on every render if not using context
   const t = useMemo(
     () => {
       // If we have context and no override, return the context's translator
@@ -78,11 +78,14 @@ export function useTranslate(overrideLocale?: AvailableLanguages) {
         return context.t;
       }
       // Otherwise create a new one
-      return createTranslator(
-        localeToUse as string,
-        translations,
-        DEFAULT_LANGUAGE as string,
-      );
+      return (key: string, variables?: Record<string, string | number>) => {
+        const translator = createTranslator(
+          localeToUse as string,
+          translations,
+          DEFAULT_LANGUAGE as string,
+        );
+        return translator(key, variables);
+      };
     },
     [context, overrideLocale, localeToUse],
   );

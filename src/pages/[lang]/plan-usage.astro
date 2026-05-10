@@ -1,0 +1,32 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import PlanUsageDashboard from "@/components/react/billing/PlanUsageDashboard";
+
+import {
+  requireAuth,
+  getUserFromAstroContext,
+  getLoginUrl,
+} from "@/utils/auth-redirect";
+import { getTranslator } from "@/infrastructure/i18n/astro";
+
+export const prerender = false;
+
+// Check authentication
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
+
+// Get user
+const user = getUserFromAstroContext(Astro);
+const { t, lang } = getTranslator(Astro.request);
+---
+
+<BaseLayout seoKey="analytics" includeHeader={true}>
+  <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <PlanUsageDashboard 
+      client:load 
+      userId={String(user.id)} 
+      initialLocale={lang}
+    />
+  </div>
+</BaseLayout>

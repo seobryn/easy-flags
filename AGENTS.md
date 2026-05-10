@@ -3,7 +3,7 @@
 ## Essential Commands
 
 ```bash
-pnpm dev           # Start dev server (http://localhost:3000)
+pnpm dev           # Start dev server (http://localhost:3000). DO NOT run this command unless explicitly requested by the user.
 pnpm build         # Production build
 pnpm start         # Run production server (node ./dist/server/entry.mjs)
 pnpm test          # Run all tests

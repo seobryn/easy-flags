@@ -164,6 +164,157 @@ export class LimitService {
   }
 
   /**
+   * Get plan limits for a specific plan ID
+   */
+  async getPlanLimits(planId: number): Promise<any[]> {
+    const db = await getDatabase();
+    const result = await db.execute({
+      sql: `SELECT limit_name, limit_value, limit_description 
+            FROM pricing_plan_limits 
+            WHERE pricing_plan_id = ?`,
+      args: [planId],
+    });
+    return result.rows as any[];
+  }
+
+  /**
+   * Get API call usage for a user and time period
+   */
+  async getApiCallUsage(userId: number, spaceId: number | undefined, periodStart: Date, periodEnd: Date): Promise<number> {
+    const db = await getDatabase();
+    
+    let sql = `SELECT COUNT(*) as count FROM flag_evaluations 
+               WHERE created_at BETWEEN ? AND ?`;
+    let args = [periodStart.toISOString(), periodEnd.toISOString()];
+    
+    if (spaceId) {
+      sql += " AND space_id = ?";
+      args.push(spaceId);
+    } else {
+      // Get all spaces for the user
+      const spacesResult = await db.execute({
+        sql: `SELECT id FROM spaces WHERE owner_id = ? 
+              UNION 
+              SELECT space_id FROM space_members WHERE user_id = ?`,
+        args: [userId, userId],
+      });
+      
+      const spaceIds = spacesResult.rows.map(row => row.id);
+      if (spaceIds.length > 0) {
+        sql += ` AND space_id IN (${spaceIds.map(() => "?").join(",")})`;
+        args.push(...spaceIds);
+      } else {
+        return 0;
+      }
+    }
+    
+    const result = await db.execute({ sql, args });
+    return Number(result.rows[0]?.count || 0);
+  }
+
+  /**
+   * Get feature flag count for a user
+   */
+  async getFeatureFlagCount(userId: number, spaceId: number | undefined): Promise<number> {
+    const db = await getDatabase();
+    
+    let sql = `SELECT COUNT(*) as count FROM features`;
+    let args: any[] = [];
+    
+    if (spaceId) {
+      sql += " WHERE space_id = ?";
+      args.push(spaceId);
+    } else {
+      // Get all spaces for the user
+      const spacesResult = await db.execute({
+        sql: `SELECT id FROM spaces WHERE owner_id = ? 
+              UNION 
+              SELECT space_id FROM space_members WHERE user_id = ?`,
+        args: [userId, userId],
+      });
+      
+      const spaceIds = spacesResult.rows.map(row => row.id);
+      if (spaceIds.length > 0) {
+        sql += ` WHERE space_id IN (${spaceIds.map(() => "?").join(",")})`;
+        args.push(...spaceIds);
+      } else {
+        return 0;
+      }
+    }
+    
+    const result = await db.execute({ sql, args });
+    return Number(result.rows[0]?.count || 0);
+  }
+
+  /**
+   * Get environment count for a user
+   */
+  async getEnvironmentCount(userId: number, spaceId: number | undefined): Promise<number> {
+    const db = await getDatabase();
+    
+    let sql = `SELECT COUNT(*) as count FROM environments`;
+    let args: any[] = [];
+    
+    if (spaceId) {
+      sql += " WHERE space_id = ?";
+      args.push(spaceId);
+    } else {
+      // Get all spaces for the user
+      const spacesResult = await db.execute({
+        sql: `SELECT id FROM spaces WHERE owner_id = ? 
+              UNION 
+              SELECT space_id FROM space_members WHERE user_id = ?`,
+        args: [userId, userId],
+      });
+      
+      const spaceIds = spacesResult.rows.map(row => row.id);
+      if (spaceIds.length > 0) {
+        sql += ` WHERE space_id IN (${spaceIds.map(() => "?").join(",")})`;
+        args.push(...spaceIds);
+      } else {
+        return 0;
+      }
+    }
+    
+    const result = await db.execute({ sql, args });
+    return Number(result.rows[0]?.count || 0);
+  }
+
+  /**
+   * Get team member count for a user
+   */
+  async getTeamMemberCount(userId: number, spaceId: number | undefined): Promise<number> {
+    const db = await getDatabase();
+    
+    let sql = `SELECT COUNT(*) as count FROM space_members`;
+    let args: any[] = [];
+    
+    if (spaceId) {
+      sql += " WHERE space_id = ?";
+      args.push(spaceId);
+    } else {
+      // Get all spaces for the user
+      const spacesResult = await db.execute({
+        sql: `SELECT id FROM spaces WHERE owner_id = ? 
+              UNION 
+              SELECT space_id FROM space_members WHERE user_id = ?`,
+        args: [userId, userId],
+      });
+      
+      const spaceIds = spacesResult.rows.map(row => row.id);
+      if (spaceIds.length > 0) {
+        sql += ` WHERE space_id IN (${spaceIds.map(() => "?").join(",")})`;
+        args.push(...spaceIds);
+      } else {
+        return 0;
+      }
+    }
+    
+    const result = await db.execute({ sql, args });
+    return Number(result.rows[0]?.count || 0);
+  }
+
+  /**
    * Get all limits for a space
    */
   async getAllLimits(spaceId: number): Promise<Record<string, LimitResult>> {
@@ -176,7 +327,7 @@ export class LimitService {
     ];
 
     const results: Record<string, LimitResult> = {};
-    
+
     for (const limit of limits) {
       if (limit === "api_requests_per_month") {
         results[limit] = await this.checkApiRateLimit(spaceId);

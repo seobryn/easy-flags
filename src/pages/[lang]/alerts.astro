@@ -1,0 +1,33 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import AlertManager from "@/components/react/alerts/AlertManager";
+
+import {
+  requireAuth,
+  getUserFromAstroContext,
+  getLoginUrl,
+} from "@/utils/auth-redirect";
+import { getTranslator } from "@/infrastructure/i18n/astro";
+
+export const prerender = false;
+
+// Check authentication
+if (!requireAuth(Astro)) {
+  return Astro.redirect(getLoginUrl(Astro));
+}
+
+// Get user
+const user = getUserFromAstroContext(Astro);
+const { lang } = getTranslator(Astro.request);
+---
+
+<BaseLayout seoKey="analytics" includeHeader={true}>
+  <div class="relative min-h-screen py-12 overflow-x-hidden">
+    <div class="fixed top-20 -left-20 w-[600px] h-[600px] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+    <div class="fixed bottom-0 -right-20 w-[600px] h-[600px] bg-cyan-500/5 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 relative z-10">
+      <AlertManager client:load userId={String(user?.id)} initialLocale={lang} />
+    </div>
+  </div>
+</BaseLayout>
