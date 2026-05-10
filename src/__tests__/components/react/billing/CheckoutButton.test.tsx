@@ -4,6 +4,23 @@ import CheckoutButton from "@components/react/billing/CheckoutButton";
 import type { PricingPlan } from "@domain/entities";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
+// Mock the i18n context
+vi.mock("@/infrastructure/i18n/context", () => ({
+  useTranslate: () => (key: string) => {
+    const translations: Record<string, string> = {
+      "auth.getStarted": "Get Started",
+      "billing.upgradePlan": "Upgrade",
+      "billing.downgradePlan": "Downgrade",
+      "billing.currentPlan": "Current Plan",
+      "billing.processing": "Processing...",
+      "billing.paymentError": "Payment error occurred",
+      "billing.customerDataTitle": "Datos del Cliente",
+    };
+    return translations[key] || key;
+  },
+  useLocalizedPath: () => (path: string) => path,
+}));
+
 const basePlan: PricingPlan = {
   id: 1,
   slug: "pro",
@@ -23,10 +40,12 @@ const basePlan: PricingPlan = {
 describe("CheckoutButton", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal("fetch", vi.fn());
     // Mock window.location
     const location = new URL("http://localhost");
-    vi.stubGlobal("location", location);
+    Object.defineProperty(window, "location", {
+      value: location,
+      writable: true,
+    });
   });
 
   it("renders a button for free plans", () => {
@@ -47,33 +66,35 @@ describe("CheckoutButton", () => {
     const user = userEvent.setup();
     const fetchMock = vi
       .fn()
-      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ id: 1 }) }) // /api/auth/me
       .mockResolvedValueOnce({
         ok: true,
-        json: () =>
-          Promise.resolve({
-            data: {
-              currency: "COP",
-              amountInCents: 200000,
-              publicKey: "pub_test",
-              transaction: { reference: "EF-123" },
-              acceptance: {
-                acceptanceToken: "token1",
-                acceptanceText: "text1",
-                dataPrivacyToken: "token2",
-                dataPrivacyText: "text2",
-              },
+        json: async () => ({ id: 1 }),
+      }) // /api/auth/me
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            currency: "COP",
+            amountInCents: 200000,
+            publicKey: "pub_test",
+            transaction: { reference: "EF-123" },
+            acceptance: {
+              acceptanceToken: "token1",
+              acceptanceText: "text1",
+              dataPrivacyToken: "token2",
+              dataPrivacyText: "text2",
             },
-          }),
+          },
+        }),
       }); // /api/payments/checkout
 
-    vi.stubGlobal("fetch", fetchMock);
+    global.fetch = fetchMock;
 
     render(
       <CheckoutButton plan={basePlan} action="checkout" initialLocale="es" />
     );
 
-    await user.click(screen.getByRole("button", { name: /empezar ahora/i }));
+    await user.click(screen.getByRole("button", { name: /get started/i }));
 
     expect(fetchMock).toHaveBeenCalledWith("/api/auth/me", {
       credentials: "include",
