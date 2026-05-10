@@ -117,6 +117,8 @@ export const en = {
     members: 'Members',
     planUsage: 'Plan Usage',
     alerts: 'Alerts',
+    product: 'Product',
+    resources: 'Resources',
   },
     auth: {
       login: 'Login',

@@ -8,7 +8,6 @@ import { SecuritySection } from "./settings/SecuritySection";
 import { ApiKeySection } from "./settings/ApiKeySection";
 import { PreferenceSection } from "./settings/PreferenceSection";
 import { SessionSection } from "./settings/SessionSection";
-import { LimitsSection } from "./settings/LimitsSection";
 import { Icon } from "@/components/react/shared/Icon";
 
 interface User {
@@ -61,7 +60,7 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "profile" | "security" | "api-keys" | "preferences" | "sessions" | "billing" | "limits"
+    "profile" | "security" | "api-keys" | "preferences" | "sessions" | "billing"
   >("profile");
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
@@ -472,12 +471,6 @@ export default function SettingsView({ initialLocale }: SettingsViewProps) {
                     subscription={subscription}
                     t={t}
                     l={l}
-                />
-            )}
-            {activeTab === "limits" && (
-                <LimitsSection
-                    subscription={subscription}
-                    t={t}
                 />
             )}
             {activeTab === "security" && (

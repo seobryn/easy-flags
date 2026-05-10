@@ -1,5 +1,6 @@
 import { useTranslate, useLocalizedPath } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
 
 interface SpaceNavigationWithTabsProps {
   spaceId: string | undefined;
@@ -106,7 +107,7 @@ export default function SpaceNavigationWithTabs({
             onClick={() => onPermissionSubTabChange?.("features")}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${isPermissionSubTabActive("features")}`}
           >
-            <span className="text-sm">🔐</span> {t('spaces.rolePermissions')}
+            <Icon name="Shield" size={16} /> {t('spaces.rolePermissions')}
           </button>
         </div>
       )}

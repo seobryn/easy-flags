@@ -3,6 +3,8 @@ import { getUserFromContext } from "@/utils/auth";
 import { isSuperUser } from "@/utils/permissions";
 import HeaderDropdown from "@/components/react/shared/HeaderDropdown";
 import LanguageSelector from "@/components/react/shared/LanguageSelector";
+import HeaderMegaMenu from "@/components/react/shared/HeaderMegaMenu";
+import MobileMenu from "@/components/react/shared/MobileMenu";
 import { getTranslator, getLocale, getLocalizedPath } from "@/infrastructure/i18n/astro";
 
 const lang = getLocale(Astro.request);
@@ -84,6 +86,35 @@ const getNavLinkClass = (href: string) => {
     }`;
   }
 };
+
+const megaMenuGroups = user 
+  ? [
+      {
+        title: t('navigation.product') || "Product",
+        items: [
+          { href: navItems.spaces.href, label: navItems.spaces.label, icon: "Layers" as const },
+          { href: navItems.metrics.href, label: navItems.metrics.label, icon: "Activity" as const },
+          { href: navItems.planUsage.href, label: navItems.planUsage.label, icon: "CreditCard" as const },
+          { href: navItems.alerts.href, label: navItems.alerts.label, icon: "AlertCircle" as const },
+        ]
+      },
+      {
+        title: t('navigation.resources') || "Resources",
+        items: [
+          { href: navItems.docs.href, label: navItems.docs.label, icon: "Book" as const },
+          { href: navItems.apiReference.href, label: navItems.apiReference.label, icon: "Code" as const },
+        ]
+      }
+    ]
+  : [
+      {
+        title: t('navigation.resources') || "Resources",
+        items: [
+          { href: navItems.docs.href, label: navItems.docs.label, icon: "Book" as const },
+          { href: navItems.apiReference.href, label: navItems.apiReference.label, icon: "Code" as const },
+        ]
+      }
+    ];
 ---
 
 <header id="main-header" class="sticky top-0 z-50 w-full border-b border-white/5 bg-[#06080f]/70 backdrop-blur-2xl transition-all duration-500">
@@ -101,7 +132,7 @@ const getNavLinkClass = (href: string) => {
     </div>
 
     <div class="hidden md:flex gap-8 items-center">
-      <div class="flex items-center gap-8">
+      <div class="flex items-center gap-6">
         {
           navItems.pricing.showFor && (
             <a
@@ -113,63 +144,12 @@ const getNavLinkClass = (href: string) => {
           )
         }
 
-        {
-          navItems.spaces.showFor && (
-            <a
-              href={navItems.spaces.href}
-              class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.spaces.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-            >
-              {navItems.spaces.label}
-            </a>
-          )
-        }
-
-        {
-          navItems.metrics.showFor && (
-            <a
-              href={navItems.metrics.href}
-              class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.metrics.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-            >
-              {navItems.metrics.label}
-            </a>
-          )
-        }
-
-        {
-          navItems.planUsage.showFor && (
-            <a
-              href={navItems.planUsage.href}
-              class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.planUsage.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-            >
-              {navItems.planUsage.label}
-            </a>
-          )
-        }
-
-        {
-          navItems.alerts.showFor && (
-            <a
-              href={navItems.alerts.href}
-              class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.alerts.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-            >
-              {navItems.alerts.label}
-            </a>
-          )
-        }
-
-        <a
-          href={navItems.docs.href}
-          class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.docs.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-        >
-          {navItems.docs.label}
-        </a>
-
-        <a
-          href={navItems.apiReference.href}
-          class={`text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300 hover:text-cyan-400 ${isActive(navItems.apiReference.href) ? 'text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]' : 'text-slate-400'}`}
-        >
-          {navItems.apiReference.label}
-        </a>
+        <HeaderMegaMenu 
+          client:load 
+          groups={megaMenuGroups} 
+          currentPath={currentPath}
+          user={user}
+        />
       </div>
 
       <div class="h-8 w-px bg-white/5 mx-2"></div>
@@ -230,237 +210,42 @@ const getNavLinkClass = (href: string) => {
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
-  <div 
-    id="mobile-menu" 
-    class="fixed inset-0 bg-[#06080f] z-9999 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-all duration-300 ease-in-out"
-    style="background-color: #06080f; opacity: 0; visibility: hidden;"
-  >
-    <!-- Background Glows -->
-    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
-
-    <div class="flex flex-col items-center gap-10 w-full px-10">
-      <div class="flex flex-col items-center gap-6">
-        {
-          navItems.pricing.showFor && (
-            <a 
-              href={navItems.pricing.href} 
-              class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-            >
-              {navItems.pricing.label}
-            </a>
-          )
-        }
-        {
-          navItems.spaces.showFor && (
-            <a
-              href={navItems.spaces.href} 
-              class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-            >
-              {navItems.spaces.label}
-            </a>
-          )
-        }
-        {
-          navItems.metrics.showFor && (
-            <a
-              href={navItems.metrics.href}
-              class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-            >
-              {navItems.metrics.label}
-            </a>
-          )
-        }
-        {
-          navItems.planUsage.showFor && (
-            <a
-              href={navItems.planUsage.href}
-              class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-            >
-              {navItems.planUsage.label}
-            </a>
-          )
-        }
-        {
-          navItems.alerts.showFor && (
-            <a
-              href={navItems.alerts.href}
-              class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-            >
-              {navItems.alerts.label}
-            </a>
-          )
-        }
-        <a
-          href={navItems.docs.href}
-          class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-        >
-          {navItems.docs.label}
-        </a>
-        <a
-          href={navItems.apiReference.href}
-          class="mobile-nav-link text-3xl font-bold text-white uppercase tracking-[0.3em] hover:text-cyan-400 transition-colors"
-        >
-          {navItems.apiReference.label}
-        </a>
-      </div>
-
-      <div class="w-20 h-px bg-white/10 my-4"></div>
-
-      {
-        user ? (
-          <div class="flex flex-col items-center gap-8 w-full">
-            <div class="flex flex-col items-center gap-3">
-              <div class="w-16 h-16 rounded-2xl bg-linear-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-cyan-500/20">
-                {user.username.charAt(0).toUpperCase()}
-              </div>
-              <span class="text-white text-xl font-medium tracking-tight">{user.username}</span>
-            </div>
-
-            <!-- Mobile Language Selector -->
-            <div class="flex gap-4 p-1.5 bg-white/5 rounded-2xl border border-white/5 w-full max-w-[280px] mt-2">
-              {
-                [
-                  { code: "en", flag: "🇺🇸", name: "EN" },
-                  { code: "es", flag: "🇪🇸", name: "ES" },
-                  { code: "fr", flag: "🇫🇷", name: "FR" }
-                ].map((l) => (
-                  <a 
-                    href={`/api/i18n/set-language?lang=${l.code}&redirect=${encodeURIComponent(currentPath)}`}
-                    class={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 font-bold text-xs tracking-widest ${
-                      lang === l.code 
-                        ? "bg-white/10 text-cyan-400 border border-white/10" 
-                        : "text-slate-500 border border-transparent hover:text-white"
-                    }`}
-                  >
-                    <span class="text-sm">{l.flag}</span>
-                    {l.name}
-                  </a>
-                ))
-              }
-            </div>
-
-            <div class="flex flex-col items-center gap-4 mt-2">
-              {isSuperUser(user) && (
-                <>
-                  <a href={getLocalizedPath("/admin/db-inspector", lang)} class="px-8 py-3 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 font-bold uppercase tracking-widest text-sm hover:bg-cyan-500 hover:text-white transition-all">
-                    Inspector
-                  </a>
-                  <a href={getLocalizedPath("/admin/users", lang)} class="px-8 py-3 rounded-full border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 font-bold uppercase tracking-widest text-sm hover:bg-cyan-500 hover:text-white transition-all">
-                    {t('navigation.members') || "Users"}
-                  </a>
-                </>
-              )}
-
-              <a href={getLocalizedPath("/billing", lang)} class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Billing</a>
-
-              <a href={getLocalizedPath("/settings", lang)} class="text-slate-400 hover:text-white transition-colors uppercase tracking-widest text-xs font-bold">Settings</a>
-
-              <form action="/api/auth/logout" method="POST">
-                <button type="submit" class="text-red-500/60 hover:text-red-500 transition-colors uppercase tracking-widest text-xs font-bold">
-                  Logout
-                </button>
-              </form>
-            </div>
-          </div>
-        ) : (
-          <div class="flex flex-col items-center gap-6 w-full max-w-xs">
-            <!-- Mobile Language Selector for Guests -->
-            <div class="flex gap-4 p-1.5 bg-white/5 rounded-2xl border border-white/5 w-full mb-4">
-              {
-                [
-                  { code: "en", flag: "🇺🇸", name: "EN" },
-                  { code: "es", flag: "🇪🇸", name: "ES" },
-                  { code: "fr", flag: "🇫🇷", name: "FR" }
-                ].map((l) => (
-                  <a 
-                    href={`/api/i18n/set-language?lang=${l.code}&redirect=${encodeURIComponent(currentPath)}`}
-                    class={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition-all duration-300 font-bold text-xs tracking-widest ${
-                      lang === l.code 
-                        ? "bg-white/10 text-cyan-400 border border-white/10" 
-                        : "text-slate-500 border border-transparent hover:text-white"
-                    }`}
-                  >
-                    <span class="text-sm">{l.flag}</span>
-                    {l.name}
-                  </a>
-                ))
-              }
-            </div>
-
-            <a href={navItems.login.href} class="text-xl font-bold text-white uppercase tracking-widest hover:text-cyan-400 transition-colors">
-              {navItems.login.label}
-            </a>
-            <a href={getLocalizedPath("/create-account", lang)} class="w-full btn-primary text-center py-5 rounded-2xl shadow-none">
-              {t('auth.getStarted') || "Get Started"}
-            </a>
-          </div>
-        )
-      }
-    </div>
-  </div>
+  <!-- Mobile Menu (via React Portal) -->
+  <MobileMenu 
+    client:load 
+    navItems={navItems}
+    user={user}
+    t={{ navigation: { product: t('navigation.product') || "Product", resources: t('navigation.resources') || "Resources" } }}
+    lang={lang}
+    currentPath={currentPath}
+  />
 
   <script>
     const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileMenu = document.getElementById('mobile-menu');
     const bar1 = document.getElementById('bar-1');
     const bar2 = document.getElementById('bar-2');
     const bar3 = document.getElementById('bar-3');
-    const mobileLinks = document.querySelectorAll('.mobile-nav-link');
 
     const mainHeader = document.getElementById('main-header');
 
-    if (mobileMenuButton && mobileMenu && bar1 && bar2 && bar3 && mainHeader) {
-      const toggleMenu = () => {
-        const isOpen = !mobileMenu.classList.contains('opacity-0');
-
+    if (mobileMenuButton && bar1 && bar2 && bar3 && mainHeader) {
+      // Toggle hamburger animation only (menu is handled by React)
+      mobileMenuButton.addEventListener('click', () => {
+        const isOpen = bar1.style.transform.includes('rotate');
+        
         if (!isOpen) {
-          // Open
-          mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
-          mobileMenu.classList.add('opacity-100');
-          mobileMenu.style.opacity = '1';
-          mobileMenu.style.visibility = 'visible';
-          mainHeader.style.zIndex = '10000';
-          mainHeader.style.backgroundColor = 'transparent';
-          mainHeader.style.borderBottom = 'none';
           bar1.style.transform = 'translateY(9px) rotate(45deg)';
           bar2.style.opacity = '0';
           bar3.style.transform = 'translateY(-9px) rotate(-45deg)';
-          document.body.style.overflow = 'hidden';
+          mainHeader.style.backgroundColor = 'transparent';
+          mainHeader.style.borderBottom = 'none';
         } else {
-          // Close
-          mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-          mobileMenu.classList.remove('opacity-100');
-          mobileMenu.style.opacity = '0';
-          mobileMenu.style.visibility = 'hidden';
-          mainHeader.style.zIndex = '50';
-          mainHeader.style.backgroundColor = ''; // Reset to class default
-          mainHeader.style.borderBottom = '';
           bar1.style.transform = 'none';
           bar2.style.opacity = '1';
           bar3.style.transform = 'none';
-          document.body.style.overflow = 'auto';
-        }
-      };
-
-      mobileMenuButton.addEventListener('click', toggleMenu);
-
-      // Close menu when clicking links
-      mobileLinks.forEach(link => {
-        link.addEventListener('click', () => {
-          mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-          mobileMenu.classList.remove('opacity-100');
-          mobileMenu.style.opacity = '0';
-          mobileMenu.style.visibility = 'hidden';
-          mainHeader.style.zIndex = '50';
           mainHeader.style.backgroundColor = '';
           mainHeader.style.borderBottom = '';
-          bar1.style.transform = 'none';
-          bar2.style.opacity = '1';
-          bar3.style.transform = 'none';
-          document.body.style.overflow = 'auto';
-        });
+        }
       });
     }
   </script>

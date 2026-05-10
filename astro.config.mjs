@@ -23,7 +23,7 @@ export default defineConfig({
     },
     plugins: [tailwindcss(), tsconfigPaths()],
   },
-  integrations: [react(), sitemap(), robotsTxt()],
+  integrations: [react({ include: ["**/react/**"] }), sitemap(), robotsTxt()],
   i18n: {
     defaultLocale: "en",
     locales: ["en", "es", "fr"],

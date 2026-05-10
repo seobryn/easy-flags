@@ -1,7 +1,7 @@
 import React from "react";
 import { Icon, type IconName } from "@/components/react/shared/Icon";
 
-type TabId = "profile" | "security" | "api-keys" | "preferences" | "sessions" | "billing" | "limits";
+type TabId = "profile" | "security" | "api-keys" | "preferences" | "sessions" | "billing";
 
 interface NavItem {
   id: TabId;
@@ -52,17 +52,11 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
       icon: "Shield", 
       description: t("settings.preferencesSidebarDesc")
     },
-    { 
+{
       id: "sessions", 
       label: t("settings.sessions"), 
       icon: "Activity", 
       description: t("settings.sessionsSidebarDesc")
-    },
-    {
-      id: "limits",
-      label: t("settings.limits") || "Limits",
-      icon: "Activity",
-      description: t("settings.limitsSidebarDesc") || "View account quotas and limits",
     },
   ];
 

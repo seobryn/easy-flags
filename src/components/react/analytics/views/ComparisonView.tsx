@@ -241,7 +241,7 @@ export default function ComparisonView({ filters, initialLocale }: ComparisonVie
 
             {metrics.responseTime.change > 10 && (
               <div className="flex items-start gap-2 p-3 bg-yellow-500/10 rounded border border-yellow-500/30">
-                <span className="text-yellow-400 font-bold">📊</span>
+                <Icon name="AlertTriangle" size={20} className="text-yellow-400" />
                 <p>
                   {t('analytics.responseTimeIncreased', { percent: metrics.responseTime.change.toFixed(1) })}
                 </p>

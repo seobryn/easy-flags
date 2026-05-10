@@ -374,10 +374,12 @@ export default function ComplianceReportsView({
 
                   <div className="flex gap-2">
                     <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors">
-                      📥 {t('analytics.downloadPdf')}
+                      <Icon name="ExternalLink" size={16} />
+                      {t('analytics.downloadPdf')}
                     </button>
                     <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg font-medium text-sm transition-colors">
-                      📊 {t('analytics.exportData')}
+                      <Icon name="Activity" size={16} />
+                      {t('analytics.exportData')}
                     </button>
                   </div>
 

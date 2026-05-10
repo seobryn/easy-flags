@@ -1,8 +1,10 @@
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
+import type { IconName } from "@/components/react/shared/Icon";
 
 interface Feature {
-  icon: string;
+  icon: IconName;
   title: string;
   description: string;
 }
@@ -16,32 +18,32 @@ export default function WhyLoveSection({ initialLocale }: WhyLoveSectionProps) {
 
   const features: Feature[] = [
     {
-      icon: "🚀",
-      title: t('whyLove.instantRollback'),
+      icon: "Rocket",
+      title: t('whyLove.instantRollout'),
       description: t('whyLove.instantRollbackDesc'),
     },
     {
-      icon: "👥",
+      icon: "Users",
       title: t('whyLove.targetedRollout'),
       description: t('whyLove.targetedRolloutDesc'),
     },
     {
-      icon: "📊",
+      icon: "Activity",
       title: t('whyLove.realTimeAnalytics'),
       description: t('whyLove.realTimeAnalyticsDesc'),
     },
     {
-      icon: "🔐",
+      icon: "Shield",
       title: t('whyLove.enterpriseSecurity'),
       description: t('whyLove.enterpriseSecurityDesc'),
     },
     {
-      icon: "⚡",
+      icon: "Zap",
       title: t('whyLove.highPerformance'),
       description: t('whyLove.highPerformanceDesc'),
     },
     {
-      icon: "🔗",
+      icon: "ExternalLink",
       title: t('whyLove.easyIntegration'),
       description: t('whyLove.easyIntegrationDesc'),
     },
@@ -70,8 +72,8 @@ export default function WhyLoveSection({ initialLocale }: WhyLoveSectionProps) {
             {/* Subtle glow on hover */}
             <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             
-            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-500">
-              {feature.icon}
+            <div className="w-14 h-14 rounded-2xl bg-linear-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+              <Icon name={feature.icon} size={28} className="text-cyan-400" />
             </div>
             
             <h3 className="text-xl font-bold text-white mb-3 group-hover:text-cyan-400 transition-colors">

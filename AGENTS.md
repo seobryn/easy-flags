@@ -55,3 +55,47 @@ Migrations are mandatory for schema changes. Use `pnpm migration:create <name>` 
 ## SSR & Hydration
 
 Astro SSR with React hydration only where needed (`client:load` or `client:visible`).
+
+## Icons
+
+All icons MUST use the centralized `Icon` component from `@/components/react/shared/Icon`. Do NOT use inline SVGs or other icon libraries.
+
+```tsx
+import { Icon } from "@/components/react/shared/Icon";
+
+// Available icons: ArrowRight, ChevronRight, ChevronDown, Activity, Layers, 
+// AlertCircle, Clock, X, Lock, Eye, EyeOff, Trash, Rocket, Box, Globe, Target,
+// Zap, Users, User, HelpCircle, Lightbulb, FileText, AlertTriangle, Info,
+// Edit, ExternalLink, Menu, Calendar, Settings, Copy, RefreshCw, Search, Check,
+// Key, Hash, Plus, Folder, Trash2, MessageSquare, Database, Table, LogOut,
+// MousePointer, Shield, Mail, Flag, CreditCard, Book, Save, PlusCircle, Type, Code, MapPin
+
+<Icon name="X" size={20} className="text-white" />
+<Icon name="ChevronDown" size={16} />
+<Icon name="Settings" size={24} />
+```
+
+If you need an icon that doesn't exist, add it to `Icon.tsx` by importing from `@radix-ui/react-icons`.
+
+## UI Components
+
+Use Radix UI primitives for accessible interactive components:
+- `@radix-ui/react-tabs` - For tabbed interfaces
+- `@radix-ui/react-dropdown-menu` - For dropdown menus
+- `@radix-ui/react-dialog` - For modals/dialogs
+- `@radix-ui/react-select` - For select dropdowns
+- `@radix-ui/react-tooltip` - For tooltips
+
+Example with tabs:
+```tsx
+import * as Tabs from "@radix-ui/react-tabs";
+
+<Tabs.Root defaultValue="tab1">
+  <Tabs.List>
+    <Tabs.Trigger value="tab1" className="...">Tab 1</Tabs.Trigger>
+    <Tabs.Trigger value="tab2" className="...">Tab 2</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Content value="tab1">...</Tabs.Content>
+  <Tabs.Content value="tab2">...</Tabs.Content>
+</Tabs.Root>
+```

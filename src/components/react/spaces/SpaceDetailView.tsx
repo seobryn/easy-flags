@@ -238,7 +238,7 @@ export default function SpaceDetailView({ spaceId, initialLocale }: SpaceDetailV
             <section>
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 border border-orange-500/20">
-                  <span className="text-xs">⚡</span>
+                  <Icon name="Zap" size={16} className="text-orange-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white tracking-tight">{t('spaces.quickActions')}</h3>
               </div>

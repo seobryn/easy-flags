@@ -8,6 +8,8 @@ import AdvancedFilters from "./filters/AdvancedFilters";
 import { exportToCSV, exportToJSON } from "@lib/analytics-export";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
+import { Icon } from "@/components/react/shared/Icon";
+import * as Tabs from "@radix-ui/react-tabs";
 
 type TabType = "flags" | "audit" | "performance" | "compliance" | "comparison";
 
@@ -32,25 +34,6 @@ interface AnalyticsManagerProps {
   initialLocale?: AvailableLanguages;
 }
 
-const TabButton: React.FC<{
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}> = ({ active, onClick, icon, label }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
-      active
-        ? "bg-blue-600 text-white shadow-lg"
-        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-    }`}
-  >
-    {icon}
-    {label}
-  </button>
-);
-
 export default function AnalyticsManager({
   userId,
   isAdmin = false,
@@ -58,7 +41,7 @@ export default function AnalyticsManager({
   initialLocale,
 }: AnalyticsManagerProps) {
   const t = useTranslate(initialLocale);
-  const [activeTab, setActiveTab] = useState<TabType>("flags");
+  const [activeTab, setActiveTab] = useState<string>("flags");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<AnalyticsFilters>({
     dateRange: {
@@ -142,8 +125,9 @@ export default function AnalyticsManager({
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                📊 {t('analytics.analyticsManager')}
+              <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                <Icon name="Activity" size={28} />
+                {t('analytics.analyticsManager')}
               </h1>
               <p className="text-slate-400">
                 {t('analytics.analyticsManagerDesc')}
@@ -152,7 +136,7 @@ export default function AnalyticsManager({
             <div className="flex gap-4 items-center">
               {/* Quick date presets */}
               <div className="flex gap-2 items-center">
-                <span className="text-slate-400">📅</span>
+                <Icon name="Calendar" size={16} className="text-slate-400" />
                 <span className="text-sm text-slate-300 font-medium">
                   {dateRangeDisplay}
                 </span>
@@ -165,7 +149,7 @@ export default function AnalyticsManager({
                   disabled={exporting}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  <span>⬇️</span>
+                  <Icon name="ExternalLink" size={16} />
                   {exporting ? t('analytics.exporting') : t('analytics.export')}
                 </button>
 
@@ -242,72 +226,92 @@ export default function AnalyticsManager({
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="bg-slate-800/20 border-b border-slate-700 p-6">
-        <div className="flex gap-3 flex-wrap">
-          <TabButton
-            active={activeTab === "flags"}
-            onClick={() => setActiveTab("flags")}
-            icon="📊"
-            label={t('analytics.flagMetrics')}
-          />
-          <TabButton
-            active={activeTab === "audit"}
-            onClick={() => setActiveTab("audit")}
-            icon="📈"
-            label={t('analytics.auditLogs')}
-          />
-          <TabButton
-            active={activeTab === "performance"}
-            onClick={() => setActiveTab("performance")}
-            icon="📊"
-            label={t('analytics.performance')}
-          />
-          <TabButton
-            active={activeTab === "compliance"}
-            onClick={() => setActiveTab("compliance")}
-            icon="📈"
-            label={t('analytics.compliance')}
-          />
+{/* Tabs */}
+      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="bg-slate-800/20 border-b border-slate-700 p-6">
+        <Tabs.List className="flex gap-3 flex-wrap">
+          <Tabs.Trigger
+            value="flags"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-slate-700 text-slate-300 hover:bg-slate-600"
+          >
+            <Icon name="Activity" size={18} />
+            {t('analytics.flagMetrics')}
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="audit"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-slate-700 text-slate-300 hover:bg-slate-600"
+          >
+            <Icon name="FileText" size={18} />
+            {t('analytics.auditLogs')}
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="performance"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-slate-700 text-slate-300 hover:bg-slate-600"
+          >
+            <Icon name="Zap" size={18} />
+            {t('analytics.performance')}
+          </Tabs.Trigger>
+          <Tabs.Trigger
+            value="compliance"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-slate-700 text-slate-300 hover:bg-slate-600"
+          >
+            <Icon name="Check" size={18} />
+            {t('analytics.compliance')}
+          </Tabs.Trigger>
           {isAdmin && (
-            <TabButton
-              active={activeTab === "comparison"}
-              onClick={() => setActiveTab("comparison")}
-              icon="📊"
-              label={t('analytics.comparisonTab')}
-            />
+            <Tabs.Trigger
+              value="comparison"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-slate-700 text-slate-300 hover:bg-slate-600"
+            >
+              <Icon name="Layers" size={18} />
+              {t('analytics.comparisonTab')}
+            </Tabs.Trigger>
           )}
-        </div>
-      </div>
+        </Tabs.List>
 
-      {/* Content */}
-      <div className="p-6">
-        {activeTab === "flags" && (
-          <FlagMetricsView filters={filters} userId={userId} initialLocale={initialLocale} />
-        )}
-        {activeTab === "audit" && (
+        {/* Content */}
+        <Tabs.Content value="flags" className="p-6">
+          <FlagMetricsView
+            userId={userId}
+            filters={filters}
+            onFilterChange={setFilters}
+            initialLocale={initialLocale}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="audit" className="p-6">
           <AuditLogsView
-            filters={filters}
             userId={userId}
-            isAdmin={isAdmin}
+            filters={filters}
+            onFilterChange={setFilters}
             initialLocale={initialLocale}
           />
-        )}
-        {activeTab === "performance" && (
-          <PerformanceMetricsView filters={filters} userId={userId} initialLocale={initialLocale} />
-        )}
-        {activeTab === "compliance" && (
+        </Tabs.Content>
+        <Tabs.Content value="performance" className="p-6">
+          <PerformanceMetricsView
+            userId={userId}
+            filters={filters}
+            onFilterChange={setFilters}
+            initialLocale={initialLocale}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="compliance" className="p-6">
           <ComplianceReportsView
-            filters={filters}
             userId={userId}
-            isAdmin={isAdmin}
+            filters={filters}
+            onFilterChange={setFilters}
             initialLocale={initialLocale}
           />
+        </Tabs.Content>
+        {isAdmin && (
+          <Tabs.Content value="comparison" className="p-6">
+            <ComparisonView
+              userId={userId}
+              filters={filters}
+              onFilterChange={setFilters}
+              initialLocale={initialLocale}
+            />
+          </Tabs.Content>
         )}
-        {activeTab === "comparison" && isAdmin && (
-          <ComparisonView filters={filters} initialLocale={initialLocale} />
-        )}
-      </div>
+      </Tabs.Root>
     </div>
   );
 }
