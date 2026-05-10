@@ -1,155 +1,21 @@
 ---
-layout: "~/layouts/MarketingLayout.astro"
-title: "Accept Invitation"
+import AcceptInvitation from "@/components/react/settings/AcceptInvitation";
+import BaseLayout from "@/layouts/BaseLayout.astro";
 ---
 
-<script>
-  import { useState } from "react";
-  import { useTranslate } from "@/infrastructure/i18n/context";
-  import { Icon } from "@/components/react/shared/Icon";
-  import { useAuth } from "@/infrastructure/auth/context";
-  import { useApi } from "@/infrastructure/api/context";
-  import { validateEmail } from "@/domain/validators/email.validator";
-
-  const AcceptInvitationPage = () => {
-    const { t } = useTranslate();
-    const { user, isLoading: isAuthLoading } = useAuth();
-    const { isLoading: isApiLoading, isError: isApiError, data: apiData, post } = useApi();
-    const [token, setToken] = useState("");
-    const [error, setError] = useState("");
-    const [hasAccount, setHasAccount] = useState(false);
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-
-    const handleAcceptInvitation = async () => {
-      if (!token) {
-        setError(t("invite.tokenRequired"));
-        return;
-      }
-
-      try {
-        if (hasAccount) {
-          await post("/api/accept-invite", { token });
-        } else {
-          // Validate email before submission
-          if (!validateEmail(email)) {
-            setError(t("invite.invalidEmail"));
-            return;
-          }
-
-          await post("/api/accept-invite", { token, username, email, password });
-        }
-        // Assume the API returns a success message or user data
-        setError("");
-      } catch (err) {
-        setError(err.message || t("invite.acceptError"));
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-white">
-              {t("invite.acceptTitle")}
-            </h1>
-            <p className="text-slate-400 text-lg leading-relaxed mt-2">
-              {t("invite.acceptDescription")}
-            </p>
-          </div>
-
-          {isAuthLoading || isApiLoading ? (
-            <div className="flex items-center gap-3 mt-4 justify-center">
-              <Icon name="Loader" size={24} className="animate-spin" />
-              <span>{t("invite.loading")}</span>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-              {apiData && apiData.message && <p className="text-green-500 text-sm text-center">{apiData.message}</p>}
-
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-white">
-                  {t("invite.tokenLabel")}
-                </label>
-                <input
-                  type="text"
-                  value={token}
-                  onChange={(e) => setToken(e.target.value)}
-                  placeholder={t("invite.tokenPlaceholder")}
-                  className="w-full bg-slate-950/40 border border-white/5 rounded-2xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all font-medium"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="hasAccount"
-                  checked={hasAccount}
-                  onChange={(e) => setHasAccount(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <label htmlFor="hasAccount" className="block text-sm text-white">
-                  {t("invite.hasAccount")}
-                </label>
-              </div>
-
-              {!hasAccount && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-white">
-                      {t("invite.usernameLabel")}
-                    </label>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder={t("invite.usernamePlaceholder")}
-                      className="w-full bg-slate-950/40 border border-white/5 rounded-2xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-white">
-                      {t("invite.emailLabel")}
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t("invite.emailPlaceholder")}
-                      className="w-full bg-slate-950/40 border border-white/5 rounded-2xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-white">
-                      {t("invite.passwordLabel")}
-                    </label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder={t("invite.passwordPlaceholder")}
-                      className="w-full bg-slate-950/40 border border-white/5 rounded-2xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-4 focus:ring-cyan-500/10 focus:border-cyan-500/50 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <button
-                onClick={handleAcceptInvitation}
-                className="btn-primary w-full py-3 mt-2"
-              >
-                {t("invite.acceptButton")}
-              </button>
-            </div>
-          )}
-        </div>
+<BaseLayout title="Accept Invitation">
+  <div class="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold tracking-tight text-white">
+          Accept Your Invitation
+        </h1>
+        <p class="text-slate-400 text-lg leading-relaxed mt-2">
+          Join us and start managing your feature flags
+        </p>
       </div>
-    );
-  };
-</script>
 
-<AcceptInvitationPage client:load />
+      <AcceptInvitation client:load />
+    </div>
+  </div>
+</BaseLayout>
