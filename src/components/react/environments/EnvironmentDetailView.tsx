@@ -222,13 +222,13 @@ export default function EnvironmentDetailView({
                   <div className="relative group/input">
                     <input
                       type="text"
-                      value={`https://api.easyflags.io/v1/envs/${envId}`}
+                      value={`https://easy-flags.orangeember.com/api/v1/envs/${envId}`}
                       readOnly
                       className="w-full bg-slate-950/40 border border-white/5 rounded-2xl px-5 py-4 text-cyan-500/80 font-mono text-sm group-hover/input:border-white/10 transition-colors"
                     />
                     <button 
                       onClick={() => {
-                        navigator.clipboard.writeText(`https://api.easyflags.io/v1/envs/${envId}`);
+                        navigator.clipboard.writeText(`https://easy-flags.orangeember.com/api/v1/envs/${envId}`);
                       }}
                       className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-600 hover:text-white transition-colors"
                       title="Copy URL"
