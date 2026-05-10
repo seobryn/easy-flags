@@ -7,6 +7,7 @@ import {
 } from "@/utils/api";
 import { getDatabase } from "@/lib/db";
 import { EmailService } from "@/application/services";
+import { validateEmail } from "@/domain/validators/email.validator";
 
 export const prerender = false;
 
@@ -17,9 +18,29 @@ export const POST: APIRoute = async (context) => {
     if (!email) {
       return new Response(
         JSON.stringify(
-          badRequestResponse("Email is required"),
+          badRequestResponse("Email is required")
         ),
-        { status: 400 },
+        { status: 400 }
+      );
+    }
+
+    if (!validateEmail(email)) {
+      return new Response(
+        JSON.stringify(badRequestResponse("Invalid email format"))
+      )
+    }
+
+    // Find user by email
+    const user = await getUserByEmail(email);
+    if (!user) {
+      // Don't reveal that the email doesn't exist - return success anyway for security
+      return new Response(
+        JSON.stringify(
+          successResponse({
+            message: "If an account exists with that email, you will receive a password reset link.",
+          })
+        ),
+        { status: 200 }
       );
     }
 

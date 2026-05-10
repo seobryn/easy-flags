@@ -11,6 +11,7 @@ import type {
   FeatureFlag,
   Space,
   SpaceMember,
+  PendingInvitation,
   User,
   Role,
   AdvancedConfiguration,
@@ -104,6 +105,25 @@ export interface SpaceMemberRepository {
   update(id: number, roleId: number): Promise<SpaceMember>;
   delete(id: number): Promise<void>;
   deleteBySpaceAndUser(spaceId: number, userId: number): Promise<void>;
+}
+
+// ====================
+// Pending Invitation Repository Port
+// ====================
+
+export interface PendingInvitationRepository {
+  findById(id: number): Promise<PendingInvitation | null>;
+  findByToken(token: string): Promise<PendingInvitation | null>;
+  findBySpaceId(spaceId: number): Promise<PendingInvitation[]>;
+  findByEmail(email: string): Promise<PendingInvitation[]>;
+  create(
+    invitation: Omit<PendingInvitation, "id" | "created_at">,
+  ): Promise<PendingInvitation>;
+  update(
+    id: number,
+    updates: Partial<PendingInvitation>,
+  ): Promise<PendingInvitation>;
+  delete(id: number): Promise<void>;
 }
 
 // ====================
@@ -446,6 +466,7 @@ export interface RepositoryRegistry {
   getRoleRepository(): RoleRepository;
   getSpaceRepository(): SpaceRepository;
   getSpaceMemberRepository(): SpaceMemberRepository;
+  getPendingInvitationRepository(): PendingInvitationRepository;
   getEnvironmentRepository(): EnvironmentRepository;
   getEnvironmentConfigRepository(): EnvironmentConfigRepository;
   getApiKeyRepository(): ApiKeyRepository;

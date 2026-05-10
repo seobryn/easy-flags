@@ -6,7 +6,7 @@ import type { APIRoute } from "astro";
 import { getUserFromContext } from "@/utils/auth";
 import { unauthorizedResponse } from "@/utils/api";
 import { checkSpaceAdminAuth } from "@/utils/permissions";
-import { TeamMemberService, SpaceService } from "@application/services";
+import { TeamMemberService, SpaceService, EmailService } from "@application/services";
 import { getRepositoryRegistry } from "@infrastructure/registry";
 
 export const prerender = false;
@@ -83,19 +83,30 @@ export const POST: APIRoute = async (context) => {
 
     // Find user by email
     const userRepo = registry.getUserRepository();
-    const targetUser = await userRepo.findByEmail(body.email);
+    let targetUser = await userRepo.findByEmail(body.email);
+
+    // If user doesn't exist, create a new account
     if (!targetUser) {
-      return new Response(JSON.stringify({ error: "User not found" }), {
-        status: 404,
+      targetUser = await userRepo.create({
+        username: body.email.split('@')[0],
+        email: body.email,
+        password: '',
+        is_verified: false,
       });
     }
 
-    const member = await teamMemberService.addTeamMember(
+    const token = await teamMemberService.generateInvitationToken(
       space.id,
-      targetUser.id,
-      body.role_id || 4,
+      targetUser.email,
+      body.role_id || 4
     );
-    return new Response(JSON.stringify(member), { status: 201 });
+
+    await EmailService.getInstance().sendTeamInvitationEmail(
+      targetUser.email,
+      targetUser.username,
+      token
+    );
+    return new Response(JSON.stringify({ message: "Invitation sent" }), { status: 201 });
   } catch (error) {
     return new Response(
       JSON.stringify({

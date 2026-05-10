@@ -11,6 +11,7 @@ import type {
   Role,
   Space,
   SpaceMember,
+  PendingInvitation,
   Environment,
   CreateSpaceDTO,
   UpdateSpaceDTO,
@@ -21,6 +22,7 @@ import type {
   RoleRepository,
   SpaceRepository,
   SpaceMemberRepository,
+  PendingInvitationRepository,
   EnvironmentRepository,
 } from "@application/ports/repositories";
 
@@ -539,6 +541,167 @@ export class LibSqlSpaceMemberRepository implements SpaceMemberRepository {
       sql: "DELETE FROM space_members WHERE space_id = ? AND user_id = ?",
       args: [spaceId, userId],
     });
+  }
+}
+
+// ====================
+// Pending Invitation Repository Adapter
+// ====================
+
+export class LibSqlPendingInvitationRepository
+  implements PendingInvitationRepository
+{
+  private db: Client | null = null;
+
+  private async getDb(): Promise<Client> {
+    if (!this.db) {
+      this.db = await getDatabase();
+    }
+    return this.db;
+  }
+
+  async findById(id: number): Promise<PendingInvitation | null> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM pending_invitations WHERE id = ?",
+      args: [id],
+    });
+    const row = result.rows[0] as any;
+    if (!row) return null;
+    return this.mapRowToEntity(row);
+  }
+
+  async findByToken(token: string): Promise<PendingInvitation | null> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM pending_invitations WHERE token = ?",
+      args: [token],
+    });
+    const row = result.rows[0] as any;
+    if (!row) return null;
+    return this.mapRowToEntity(row);
+  }
+
+  async findBySpaceId(spaceId: number): Promise<PendingInvitation[]> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM pending_invitations WHERE space_id = ? ORDER BY created_at DESC",
+      args: [spaceId],
+    });
+    return result.rows.map((row: any) => this.mapRowToEntity(row));
+  }
+
+  async findByEmail(email: string): Promise<PendingInvitation[]> {
+    const db = await this.getDb();
+    const result = await db.execute({
+      sql: "SELECT * FROM pending_invitations WHERE email = ? ORDER BY created_at DESC",
+      args: [email],
+    });
+    return result.rows.map((row: any) => this.mapRowToEntity(row));
+  }
+
+  async create(
+    invitation: Omit<PendingInvitation, "id" | "created_at">,
+  ): Promise<PendingInvitation> {
+    const db = await this.getDb();
+    const now = new Date().toISOString();
+    const expiresAt =
+      invitation.expires_at instanceof Date
+        ? invitation.expires_at.toISOString()
+        : invitation.expires_at;
+
+    const result = await db.execute({
+      sql: `INSERT INTO pending_invitations (space_id, email, role_id, token, expires_at, accepted_at, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        invitation.space_id,
+        invitation.email,
+        invitation.role_id,
+        invitation.token,
+        expiresAt,
+        invitation.accepted_at || null,
+        now,
+      ],
+    });
+
+    return {
+      id: Number(result.lastInsertRowid),
+      space_id: invitation.space_id,
+      email: invitation.email,
+      role_id: invitation.role_id,
+      token: invitation.token,
+      expires_at: expiresAt,
+      accepted_at: invitation.accepted_at || null,
+      created_at: now,
+    };
+  }
+
+  async update(
+    id: number,
+    updates: Partial<PendingInvitation>,
+  ): Promise<PendingInvitation> {
+    const db = await this.getDb();
+    const setClauses: string[] = [];
+    const args: any[] = [];
+
+    if (updates.email !== undefined) {
+      setClauses.push("email = ?");
+      args.push(updates.email);
+    }
+    if (updates.role_id !== undefined) {
+      setClauses.push("role_id = ?");
+      args.push(updates.role_id);
+    }
+    if (updates.expires_at !== undefined) {
+      setClauses.push("expires_at = ?");
+      const expiresAt =
+        updates.expires_at instanceof Date
+          ? updates.expires_at.toISOString()
+          : updates.expires_at;
+      args.push(expiresAt);
+    }
+    if (updates.accepted_at !== undefined) {
+      setClauses.push("accepted_at = ?");
+      const acceptedAt =
+        updates.accepted_at instanceof Date
+          ? updates.accepted_at.toISOString()
+          : updates.accepted_at;
+      args.push(acceptedAt);
+    }
+
+    if (setClauses.length === 0) {
+      return this.findById(id) as Promise<PendingInvitation>;
+    }
+
+    args.push(id);
+
+    await db.execute({
+      sql: `UPDATE pending_invitations SET ${setClauses.join(", ")} WHERE id = ?`,
+      args,
+    });
+
+    return (await this.findById(id)) as PendingInvitation;
+  }
+
+  async delete(id: number): Promise<void> {
+    const db = await this.getDb();
+    await db.execute({
+      sql: "DELETE FROM pending_invitations WHERE id = ?",
+      args: [id],
+    });
+  }
+
+  private mapRowToEntity(row: any): PendingInvitation {
+    return {
+      id: row.id,
+      space_id: row.space_id,
+      email: row.email,
+      role_id: row.role_id,
+      token: row.token,
+      expires_at: new Date(row.expires_at),
+      accepted_at: row.accepted_at ? new Date(row.accepted_at) : null,
+      created_at: row.created_at,
+    };
   }
 }
 

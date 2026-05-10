@@ -4,6 +4,7 @@ import { successResponse, badRequestResponse } from "@/utils/api";
 import { getSafeRedirectUrl } from "@/utils/redirect";
 import { verifyCredentials } from "@/lib/auth-service";
 import { validateBody, authSchemas, validationErrorResponse } from "@/lib/validation";
+import { validateEmail } from "@/domain/validators/email.validator";
 import {
   checkRateLimit,
   getRateLimitConfig,
@@ -71,6 +72,11 @@ export const POST: APIRoute = async (context) => {
 
     const { username, password, redirectUrl } = body;
 
+    if (!validateEmail(username)) {
+      return new Response(
+        JSON.stringify(badRequestResponse("Invalid email format"))
+      )
+    }
     const validation = validateBody(body, authSchemas.login);
     if (validation) {
       return validationErrorResponse(validation.errors);
@@ -92,7 +98,7 @@ export const POST: APIRoute = async (context) => {
             "Content-Type": "application/json",
             ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
           },
-        },
+        }
       );
     }
 
@@ -110,27 +116,27 @@ export const POST: APIRoute = async (context) => {
 
     console.log(`✅ Login successful for user: ${username} (ID: ${user.id})`);
 
-return new Response(
-        JSON.stringify(
-          successResponse({
-            user: {
-              id: user.id,
-              username: user.username,
-              email: user.email,
-              role_id: user.role_id,
-            },
-            token,
-            redirectUrl: sanitizedRedirectUrl,
-          }),
-        ),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+    return new Response(
+      JSON.stringify(
+        successResponse({
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role_id: user.role_id,
           },
+          token,
+          redirectUrl: sanitizedRedirectUrl,
+        })
+      ),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
         },
-      );
+      }
+    );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Login failed";
     

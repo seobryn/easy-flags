@@ -3,6 +3,7 @@ import { setAuthCookie, signToken } from "@/utils/auth";
 import { successResponse, badRequestResponse } from "@/utils/api";
 import { createUser } from "@/lib/auth-service";
 import { validateBody, authSchemas, validationErrorResponse } from "@/lib/validation";
+import { validateEmail } from "@/domain/validators/email.validator";
 import {
   checkRateLimit,
   getRateLimitConfig,
@@ -68,16 +69,41 @@ export const POST: APIRoute = async (context) => {
 
     const { username, email, password } = body;
 
+    if (!validateEmail(email)) {
+      return new Response(
+        JSON.stringify(badRequestResponse("Invalid email format")),
+        { status: 400 }
+      )
+    }
     const validation = validateBody(body, authSchemas.register);
     if (validation) {
       return validationErrorResponse(validation.errors);
     }
-
     // Create user in database
     const user = await createUser(username, email, password, 2); // 2 = editor role
 
     console.log(
       `✅ Registration successful for user: ${username} (ID: ${user.id}). Verification email sent.`,
+    );
+    return new Response(
+      JSON.stringify(
+        successResponse({
+          message: "Registration successful. Please check your email to verify your account.",
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role_id: user.role_id,
+          },
+        })
+      ),
+      {
+        status: 201,
+        headers: {
+          "Content-Type": "application/json",
+          ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
+        },
+      }
     );
 
     return new Response(
@@ -90,7 +116,7 @@ export const POST: APIRoute = async (context) => {
             email: user.email,
             role_id: user.role_id,
           },
-        }),
+        })
       ),
       {
         status: 201,
@@ -98,7 +124,7 @@ export const POST: APIRoute = async (context) => {
           "Content-Type": "application/json",
           ...getRateLimitHeaders(rateLimit.remaining, rateLimit.resetAt),
         },
-      },
+      }
     );
   } catch (error) {
     console.error("Registration error:", error);

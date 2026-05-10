@@ -9,6 +9,7 @@ import type {
   RoleRepository,
   SpaceRepository,
   SpaceMemberRepository,
+  PendingInvitationRepository,
   EnvironmentRepository,
   EnvironmentConfigRepository,
   ApiKeyRepository,
@@ -31,6 +32,7 @@ import { LibSqlUserRepository } from "./adapters/libsql.adapter";
 import { LibSqlRoleRepository } from "./adapters/libsql.adapter";
 import { LibSqlSpaceRepository } from "./adapters/libsql.adapter";
 import { LibSqlSpaceMemberRepository } from "./adapters/libsql.adapter";
+import { LibSqlPendingInvitationRepository } from "./adapters/libsql.adapter";
 import { LibSqlEnvironmentRepository } from "./adapters/libsql.adapter";
 import { LibSqlEnvironmentConfigRepository } from "./adapters/libsql-additional.adapter";
 import { LibSqlApiKeyRepository } from "./adapters/libsql-additional.adapter";
@@ -61,6 +63,8 @@ class LibSqlRepositoryRegistry implements RepositoryRegistry {
   private roleRepository: RoleRepository | null = null;
   private spaceRepository: SpaceRepository | null = null;
   private spaceMemberRepository: SpaceMemberRepository | null = null;
+  private pendingInvitationRepository: PendingInvitationRepository | null =
+    null;
   private environmentRepository: EnvironmentRepository | null = null;
   private environmentConfigRepository: EnvironmentConfigRepository | null =
     null;
@@ -110,6 +114,14 @@ class LibSqlRepositoryRegistry implements RepositoryRegistry {
       this.spaceMemberRepository = new LibSqlSpaceMemberRepository();
     }
     return this.spaceMemberRepository;
+  }
+
+  getPendingInvitationRepository(): PendingInvitationRepository {
+    if (!this.pendingInvitationRepository) {
+      this.pendingInvitationRepository =
+        new LibSqlPendingInvitationRepository();
+    }
+    return this.pendingInvitationRepository;
   }
 
   getEnvironmentRepository(): EnvironmentRepository {

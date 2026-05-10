@@ -3,6 +3,7 @@ import { Modal } from "@/components/react/shared/Modals";
 import { useTranslate } from "@/infrastructure/i18n/context";
 import type { AvailableLanguages } from "@/infrastructure/i18n/locales";
 import { Icon, type IconName } from "@/components/react/shared/Icon";
+import AcceptInvitation from "@/components/react/settings/AcceptInvitation";
 
 interface Space {
   id: number;
@@ -49,6 +50,18 @@ interface SpaceMemberAPI {
   };
 }
 
+interface PendingInvitation {
+  id: number;
+  space_id: number;
+  email: string;
+  role_id: number;
+  token: string;
+  expires_at: string;
+  created_at: string;
+  updated_at: string;
+  accepted_at?: string;
+}
+
 interface PermissionsViewProps {
   spaceId: string | undefined;
   canManageFeaturePermissions?: boolean;
@@ -79,6 +92,7 @@ export default function PermissionsView({
     "editor",
   );
   const [memberToRemove, setMemberToRemove] = useState<TeamMember | null>(null);
+  const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([]);
 
   const fetchTeamMembers = useCallback(async () => {
     if (!spaceId) return;
@@ -120,26 +134,51 @@ export default function PermissionsView({
     }
   }, [spaceId, t]);
 
-  const fetchSpaceInfo = useCallback(async () => {
-    if (!spaceId) return;
-    try {
-      const spaceRes = await fetch(`/api/spaces/${spaceId}`, {
-        credentials: "include",
-      });
-      if (!spaceRes.ok) throw new Error(t('permissions.spaceError'));
-      const spaceData = await spaceRes.json();
-      setSpace(spaceData.data || spaceData);
-    } catch (err) {
-      console.error("Error fetching space info:", err);
-    }
-  }, [spaceId, t]);
+const fetchSpaceInfo = useCallback(async () => {
+  if (!spaceId) return;
+  try {
+    const spaceRes = await fetch(`/api/spaces/${spaceId}`, {
+      credentials: "include",
+    });
+    if (!spaceRes.ok) throw new Error(t('permissions.spaceError'));
+    const spaceData = await spaceRes.json();
+    setSpace(spaceData.data || spaceData);
+  } catch (err) {
+    console.error("Error fetching space info:", err);
+  }
+}, [spaceId, t]);
 
-  useEffect(() => {
-    if (spaceId) {
-      fetchSpaceInfo();
-      fetchTeamMembers();
+const fetchPendingInvitations = useCallback(async () => {
+  if (!spaceId) return;
+  try {
+    const response = await fetch(`/api/pending-invitations`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(t('permissions.fetchError'));
     }
-  }, [spaceId, fetchSpaceInfo, fetchTeamMembers]);
+
+    const data = await response.json();
+    const pendingInvites: PendingInvitation[] = Array.isArray(data)
+      ? data
+      : data.data || [];
+
+    setPendingInvitations(pendingInvites);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : t('permissions.loadError');
+    setError(message);
+  }
+}, [spaceId, t]);
+
+useEffect(() => {
+  if (spaceId) {
+    fetchSpaceInfo();
+    fetchTeamMembers();
+    fetchPendingInvitations();
+  }
+}, [spaceId, fetchSpaceInfo, fetchTeamMembers, fetchPendingInvitations]);
 
   const handleInviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,37 +256,67 @@ export default function PermissionsView({
     }
   };
 
-  const handleRemoveMember = async (memberId: number) => {
-    if (!spaceId) return;
+const handleRemoveMember = async (memberId: number) => {
+  if (!spaceId) return;
 
-    try {
-      setIsSaving(true);
-      setError(null);
+  try {
+    setIsSaving(true);
+    setError(null);
 
-      const response = await fetch(
-        `/api/spaces/${spaceId}/team-members/${memberId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        },
-      );
+    const response = await fetch(
+      `/api/spaces/${spaceId}/team-members/${memberId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
 
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error || t('permissions.removeError'));
-      }
-
-      await fetchTeamMembers();
-      setSelectedMemberForEdit(null);
-      setMemberToRemove(null);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t('permissions.removeError');
-      setError(message);
-    } finally {
-      setIsSaving(false);
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || t('permissions.removeError'));
     }
-  };
+
+    await fetchTeamMembers();
+    setSelectedMemberForEdit(null);
+    setMemberToRemove(null);
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : t('permissions.removeError');
+    setError(message);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+const handleRemoveInvitation = async (invitationId: number) => {
+  if (!spaceId) return;
+
+  try {
+    setIsSaving(true);
+    setError(null);
+
+    const response = await fetch(
+      `/api/pending-invitations/${invitationId}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      },
+    );
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || t('permissions.removeError'));
+    }
+
+    await fetchPendingInvitations();
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : t('permissions.removeError');
+    setError(message);
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const roleDescriptions: Record<string, string> = {
     admin: t('permissions.adminDesc'),

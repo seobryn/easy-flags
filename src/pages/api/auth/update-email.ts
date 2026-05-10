@@ -6,6 +6,7 @@ import {
   badRequestResponse,
 } from "@/utils/api";
 import { updateUserEmail, getUserByEmail } from "@/lib/auth-service";
+import { validateEmail } from "@/domain/validators/email.validator";
 
 export const prerender = false;
 
@@ -30,14 +31,12 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!validateEmail(email)) {
       return new Response(
         JSON.stringify(badRequestResponse("Invalid email format")),
-        { status: 400 },
+        { status: 400 }
       );
     }
-
     // Check if email is already in use
     const existingUser = await getUserByEmail(email);
     if (existingUser && existingUser.id !== user.id) {

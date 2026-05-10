@@ -89,15 +89,40 @@ export class TeamMemberService {
     return this.registry.getSpaceMemberRepository().findBySpaceId(spaceId);
   }
 
-  async addTeamMember(
-    spaceId: number,
-    userId: number,
-    roleId: number,
-  ): Promise<SpaceMember> {
-    return this.registry
-      .getSpaceMemberRepository()
-      .create(spaceId, userId, roleId);
-  }
+async addTeamMember(
+      spaceId: number,
+      userId: number,
+      roleId: number,
+    ): Promise<SpaceMember> {
+      return this.registry
+        .getSpaceMemberRepository()
+        .create(spaceId, userId, roleId);
+    }
+
+    private generateUniqueToken(): string {
+      return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    async generateInvitationToken(
+      spaceId: number,
+      email: string,
+      roleId: number,
+    ): Promise<string> {
+      const token = this.generateUniqueToken();
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+
+      await this.registry
+        .getPendingInvitationRepository()
+        .create({
+          space_id: spaceId,
+          email,
+          role_id: roleId,
+          token,
+          expires_at: expiresAt,
+        });
+
+      return token;
+    }
 
   async updateTeamMemberRole(
     memberId: number,

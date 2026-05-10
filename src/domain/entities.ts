@@ -49,6 +49,17 @@ export interface SpaceMember {
   role?: Role;
 }
 
+export interface PendingInvitation {
+  id: number;
+  space_id: number;
+  email: string;
+  role_id: number;
+  token: string;
+  expires_at: Date | string;
+  accepted_at?: Date | string | null;
+  created_at: string;
+}
+
 // ====================
 // Environments
 // ====================
