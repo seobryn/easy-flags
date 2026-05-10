@@ -27,11 +27,11 @@ if (!checkResourceExists(space, Astro, "Space")) {
 const initialLocale = lang;
 ---
 
-<BaseLayout title="Environments" includeHeader={true}>
+<BaseLayout title={`${space?.name || "Space"} - Environments`} includeHeader={true}>
   <EnvironmentsView 
     client:load 
-    spaceId={space?.id || 0} 
+    spaceId={spaceSlug} 
     initialLocale={initialLocale}
+    spaceName={space?.name}
   />
-</BaseLayout>
 </BaseLayout>

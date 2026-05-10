@@ -3,6 +3,7 @@
  */
 
 import type { APIRoute } from "astro";
+import { getUserFromContext } from "@/utils/auth";
 import { unauthorizedResponse, badRequestResponse } from "@/utils/api";
 import { SpaceService, FeatureService, LimitService } from "@application/services";
 
