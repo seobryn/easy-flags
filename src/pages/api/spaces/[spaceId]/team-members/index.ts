@@ -85,15 +85,14 @@ export const POST: APIRoute = async (context) => {
     const userRepo = registry.getUserRepository();
     let targetUser = await userRepo.findByEmail(body.email);
 
-    // If user doesn't exist, create a new account
-    if (!targetUser) {
-      targetUser = await userRepo.create({
-        username: body.email.split('@')[0],
-        email: body.email,
-        password: '',
-        is_verified: false,
-      });
-    }
+     // If user doesn't exist, create a new account
+     if (!targetUser) {
+       targetUser = await userRepo.create({
+         username: body.email.split('@')[0],
+         email: body.email,
+         is_verified: false,
+       });
+     }
 
     const token = await teamMemberService.generateInvitationToken(
       space.id,

@@ -41,7 +41,7 @@ export default function AnalyticsManager({
   initialLocale,
 }: AnalyticsManagerProps) {
   const t = useTranslate(initialLocale);
-  const [activeTab, setActiveTab] = useState<string>("flags");
+  const [activeTab, setActiveTab] = useState<TabType>("flags");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<AnalyticsFilters>({
     dateRange: {
@@ -227,7 +227,7 @@ export default function AnalyticsManager({
       )}
 
 {/* Tabs */}
-      <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="bg-slate-800/20 border-b border-slate-700 p-6">
+      <Tabs.Root value={activeTab} onValueChange={(value) => setActiveTab(value as TabType)} className="bg-slate-800/20 border-b border-slate-700 p-6">
         <Tabs.List className="flex gap-3 flex-wrap">
           <Tabs.Trigger
             value="flags"
@@ -268,49 +268,43 @@ export default function AnalyticsManager({
           )}
         </Tabs.List>
 
-        {/* Content */}
-        <Tabs.Content value="flags" className="p-6">
-          <FlagMetricsView
-            userId={userId}
-            filters={filters}
-            onFilterChange={setFilters}
-            initialLocale={initialLocale}
-          />
-        </Tabs.Content>
-        <Tabs.Content value="audit" className="p-6">
-          <AuditLogsView
-            userId={userId}
-            filters={filters}
-            onFilterChange={setFilters}
-            initialLocale={initialLocale}
-          />
-        </Tabs.Content>
-        <Tabs.Content value="performance" className="p-6">
-          <PerformanceMetricsView
-            userId={userId}
-            filters={filters}
-            onFilterChange={setFilters}
-            initialLocale={initialLocale}
-          />
-        </Tabs.Content>
-        <Tabs.Content value="compliance" className="p-6">
-          <ComplianceReportsView
-            userId={userId}
-            filters={filters}
-            onFilterChange={setFilters}
-            initialLocale={initialLocale}
-          />
-        </Tabs.Content>
-        {isAdmin && (
-          <Tabs.Content value="comparison" className="p-6">
-            <ComparisonView
-              userId={userId}
-              filters={filters}
-              onFilterChange={setFilters}
-              initialLocale={initialLocale}
-            />
-          </Tabs.Content>
-        )}
+         {/* Content */}
+         <Tabs.Content value="flags" className="p-6">
+           <FlagMetricsView
+             userId={userId}
+             filters={filters}
+             initialLocale={initialLocale}
+           />
+         </Tabs.Content>
+         <Tabs.Content value="audit" className="p-6">
+           <AuditLogsView
+             userId={userId}
+             filters={filters}
+             initialLocale={initialLocale}
+           />
+         </Tabs.Content>
+         <Tabs.Content value="performance" className="p-6">
+           <PerformanceMetricsView
+             userId={userId}
+             filters={filters}
+             initialLocale={initialLocale}
+           />
+         </Tabs.Content>
+         <Tabs.Content value="compliance" className="p-6">
+           <ComplianceReportsView
+             userId={userId}
+             filters={filters}
+             initialLocale={initialLocale}
+           />
+         </Tabs.Content>
+         {isAdmin && (
+           <Tabs.Content value="comparison" className="p-6">
+             <ComparisonView
+               filters={filters}
+               initialLocale={initialLocale}
+             />
+           </Tabs.Content>
+         )}
       </Tabs.Root>
     </div>
   );

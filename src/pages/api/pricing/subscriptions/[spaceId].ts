@@ -10,7 +10,7 @@ import { PricingService, SpaceService } from "@application/services";
 export const prerender = false;
 
 // GET /api/pricing/subscriptions/[spaceId] - Get subscription for a space
-export const GET: APIRoute = async ({ params, ...context }) => {
+export const GET: APIRoute = async (context) => {
   const user = getUserFromContext(context);
 
   if (!user) {
@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ params, ...context }) => {
   }
 
   try {
-    const { spaceId } = params;
+    const { spaceId } = context.params;
 
     if (!spaceId || typeof spaceId !== "string") {
       return new Response(
@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ params, ...context }) => {
 
     // Verify user has access to this space
     const spaceService = new SpaceService();
-    const space = await spaceService.getSpaceById(Number(spaceId));
+    const space = await spaceService.getSpace(Number(spaceId));
 
     if (!space) {
       return new Response(

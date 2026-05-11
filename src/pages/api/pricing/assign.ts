@@ -2,8 +2,8 @@ import type { APIRoute } from 'astro';
 import { PricingService } from '@application/services';
 import { getUserFromContext } from '@/utils/auth';
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const user = getUserFromContext(locals);
+export const POST: APIRoute = async (context) => {
+  const user = getUserFromContext(context);
 
   if (!user) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -12,7 +12,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   }
 
-  const { planSlug } = await request.json();
+  const { planSlug } = await context.request.json();
 
   if (!planSlug) {
     return new Response(JSON.stringify({ error: 'planSlug is required' }), {

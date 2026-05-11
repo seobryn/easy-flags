@@ -1,5 +1,6 @@
 import React from "react";
 import type { AnalyticsFilters } from "../AnalyticsManager";
+import { Icon } from "../../shared/Icon";
 
 interface AdvancedFiltersProps {
   filters: AnalyticsFilters;
@@ -73,22 +74,18 @@ export default function AdvancedFilters({
   };
 
   const handleSeverityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as
-      | "info"
-      | "warning"
-      | "critical"
-      | undefined;
+    const value = e.target.value;
     onChange({
       ...filters,
-      severity: value === "" ? undefined : value,
+      severity: !value ? undefined : (value as "info" | "warning" | "critical"),
     });
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as "success" | "failed" | undefined;
+    const value = e.target.value;
     onChange({
       ...filters,
-      status: value === "" ? undefined : value,
+      status: !value ? undefined : (value as "success" | "failed"),
     });
   };
 
@@ -121,13 +118,13 @@ export default function AdvancedFilters({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-semibold">Advanced Filters</h3>
         {activeFilterCount > 0 && (
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm font-medium transition-colors"
-          >
-            <X className="w-4 h-4" />
-            Reset Filters ({activeFilterCount})
-          </button>
+           <button
+             onClick={handleReset}
+             className="flex items-center gap-2 px-3 py-1 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded text-sm font-medium transition-colors"
+           >
+             <Icon name="X" size={16} />
+             Reset Filters ({activeFilterCount})
+           </button>
         )}
       </div>
 

@@ -262,14 +262,14 @@ export default function PlanUsageDashboard({
                </div>
              </div>
 
-             {/* Export Button - Simple version */}
-             <button
-               onClick={exportUsageData}
-               className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-bold text-sm transition-colors shadow-lg"
-             >
-               <Icon name="CloudDownload" size={16} />
-               {t('billing.exportUsage')}
-             </button>
+              {/* Export Button - Simple version */}
+              <button
+                onClick={exportUsageData}
+                className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-bold text-sm transition-colors shadow-lg"
+              >
+                <Icon name="RefreshCw" size={16} />
+                {t('billing.exportUsage')}
+              </button>
            </div>
         </div>
 

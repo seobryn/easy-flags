@@ -4,7 +4,7 @@ import { Icon } from "@/components/react/shared/Icon";
 import { useAuth } from "@/infrastructure/auth/context";
 
 const AcceptInvitation = () => {
-  const { t } = useTranslate();
+  const t = useTranslate();
   const { user, isLoading: isAuthLoading } = useAuth();
   const [token, setToken] = useState("");
   const [error, setError] = useState("");

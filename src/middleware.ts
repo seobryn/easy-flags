@@ -61,10 +61,12 @@ export const onError = defineMiddleware(async (context, error) => {
     const { captureError } = await import("./lib/sentry");
     const msg = error instanceof Error ? error.message : String(error);
     console.error("❌ Server error:", msg);
-    captureError(error, {
-      url: context.url.pathname,
-      method: context.request.method,
-    });
+    if (error instanceof Error) {
+      captureError(error, {
+        url: context.url.pathname,
+        method: context.request.method,
+      });
+    }
   } catch {
     // Sentry not available, just log
   }

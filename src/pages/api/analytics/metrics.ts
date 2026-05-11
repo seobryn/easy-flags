@@ -80,7 +80,7 @@ export const GET: APIRoute = async (context) => {
       limit: 1000,
     };
 
-    let data;
+    let data: any[] | Record<string, any> = [];
 
     switch (metricType) {
       case "evaluations":

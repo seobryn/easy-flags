@@ -4,6 +4,7 @@ import { Icon } from "../shared/Icon";
 interface BillingSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   loading?: boolean;
+  placeholder?: string;
   options: { value: string; label: string; flag?: string }[];
 }
 

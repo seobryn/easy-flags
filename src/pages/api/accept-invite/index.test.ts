@@ -13,7 +13,7 @@ vi.mock("@/utils/auth", () => ({
 vi.mock("@application/services", () => {
   const mockAddTeamMember = vi.fn().mockResolvedValue({ id: 1, space_id: 1, user_id: 1, role_id: 4, created_at: new Date().toISOString() });
   
-  const TeamMemberService = vi.fn().mockImplementation(function() {
+  const TeamMemberService = vi.fn(function(this: any) {
     this.addTeamMember = mockAddTeamMember;
   });
   
@@ -65,7 +65,11 @@ describe("POST /api/accept-invite", () => {
   });
 
   it("should return 400 if the token is invalid or expired", async () => {
-    vi.mocked(getUserFromContext).mockReturnValue({ id: 1 });
+    vi.mocked(getUserFromContext).mockReturnValue({ 
+      id: 1, 
+      username: "testuser",
+      email: "test@example.com"
+    });
     vi.mocked(getRepositoryRegistry).mockReturnValue({
       getPendingInvitationRepository: vi.fn().mockReturnValue({
         findByToken: vi.fn().mockResolvedValue(null),
@@ -73,7 +77,7 @@ describe("POST /api/accept-invite", () => {
       getUserRepository: vi.fn().mockReturnValue({
         findByEmail: vi.fn().mockResolvedValue(null),
       }),
-    });
+    } as any);
 
     const context = {
       params: {},
@@ -88,7 +92,11 @@ describe("POST /api/accept-invite", () => {
   });
 
   it("should return 200 if the invitation is accepted successfully", async () => {
-    vi.mocked(getUserFromContext).mockReturnValue({ id: 1 });
+    vi.mocked(getUserFromContext).mockReturnValue({ 
+      id: 1, 
+      username: "testuser",
+      email: "test@example.com"
+    });
     vi.mocked(getRepositoryRegistry).mockReturnValue({
       getPendingInvitationRepository: vi.fn().mockReturnValue({
         findByToken: vi.fn().mockResolvedValue({
@@ -108,7 +116,7 @@ describe("POST /api/accept-invite", () => {
           email: "test@example.com",
         }),
       }),
-    });
+    } as any);
 
     const context = {
       params: {},

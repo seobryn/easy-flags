@@ -55,9 +55,7 @@ describe("POST /api/spaces/[spaceId]/team-members", () => {
     // Mock prototype methods to intercept new instance calls
     vi.spyOn(TeamMemberService.prototype, 'generateInvitationToken').mockImplementation(mockGenerateInvitationToken);
     vi.spyOn(SpaceService.prototype, 'getSpaceBySlug').mockImplementation(mockGetSpaceBySlug);
-    vi.spyOn(EmailService, 'getInstance').mockReturnValue({
-      sendTeamInvitationEmail: mockSendTeamInvitationEmail,
-    });
+    vi.spyOn(EmailService.prototype, 'sendTeamInvitationEmail').mockImplementation(mockSendTeamInvitationEmail);
     
     // Mock the registry
     vi.mocked(getRepositoryRegistry).mockReturnValue({
@@ -83,7 +81,11 @@ describe("POST /api/spaces/[spaceId]/team-members", () => {
   });
 
   it("should return 404 if the space is not found", async () => {
-    vi.mocked(getUserFromContext).mockReturnValue({ id: 1 });
+    vi.mocked(getUserFromContext).mockReturnValue({ 
+      id: 1, 
+      username: "testuser",
+      email: "test@example.com"
+    });
     mockGetSpaceBySlug.mockResolvedValue(null);
 
     const context = {
@@ -98,8 +100,15 @@ describe("POST /api/spaces/[spaceId]/team-members", () => {
   });
 
   it("should return 403 if the user is not authorized to manage team members", async () => {
-    vi.mocked(getUserFromContext).mockReturnValue({ id: 1 });
-    vi.mocked(checkSpaceAdminAuth).mockResolvedValue({ isAuthorized: false });
+    vi.mocked(getUserFromContext).mockReturnValue({ 
+      id: 1, 
+      username: "testuser",
+      email: "test@example.com"
+    });
+    vi.mocked(checkSpaceAdminAuth).mockResolvedValue({ 
+      isAuthorized: false,
+      user: null 
+    });
     mockGetSpaceBySlug.mockResolvedValue({
       id: 1,
       name: "Test Space",
@@ -119,8 +128,19 @@ describe("POST /api/spaces/[spaceId]/team-members", () => {
   });
 
   it("should return 201 if the team member is added successfully", async () => {
-    vi.mocked(getUserFromContext).mockReturnValue({ id: 1 });
-    vi.mocked(checkSpaceAdminAuth).mockResolvedValue({ isAuthorized: true });
+    vi.mocked(getUserFromContext).mockReturnValue({ 
+      id: 1, 
+      username: "testuser",
+      email: "test@example.com"
+    });
+    vi.mocked(checkSpaceAdminAuth).mockResolvedValue({ 
+      isAuthorized: true,
+      user: {
+        id: 1,
+        username: "testuser",
+        email: "test@example.com"
+      }
+    });
     mockGetSpaceBySlug.mockResolvedValue({
       id: 1,
       name: "Test Space",

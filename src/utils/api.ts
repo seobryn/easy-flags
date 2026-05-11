@@ -55,6 +55,17 @@ export function forbiddenResponse(): ApiResponse {
   return errorResponse("Forbidden", HTTP_STATUS.FORBIDDEN);
 }
 
-export function badRequestResponse(message: string): ApiResponse {
-  return errorResponse(message, HTTP_STATUS.BAD_REQUEST);
+export function badRequestResponse(
+  message: string,
+  code?: string,
+  errors?: unknown,
+): ApiResponse {
+  const response = errorResponse(message, HTTP_STATUS.BAD_REQUEST);
+  if (code) {
+    (response as any).code = code;
+  }
+  if (errors) {
+    (response as any).errors = errors;
+  }
+  return response;
 }

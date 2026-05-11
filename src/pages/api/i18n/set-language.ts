@@ -6,7 +6,7 @@ export const GET: APIRoute = async ({ url, cookies, redirect }) => {
   const lang = url.searchParams.get("lang");
   const redirectTo = url.searchParams.get("redirect") || "/";
 
-  if (lang && translations[lang as any]) {
+  if (lang && lang in translations) {
     // Set cookie for 1 year
     cookies.set("lang", lang, {
       path: "/",

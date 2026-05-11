@@ -67,6 +67,7 @@ describe("PaymentService", () => {
         email: "test@example.com",
         role_id: 1,
         is_active: true,
+        is_verified: true,
         created_at: "",
         updated_at: ""
       };

@@ -97,7 +97,7 @@ export function hasFeatureAccess(
   if (user.role_id === ROLES.SUPER_USER) return true;
 
   // Check default feature permissions by role
-  const allowedFeatures = DEFAULT_FEATURE_PERMISSIONS[user.role_id];
+  const allowedFeatures = DEFAULT_FEATURE_PERMISSIONS[user.role_id as keyof typeof DEFAULT_FEATURE_PERMISSIONS];
   return allowedFeatures ? allowedFeatures.includes(feature) : false;
 }
 

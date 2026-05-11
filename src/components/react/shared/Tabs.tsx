@@ -17,7 +17,7 @@ interface TabsProps {
 
 export function Tabs({ tabs, defaultTab, className = "" }: TabsProps) {
   return (
-    <TabsPrimitive.Root defaultTab={defaultTab || tabs[0]?.id} className={className}>
+    <TabsPrimitive.Root defaultValue={defaultTab || tabs[0]?.id} className={className}>
       <TabsPrimitive.List className="flex gap-2 flex-wrap">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger

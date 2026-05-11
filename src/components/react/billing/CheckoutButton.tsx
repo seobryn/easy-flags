@@ -227,16 +227,15 @@ function CustomerDataModal({
                   onChange={(e) =>
                     setFormData({ ...formData, phoneNumber: e.target.value })
                   }
-                  placeholder="3001234567"
-                  prefix={
-                    <PhonePrefixSelector
-                      countries={countries}
-                      selectedCountry={formData.country}
-                      phonePrefix={formData.phoneNumberPrefix}
-                      onCountryChange={handleCountryChange}
-                      initialLocale={initialLocale}
-                    />
-                  }
+                   placeholder="3001234567"
+                   prefix={
+                     <PhonePrefixSelector
+                       countries={countries}
+                       selectedCountry={formData.country}
+                       phonePrefix={formData.phoneNumberPrefix}
+                       onCountryChange={handleCountryChange}
+                     />
+                   }
                 />
 
                 <div className="grid grid-cols-3 gap-6">
@@ -584,7 +583,7 @@ export default function CheckoutButton({
       const userResponse = await fetch("/api/auth/me", {
         credentials: "include",
       });
-      if (!userResponse.ok && action !== "login") {
+      if (!userResponse.ok) {
         window.location.href = `/login?redirect=${encodeURIComponent(
           window.location.pathname
         )}`;

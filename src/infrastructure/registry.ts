@@ -27,6 +27,7 @@ import type {
   PricingPlanFeatureRepository,
   PricingPlanLimitRepository,
   UserSubscriptionRepository,
+  PaymentRepository,
 } from "@application/ports/repositories";
 import { LibSqlUserRepository } from "./adapters/libsql.adapter";
 import { LibSqlRoleRepository } from "./adapters/libsql.adapter";

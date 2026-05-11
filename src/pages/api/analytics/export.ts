@@ -27,8 +27,8 @@ export const POST: APIRoute = async (context) => {
     const body = (await context.request.json()) as ExportRequest;
     const { tab, filters } = body;
 
-    // Handle different tabs
-    const exportData = await getExportData(tab, filters, user.id);
+     // Handle different tabs
+     const exportData = await getExportData(tab, filters, user.id.toString());
 
     return new Response(JSON.stringify(exportData), {
       status: 200,

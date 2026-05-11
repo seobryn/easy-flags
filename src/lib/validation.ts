@@ -86,7 +86,7 @@ export function validationErrorResponse(errors: ValidationError[]): Response {
   );
 }
 
-export const authSchemas = {
+export const authSchemas: { login: ValidationSchema; register: ValidationSchema } = {
   login: {
     username: [{ type: "required", message: "Username is required" }],
     password: [{ type: "required", message: "Password is required" }],

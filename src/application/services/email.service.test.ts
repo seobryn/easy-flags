@@ -13,7 +13,9 @@ describe("EmailService", () => {
     mockGateway = {
       sendEmail: vi.fn().mockResolvedValue(undefined),
     };
-    emailService = new EmailService(mockGateway);
+    // Use reflection to set the private instance for testing
+    emailService = EmailService.getInstance();
+    (emailService as any).gateway = mockGateway;
   });
 
   describe("sendTeamInvitationEmail", () => {

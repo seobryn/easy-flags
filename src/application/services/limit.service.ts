@@ -185,7 +185,7 @@ export class LimitService {
     
     let sql = `SELECT COUNT(*) as count FROM flag_evaluations 
                WHERE created_at BETWEEN ? AND ?`;
-    let args = [periodStart.toISOString(), periodEnd.toISOString()];
+    let args: (string | number)[] = [periodStart.toISOString(), periodEnd.toISOString()];
     
     if (spaceId) {
       sql += " AND space_id = ?";
@@ -199,7 +199,7 @@ export class LimitService {
         args: [userId, userId],
       });
       
-      const spaceIds = spacesResult.rows.map(row => row.id);
+      const spaceIds = spacesResult.rows.map(row => row.id).filter((id): id is number => id !== null);
       if (spaceIds.length > 0) {
         sql += ` AND space_id IN (${spaceIds.map(() => "?").join(",")})`;
         args.push(...spaceIds);

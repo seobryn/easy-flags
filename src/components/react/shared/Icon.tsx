@@ -59,6 +59,7 @@ export type IconName =
   | "Clock"
   | "X"
   | "Lock"
+  | "LockOpen"
   | "Eye"
   | "EyeOff"
   | "Trash"

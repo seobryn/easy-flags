@@ -37,9 +37,9 @@ export default function SpaceNavigation({
             className="group flex items-center gap-2 text-slate-500 hover:text-cyan-400 text-[10px] font-bold uppercase tracking-[0.3em] mb-6 transition-all"
           >
             <Icon
-              name="ArrowLeft"
+              name="ArrowRight"
               size={12}
-              className="transition-transform group-hover:-translate-x-1"
+              className="transition-transform group-hover:-translate-x-1 rotate-180"
             />
             {t("spaces.backToSpace")}
           </a>

@@ -1,7 +1,7 @@
 import React from "react";
 import { Icon } from "../shared/Icon";
 
-interface BillingInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface BillingInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
   label: string;
   icon?: string;
   prefix?: React.ReactNode;

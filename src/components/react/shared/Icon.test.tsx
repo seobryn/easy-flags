@@ -31,7 +31,7 @@ describe('Icon Component', () => {
     });
 
     it('should render nothing if name is invalid', () => {
-        const { container } = render(<Icon name="InvalidIcon" as any />);
+        const { container } = render(<Icon name={"InvalidIcon" as any} />);
         expect(container.firstChild).toBeNull();
     });
 });
