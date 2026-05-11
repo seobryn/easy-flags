@@ -1,10 +1,9 @@
 import type { APIRoute } from "astro";
-import { setAuthCookie, signToken } from "@/utils/auth";
+import { setAuthCookie, setRefreshTokenCookie, signToken, createRefreshToken } from "@/utils/auth";
 import { successResponse, badRequestResponse } from "@/utils/api";
 import { getSafeRedirectUrl } from "@/utils/redirect";
 import { verifyCredentials } from "@/lib/auth-service";
 import { validateBody, authSchemas, validationErrorResponse } from "@/lib/validation";
-import { validateEmail } from "@/domain/validators/email.validator";
 import {
   checkRateLimit,
   getRateLimitConfig,
@@ -72,11 +71,6 @@ export const POST: APIRoute = async (context) => {
 
     const { username, password, redirectUrl } = body;
 
-    if (!validateEmail(username)) {
-      return new Response(
-        JSON.stringify(badRequestResponse("Invalid email format"))
-      )
-    }
     const validation = validateBody(body, authSchemas.login);
     if (validation) {
       return validationErrorResponse(validation.errors);
@@ -111,8 +105,12 @@ export const POST: APIRoute = async (context) => {
       token_version: user.token_version,
     });
 
-    // Set authentication cookie
+    // Create refresh token
+    const refreshToken = await createRefreshToken(user.id);
+
+    // Set authentication cookies
     setAuthCookie(context, token);
+    setRefreshTokenCookie(context, refreshToken);
 
     console.log(`✅ Login successful for user: ${username} (ID: ${user.id})`);
 
@@ -126,6 +124,8 @@ export const POST: APIRoute = async (context) => {
             role_id: user.role_id,
           },
           token,
+          refreshToken,
+          expiresIn: 3600,
           redirectUrl: sanitizedRedirectUrl,
         })
       ),

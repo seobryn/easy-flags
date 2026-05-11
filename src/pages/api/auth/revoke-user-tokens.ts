@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getUserFromContext, isSuperUser } from "@/utils/auth";
+import { getUserFromContextWithVersionCheck, isSuperUser } from "@/utils/auth";
 import { revokeUserTokens, getUserById } from "@/lib/auth-service";
 import {
   successResponse,
@@ -18,8 +18,8 @@ export const prerender = false;
  */
 export const POST: APIRoute = async (context) => {
   try {
-    // Check authentication
-    const user = getUserFromContext(context);
+    // Check authentication (including token_version check to detect revoked tokens)
+    const user = await getUserFromContextWithVersionCheck(context);
     if (!user) {
       return new Response(JSON.stringify(unauthorizedResponse()), {
         status: 401,

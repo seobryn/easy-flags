@@ -165,10 +165,10 @@ export async function verifyCredentials(
     const db = await getDatabase();
     console.log(`✅ Database connection established`);
 
-    // Get user with password hash
+    // Get user with password hash (check by username or email)
     const result = await db.execute({
-      sql: "SELECT id, username, email, password_hash, role_id, is_active, is_verified, token_version, created_at, updated_at FROM users WHERE LOWER(username) = LOWER(?) AND is_active = 1",
-      args: [username],
+      sql: "SELECT id, username, email, password_hash, role_id, is_active, is_verified, token_version, created_at, updated_at FROM users WHERE (LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)) AND is_active = 1",
+      args: [username, username],
     });
 
     console.log(`📊 Query result rows: ${result.rows.length}`);
